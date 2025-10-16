@@ -28,7 +28,9 @@ abstract class Character {
 class Zor extends Character {
     public Zor() {
         super("Zor", 800, 120, "Energy", "A former deep-cover operative, Zor's training focused on infiltration and espionage. He was one of the few who, due to a rare genetic anomaly, was naturally immune to the vaccine's effects. He uses his enhanced skills to fight for a government that abandoned its people, his only motivation a desire to see justice served.");
-
+        skills.add(new Skill("Sword Slash", 50, 0));
+        skills.add(new Skill("High-Jump", 0, 20));
+        skills.add(new Skill("Stealth", 0, 5));
     }
     
     @Override
@@ -43,7 +45,9 @@ class Zor extends Character {
 class Leo extends Character {
     public Leo() {
         super("Leo", 1500, 100, "Stamina", "Leo was a combat medic on the front lines when the pandemic hit. He was among the first to be administered the vaccine, but it had no effect on him due to his unique genetics. The trauma of losing his entire unit when the Reavers first emerged fuels his relentless drive to protect others.");
-
+        skills.add(new Skill("Overhead Strike", 300, 25));
+        skills.add(new Skill("Basic Block", 0, 10));
+        skills.add(new Skill("Crowd Control", 100, 60));
     }
 
     @Override
@@ -58,7 +62,9 @@ class Leo extends Character {
 class Elara extends Character {
     public Elara() {
         super("Elara", 700, 200, "Battery", "A brilliant but reclusive software engineer, Elara was immune to the vaccine due to a rare blood type. She was forced to watch as her entire family, who were not immune, turned into Reavers.");
-
+        skills.add(new Skill("Piercing Arrow", 250, 50));
+        skills.add(new Skill("Precision Aim", 0, 15));
+        skills.add(new Skill("Scout", 0, 30));
     }
 
     @Override 
@@ -73,7 +79,9 @@ class Elara extends Character {
 class Kai extends Character {
     public Kai() {
         super("Kai", 950, 150, "Focus", "A former bio-hacker, Kai developed a unique neural interface that allows him to manipulate the mutated creatures' own biology. He has a complicated past, having been involved in the very corporation that created the vaccine, and seeks redemption by using his knowledge to undo the damage.");
-
+        skills.add(new Skill("Neural Shock", 150, 20));
+        skills.add(new Skill("Bio-Scan", 0, 10));
+        skills.add(new Skill("Mutagenic Surge", 300, 45));
     }
 
     @Override 
@@ -88,7 +96,9 @@ class Kai extends Character {
 class Anya extends Character {
     public Anya() {
         super("Anya", 1000, 100, "Resolve", "A former bio-hacker, Kai developed a unique neural interface that allows him to manipulate the mutated creatures' own biology. He has a complicated past, having been involved in the very corporation that created the vaccine, and seeks redemption by using his knowledge to undo the damage.");
-
+        skills.add(new Skill("Headshot", 400, 50));
+        skills.add(new Skill("Suppressive Fire", 120, 30));
+        skills.add(new Skill("Camouflage", 0, 20));
     }
 
     @Override
