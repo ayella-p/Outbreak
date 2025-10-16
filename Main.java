@@ -4,6 +4,40 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
+abstract class Character {
+    String name;
+    int maxHP;
+    int currentHP;
+    int maxResource;
+    int currentResource;
+    String resourceName;
+    String backstory;
+    List<Skill> skills = new ArrayList<>();
+
+    public Character(String name, int hp, int resource, String resourceName, String backstory) {
+        this.name = name;
+        this.maxHP = hp;
+        this.currentHP = hp;
+        this.maxResource = resource;
+        this.currentResource = resource;
+        this.resourceName = resourceName;
+        this.backstory = backstory;
+    }
+    public abstract void displaySkills();
+}
+
+class Skill {
+    String name;
+    int damage;
+    int cost;
+
+    public Skill(String name; int damage, int cost) {
+        this.name = name;
+        this.damage = damage;
+        this.cost = cost;
+    }
+}
+
 public class Main {
     public static void main(String[] args){
         Scanner scanner = new Scanner(System.in);
