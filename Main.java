@@ -1,9 +1,14 @@
  
+<<<<<<< HEAD
+=======
  
+>>>>>>> b0a0d0ca6b5384fb172b3c60263b2b4f7f708f08
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
+<<<<<<< HEAD
+=======
 abstract class Character {
     String name;
     int maxHP;
@@ -121,6 +126,7 @@ class Skill {
     }
 }
 
+>>>>>>> b0a0d0ca6b5384fb172b3c60263b2b4f7f708f08
 public class Main {
     public static void main(String[] args){
         Scanner scanner = new Scanner(System.in);
@@ -158,4 +164,8 @@ public class Main {
             System.out.println("- " + member.name);
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> b0a0d0ca6b5384fb172b3c60263b2b4f7f708f08
