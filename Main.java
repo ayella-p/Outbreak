@@ -1,5 +1,3 @@
- 
- 
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,6 +118,73 @@ class Skill {
         this.cost = cost;
     }
 }
+
+
+abstract class Enemy {
+    String name;
+    int maxHP;
+    int currentHP;
+    int damage;
+    String description;
+    
+    public Enemy(String name, int hp, int damage, String description) {
+        this.name = name;
+        this.maxHP = hp;
+        this.currentHP = hp;
+        this.damage = damage;
+        this.description = description;
+    }
+
+    public void takeDamage(int damage) {
+        this.currentHP -= damage;
+        if (this.currentHP < 0) {
+            this.currentHP = 0;
+        }
+    }
+
+    public boolean isAlive() {
+        return currentHP > 0;
+    }
+
+    public abstract void attack(Character target);
+}
+
+class Carrier extends Enemy {
+    public Carrier() {
+        super("Carrier", 50, 10, "Slow but spreads the virus.");
+    }
+
+    @Override
+    public void attack(Character target) {
+        System.out.println("The Carrier lunges at " + target.name + "!");
+        target.takeDamage(damage);
+    }
+}
+
+class Boneclaw extends Enemy {
+    public Boneclaw() {
+        super("Boneclaw", 75, 14, "Fast and lethal ambusher.");
+    }
+
+    @Override
+    public void attack(Character target) {
+        System.out.println("The Boneclaw strikes " + target.name + " with its bone blades!");
+        target.takeDamage(damage);
+    }
+}
+
+class Howler extends Enemy {
+    public Howler() {
+        super("Howler", 100, 10 , "Disorients enemies and summons more Carriers.");
+    }
+
+    @Override
+    public void attack(Character target) {
+        System.out.println("The Howler unleashes a piercing scream!");
+        target.takeDamage(damage);
+    }
+}
+
 
 public class Main {
     public static void main(String[] args){
