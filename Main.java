@@ -185,6 +185,87 @@ class Howler extends Enemy {
     }
 }
 
+abstract class Boss extends Enemy {
+    int maxMana;
+    int currentMana;
+    int skillDamageMin;
+    int skillDamageMax;
+    List<Skill> skills = new ArrayList<>();
+
+    public Boss(String name, int hp, int damage, int mana, int skillDmgMin, int skillDmgMax) {
+        super(name, hp, damage, "Boss monster.");
+        this.maxMana = mana;
+        this.currentMana = mana;
+        this.skillDamageMin = skillDmgMin;
+        this.skillDamageMax = skillDmgMax;
+    }
+
+    public abstract void useSkill(Character target);
+}
+
+class IronMaw extends Boss {
+    public IronMaw() {
+        super("General Iron Maw", 120000, 500, 10000, 4500, 7500);
+    }
+
+    @Override
+    public void useSkill(Character target) {
+        Random rand = new Random();
+        int skillChoice = rand.nextInt(3);
+        if (skillChoice == 0) {
+            System.out.println(name + " uses Jawbreaker on " + target.name + "!");
+            target.takeDamage(rand.nextInt(skillDamageMax - skillDamageMin) + skillDamageMin);
+        } else if (skillChoice == 1) {
+            System.out.println(name + " uses Iron Guard!");
+            System.out.println("His armor hardens, reducing incoming damage.");
+        } else {
+            System.out.println(name + " uses Earth Shatter, stunning all players!");
+        }
+    }
+}
+
+class Venomshade extends Boss {
+    public Venomshade() {
+        super("General Venomshade", 150000, 600, 12000, 5000, 8000);
+    }
+
+    @Override
+    public void useSkill(Character target) {
+        Random rand = new Random();
+        int skillChoice = rand.nextInt(3);
+        if (skillChoice == 0) {
+            System.out.println(name + " uses Toxic Spit on " + target.name + "!");
+            target.takeDamage(rand.nextInt(skillDamageMax - skillDamageMin) + skillDamageMin);
+        } else if (skillChoice == 1) {
+            System.out.println(name + " releases a Poison Veil!");
+            System.out.println("You are slowed and Venomshade's allies are healed.");
+        } else {
+            System.out.println(name + " uses Shadow Dash, leaving a poisonous trail!");
+        }
+    }
+}
+
+class DrAlcaraz extends Boss {
+    public DrAlcaraz() {
+        super("Dr. Severino Alcaraz", 500000, 1000, 50000, 10000, 20000);
+    }
+
+    @Override
+    public void useSkill(Character target) {
+        Random rand = new Random();
+        int skillChoice = rand.nextInt(3);
+        if (skillChoice == 0) {
+            System.out.println(name + " unleashes Plague Nova!");
+            System.out.println("Your healing is reduced by 50% for 10 seconds.");
+        } else if (skillChoice == 1) {
+            System.out.println(name + " undergoes Genetic Overdrive!");
+            System.out.println("His attack speed and damage are doubled for 15 seconds.");
+        } else {
+            System.out.println(name + " uses his ultimate, Hand of Evolution on " + target.name + "!");
+            System.out.println(target.name + " is temporarily mutated and becomes a minion!");
+        }
+    }
+}
 
 public class Main {
     public static void main(String[] args){
