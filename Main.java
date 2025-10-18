@@ -2,7 +2,7 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class Character {
+static abstract class Character {
     String name;
     int maxHP;
     int currentHP;
@@ -23,7 +23,7 @@ abstract class Character {
     }
     public abstract void displaySkills();
 }
-class Zor extends Character {
+static class Zor extends Character {
     public Zor() {
         super("Zor", 100, 70, "Energy", "A former deep-cover operative, Zor's training focused on infiltration and espionage. He was one of the few who, due to a rare genetic anomaly, was naturally immune to the vaccine's effects. He uses his enhanced skills to fight for a government that abandoned its people, his only motivation a desire to see justice served.");
         skills.add(new Skill("Sword Slash", 10, 0));
@@ -40,7 +40,7 @@ class Zor extends Character {
     }
 }
 
-class Leo extends Character {
+static class Leo extends Character {
     public Leo() {
         super("Leo", 150, 80, "Stamina", "Leo was a combat medic on the front lines when the pandemic hit. He was among the first to be administered the vaccine, but it had no effect on him due to his unique genetics. The trauma of losing his entire unit when the Reavers first emerged fuels his relentless drive to protect others.");
         skills.add(new Skill("Overhead Strike", 15, 10));
@@ -57,7 +57,7 @@ class Leo extends Character {
     }
 }
 
-class Elara extends Character {
+static class Elara extends Character {
     public Elara() {
         super("Elara", 95, 85, "Battery", "A brilliant but reclusive software engineer, Elara was immune to the vaccine due to a rare blood type. She was forced to watch as her entire family, who were not immune, turned into Reavers.");
         skills.add(new Skill("Piercing Arrow", 17, 5));
@@ -74,7 +74,7 @@ class Elara extends Character {
     }
 }
 
-class Kai extends Character {
+static class Kai extends Character {
     public Kai() {
         super("Kai", 100, 70, "Focus", "A former bio-hacker, Kai developed a unique neural interface that allows him to manipulate the mutated creatures' own biology. He has a complicated past, having been involved in the very corporation that created the vaccine, and seeks redemption by using his knowledge to undo the damage.");
         skills.add(new Skill("Neural Shock", 15, 11));
@@ -91,7 +91,7 @@ class Kai extends Character {
     }
 }
 
-class Anya extends Character {
+static class Anya extends Character {
     public Anya() {
         super("Anya", 100, 90, "Resolve", "An ex-special forces sniper, Anya is a master of stealth and long-range combat. She was on a classified mission when the vaccine was distributed, and her unique circumstances shielded her from its effects. Driven by the loss of her entire unit, she now fights to prevent anyone else from experiencing the same horror.");
         skills.add(new Skill("Headshot", 20, 15));
@@ -107,7 +107,7 @@ class Anya extends Character {
         System.out.println("3. Camouflage: Utility skill. Hides from enemies. Costs 2 " + resourceName + ".");
     }
 }
-class Skill {
+static class Skill {
     String name;
     int damage;
     int cost;
@@ -120,7 +120,7 @@ class Skill {
 }
 
 
-abstract class Enemy {
+static abstract class Enemy {
     String name;
     int maxHP;
     int currentHP;
@@ -149,7 +149,7 @@ abstract class Enemy {
     public abstract void attack(Character target);
 }
 
-class Carrier extends Enemy {
+static class Carrier extends Enemy {
     public Carrier() {
         super("Carrier", 50, 10, "Slow but spreads the virus.");
     }
@@ -161,7 +161,7 @@ class Carrier extends Enemy {
     }
 }
 
-class Boneclaw extends Enemy {
+static class Boneclaw extends Enemy {
     public Boneclaw() {
         super("Boneclaw", 75, 14, "Fast and lethal ambusher.");
     }
@@ -173,7 +173,7 @@ class Boneclaw extends Enemy {
     }
 }
 
-class Howler extends Enemy {
+static class Howler extends Enemy {
     public Howler() {
         super("Howler", 100, 10 , "Disorients enemies and summons more Carriers.");
     }
@@ -185,7 +185,7 @@ class Howler extends Enemy {
     }
 }
 
-abstract class Boss extends Enemy {
+static abstract class Boss extends Enemy {
     int maxMana;
     int currentMana;
     int skillDamageMin;
@@ -203,7 +203,7 @@ abstract class Boss extends Enemy {
     public abstract void useSkill(Character target);
 }
 
-class IronMaw extends Boss {
+static class IronMaw extends Boss {
     public IronMaw() {
         super("General Iron Maw", 120000, 500, 10000, 4500, 7500);
     }
@@ -224,7 +224,7 @@ class IronMaw extends Boss {
     }
 }
 
-class Venomshade extends Boss {
+static class Venomshade extends Boss {
     public Venomshade() {
         super("General Venomshade", 150000, 600, 12000, 5000, 8000);
     }
@@ -245,7 +245,7 @@ class Venomshade extends Boss {
     }
 }
 
-class DrAlcaraz extends Boss {
+static class DrAlcaraz extends Boss {
     public DrAlcaraz() {
         super("Dr. Severino Alcaraz", 500000, 1000, 50000, 10000, 20000);
     }
