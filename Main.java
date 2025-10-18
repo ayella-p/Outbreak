@@ -89,7 +89,6 @@ public class Main {
         detailsButtonPanel = new JPanel();
         detailsButtonPanel.setBackground(new Color(30, 30, 30));
         detailsButtonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        detailsButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5));
 
 
         charDisplayPanel.add(charNameLabel);
@@ -140,8 +139,6 @@ public class Main {
              detailsButtonPanel.removeAll();
         }
 
-        detailsButtonPanel.revalidate();
-        detailsButtonPanel.repaint();
     }
 
     public void initializeCharacters() {
@@ -154,7 +151,7 @@ public class Main {
 
     public void createCharacterSelectionButtons() {
         JButton startButton = new JButton("START MISSION");
-        startButton.setFont(titleFont.deriveFont(Font.BOLD, 24));
+        startButton.setFont(new Font("Times New Roman", Font.BOLD, 24));
         startButton.setBackground(new Color(150, 0, 0));
         startButton.setForeground(Color.WHITE);
         startButton.setEnabled(false);
@@ -170,15 +167,7 @@ public class Main {
             charButton.setFocusPainted(false);
             
             charButton.addActionListener(e -> {
-                for(Component comp : selectionButtonsPanel.getComponents()) {
-                    if (comp instanceof JButton && !"START_BUTTON".equals(comp.getName())) {
-                        if (comp.isEnabled()) comp.setBackground(new Color(60, 60, 60)); 
-                    }
-                }
-                if(charButton.isEnabled()) {
-                    charButton.setBackground(new Color(0, 120, 180)); 
-                }
-                
+               
                 displayCharacterDetails(character, charButton);
             });
             
