@@ -1,6 +1,227 @@
-import java.util.Scanner;
+import java.awt.*;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.Random;
+import java.util.Scanner;
+
+public class Main {
+    JFrame window;
+    Container con;
+    JPanel mainTitlePanel, charDisplayPanel, selectionButtonsPanel, detailsButtonPanel;
+    JLabel mainTitleLabel, charNameLabel, charStatsLabel;
+    JTextArea charBackstoryArea; 
+
+    Font titleFont = new Font("Times New Roman", Font.BOLD, 50);
+    Font normalFont = new Font("Arial", Font.PLAIN, 16);
+    Font smallFont = new Font("Arial", Font.ITALIC, 12);
+    
+    List<Character> availableCharacters = new ArrayList<>();
+    List<Character> playerParty = new ArrayList<>();
+    int selectionCount = 0;
+    
+    private AtomicReference<Character> currentViewedCharacter = new AtomicReference<>(null);
+
+    public static void main(String[] args){
+         SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new Main();
+            }
+        });
+    }
+    public Main() {
+        initializeCharacters();
+
+        window = new JFrame();
+        window.setSize(1000, 700); 
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setTitle("OUTBREAK: Character Selection");
+        window.getContentPane().setBackground(Color.DARK_GRAY);
+        window.setLayout(new BorderLayout());
+        con = window.getContentPane();
+        
+        mainTitlePanel = new JPanel();
+        mainTitlePanel.setBackground(Color.BLACK);
+        mainTitlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
+        mainTitleLabel = new JLabel("CHOOSE YOUR SQUAD (0/3)");
+        mainTitleLabel.setForeground(Color.WHITE);
+        mainTitleLabel.setFont(titleFont);
+        mainTitlePanel.add(mainTitleLabel);
+        
+        con.add(mainTitlePanel, BorderLayout.NORTH);
+
+        charDisplayPanel = new JPanel();
+        charDisplayPanel.setLayout(new BoxLayout(charDisplayPanel, BoxLayout.Y_AXIS));
+        charDisplayPanel.setBackground(new Color(30, 30, 30));
+        charDisplayPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        charNameLabel = new JLabel(" ");
+        charNameLabel.setFont(new Font("Times New Roman", Font.BOLD, 36));
+        charNameLabel.setForeground(Color.RED);
+        charNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        charStatsLabel = new JLabel(" ");
+        charStatsLabel.setFont(normalFont);
+        charStatsLabel.setForeground(Color.LIGHT_GRAY);
+        charStatsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        charBackstoryArea = new JTextArea(" ");
+        charBackstoryArea.setFont(normalFont);
+        charBackstoryArea.setForeground(Color.LIGHT_GRAY);
+        charBackstoryArea.setBackground(new Color(30, 30, 30));
+        
+        charBackstoryArea.setWrapStyleWord(true);
+        charBackstoryArea.setLineWrap(true);
+        charBackstoryArea.setEditable(false);
+        charBackstoryArea.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        charBackstoryArea.setMaximumSize(new Dimension(500, 100)); 
+        charBackstoryArea.setPreferredSize(new Dimension(500, 100)); 
+
+        JPanel textAreaWrapper = new JPanel();
+        textAreaWrapper.setLayout(new GridBagLayout());
+        textAreaWrapper.setBackground(new Color(30, 30, 30));
+        textAreaWrapper.add(charBackstoryArea);
+        textAreaWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        detailsButtonPanel = new JPanel();
+        detailsButtonPanel.setBackground(new Color(30, 30, 30));
+        detailsButtonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        detailsButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5));
+
+
+        charDisplayPanel.add(charNameLabel);
+        charDisplayPanel.add(Box.createVerticalStrut(10));
+        charDisplayPanel.add(charStatsLabel);
+        charDisplayPanel.add(Box.createVerticalStrut(20));
+        charDisplayPanel.add(textAreaWrapper);
+        charDisplayPanel.add(Box.createVerticalStrut(10));
+        charDisplayPanel.add(detailsButtonPanel); 
+        
+        con.add(charDisplayPanel, BorderLayout.CENTER);
+        
+        
+        selectionButtonsPanel = new JPanel();
+        selectionButtonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        selectionButtonsPanel.setBackground(Color.DARK_GRAY);
+        
+        createCharacterSelectionButtons();
+        
+        con.add(selectionButtonsPanel, BorderLayout.SOUTH);
+        
+        window.setLocationRelativeTo(null);
+        window.setVisible(true);
+    }
+
+    public void displayCharacterDetails(Character c, JButton sourceButton) {
+        charNameLabel.setText(c.name.toUpperCase());
+        charStatsLabel.setText("HP: " + c.maxHP + " | " + c.resourceName + ": " + c.maxResource);
+        charBackstoryArea.setText(c.backstory);
+        currentViewedCharacter.set(c); 
+        
+        updateDetailsButtonPanel(c, sourceButton);
+    }
+
+    void updateDetailsButtonPanel(Character c, JButton sourceButton) {
+        detailsButtonPanel.removeAll();
+        JButton selectButton = new JButton("SELECT " + c.name.toUpperCase());
+        selectButton.setFont(normalFont.deriveFont(Font.BOLD));
+
+      if (selectionCount < 3) {
+            selectButton.setBackground(new Color(0, 150, 0));
+            selectButton.setForeground(Color.WHITE);
+            
+            selectButton.addActionListener(e -> selectCharacter(sourceButton, c));
+            detailsButtonPanel.add(selectButton);
+            
+        } else {
+             detailsButtonPanel.removeAll();
+        }
+
+        detailsButtonPanel.revalidate();
+        detailsButtonPanel.repaint();
+    }
+
+    public void initializeCharacters() {
+        availableCharacters.add(new Zor());
+        availableCharacters.add(new Leo());
+        availableCharacters.add(new Elara());
+        availableCharacters.add(new Kai());
+        availableCharacters.add(new Anya());
+    }
+
+    public void createCharacterSelectionButtons() {
+        JButton startButton = new JButton("START MISSION");
+        startButton.setFont(titleFont.deriveFont(Font.BOLD, 24));
+        startButton.setBackground(new Color(150, 0, 0));
+        startButton.setForeground(Color.WHITE);
+        startButton.setEnabled(false);
+        startButton.addActionListener(e -> startGame());
+        startButton.setName("START_BUTTON"); 
+        selectionButtonsPanel.add(startButton);
+
+        for (Character character : availableCharacters) {
+            JButton charButton = new JButton(character.name);
+            charButton.setFont(normalFont);
+            charButton.setBackground(new Color(60, 60, 60));
+            charButton.setForeground(Color.WHITE);
+            charButton.setFocusPainted(false);
+            
+            charButton.addActionListener(e -> {
+                for(Component comp : selectionButtonsPanel.getComponents()) {
+                    if (comp instanceof JButton && !"START_BUTTON".equals(comp.getName())) {
+                        if (comp.isEnabled()) comp.setBackground(new Color(60, 60, 60)); 
+                    }
+                }
+                if(charButton.isEnabled()) {
+                    charButton.setBackground(new Color(0, 120, 180)); 
+                }
+                
+                displayCharacterDetails(character, charButton);
+            });
+            
+            selectionButtonsPanel.add(charButton, selectionButtonsPanel.getComponentCount() - 1); // Insert before START
+        }
+    }
+    
+    public void selectCharacter(JButton button, Character c) {
+        if (selectionCount < 3 && !playerParty.contains(c)) {
+            playerParty.add(c);
+            selectionCount++;
+            mainTitleLabel.setText("CHOOSE YOUR SQUAD (" + selectionCount + "/3)");
+           
+            button.setEnabled(false);
+            button.setBackground(Color.GRAY);
+            button.setText(c.name + " (SELECTED)");
+  
+            displayCharacterDetails(c, button);
+
+            if (selectionCount == 3) {
+                for (Component comp : selectionButtonsPanel.getComponents()) {
+                   
+                    if (comp instanceof JButton) {
+                        JButton btn = (JButton) comp;
+                        
+                        if ("START_BUTTON".equals(btn.getName())) { 
+                            btn.setEnabled(true);
+                            btn.setBackground(new Color(0, 150, 0));
+                            break; 
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    public void startGame() {
+    	charNameLabel.setText("START GAME!");
+    	charStatsLabel.setText(" ");
+        charBackstoryArea.setText(" ");
+    }
+
+
 
 static abstract class Character {
     String name;
@@ -21,7 +242,12 @@ static abstract class Character {
         this.resourceName = resourceName;
         this.backstory = backstory;
     }
-    public abstract void displaySkills();
+    public void takeDamage(int damage) {
+            this.currentHP -= damage;
+            if (this.currentHP < 0) {
+                this.currentHP = 0;
+            }
+        }
 }
 static class Zor extends Character {
     public Zor() {
@@ -31,13 +257,7 @@ static class Zor extends Character {
         skills.add(new Skill("Stealth", 0, 3));
     }
     
-    @Override
-    public void displaySkills() {
-        System.out.println("Zor's Skiils:");
-        System.out.println("1. Sword Slash: Deals 100 damage. No energy cost" + resourceName + " cost.");
-        System.out.println("2. High-Jump: Utility skill. Costs 5 " + resourceName + ".");
-        System.out.println("3. Stealth: Utility skill. Costs 3 " + resourceName + " per turn.");
-    }
+   
 }
 
 static class Leo extends Character {
@@ -48,13 +268,7 @@ static class Leo extends Character {
         skills.add(new Skill("Crowd Control", 10, 3));
     }
 
-    @Override
-    public void displaySkills() {
-        System.out.println("Leo's Skiils:");
-        System.out.println("1. Overhead Strike: Deals 15 damage. Costs 105  " + resourceName + ".");
-        System.out.println("2. Basic Block: Reduces incoming damage. Costs 5 " + resourceName + ".");
-        System.out.println("3. Crowd Control (Roar/Stomp): Deals 10 damage to all enemies and stuns them for 3s. Costs 3" + resourceName + " per turn.");
-    }
+    
 }
 
 static class Elara extends Character {
@@ -65,13 +279,6 @@ static class Elara extends Character {
         skills.add(new Skill("Scout", 0, 3));
     }
 
-    @Override 
-    public void displaySkills() {
-        System.out.println("Elara's Skills:");
-        System.out.println("1. Piercing Arrow: Deals 17 damage. Costs 5 " + resourceName + ".");
-        System.out.println("2. Precision Aim: Utility skill. Costs 5 " + resourceName + " per turn.");
-        System.out.println("3. Scout: Utility skill. Costs 3 " + resourceName + " to deploy.");
-    }
 }
 
 static class Kai extends Character {
@@ -82,13 +289,7 @@ static class Kai extends Character {
         skills.add(new Skill("Mutagenic Surge", 20, 15));
     }
 
-    @Override 
-    public void displaySkills() {
-        System.out.println("Kai's Skills:");
-        System.out.println("1. Neutral Shock: Deals 15 damage. Has a chance to stun. Costs 11 " + resourceName + ".");
-        System.out.println("2. Bio-Scan: Utility skill. Reveals enemy weak points. Costs 5 " + resourceName + ".");
-        System.out.println("3. Mutagenic Surge: Deals 20 damage and debuffs enemy defenses. Costs 15 " + resourceName + ".");
-    }
+    
 }
 
 static class Anya extends Character {
@@ -99,13 +300,7 @@ static class Anya extends Character {
         skills.add(new Skill("Camouflage", 0, 2));
     }
 
-    @Override
-    public void displaySkills() {
-        System.out.println("Anya's Skills:");
-        System.out.println("1. Headshot: Deals 20 damage. High single-target damage. Costs 15 " + resourceName + ".");
-        System.out.println("2. Suppressive Fire: Deals 10 damage to multiple enemies. Costs 5 " + resourceName + ".");
-        System.out.println("3. Camouflage: Utility skill. Hides from enemies. Costs 2 " + resourceName + ".");
-    }
+    
 }
 static class Skill {
     String name;
@@ -155,10 +350,7 @@ static class Carrier extends Enemy {
     }
 
     @Override
-    public void attack(Character target) {
-        System.out.println("The Carrier lunges at " + target.name + "!");
-        target.takeDamage(damage);
-    }
+        public void attack(Character target) { target.takeDamage(damage); }
 }
 
 static class Boneclaw extends Enemy {
@@ -167,10 +359,7 @@ static class Boneclaw extends Enemy {
     }
 
     @Override
-    public void attack(Character target) {
-        System.out.println("The Boneclaw strikes " + target.name + " with its bone blades!");
-        target.takeDamage(damage);
-    }
+        public void attack(Character target) { target.takeDamage(damage); }
 }
 
 static class Howler extends Enemy {
@@ -179,129 +368,8 @@ static class Howler extends Enemy {
     }
 
     @Override
-    public void attack(Character target) {
-        System.out.println("The Howler unleashes a piercing scream!");
-        target.takeDamage(damage);
-    }
+    public void attack(Character target) {target.takeDamage(damage);}
+
 }
 
-static abstract class Boss extends Enemy {
-    int maxMana;
-    int currentMana;
-    int skillDamageMin;
-    int skillDamageMax;
-    List<Skill> skills = new ArrayList<>();
-
-    public Boss(String name, int hp, int damage, int mana, int skillDmgMin, int skillDmgMax) {
-        super(name, hp, damage, "Boss monster.");
-        this.maxMana = mana;
-        this.currentMana = mana;
-        this.skillDamageMin = skillDmgMin;
-        this.skillDamageMax = skillDmgMax;
-    }
-
-    public abstract void useSkill(Character target);
-}
-
-static class IronMaw extends Boss {
-    public IronMaw() {
-        super("General Iron Maw", 120000, 500, 10000, 4500, 7500);
-    }
-
-    @Override
-    public void useSkill(Character target) {
-        Random rand = new Random();
-        int skillChoice = rand.nextInt(3);
-        if (skillChoice == 0) {
-            System.out.println(name + " uses Jawbreaker on " + target.name + "!");
-            target.takeDamage(rand.nextInt(skillDamageMax - skillDamageMin) + skillDamageMin);
-        } else if (skillChoice == 1) {
-            System.out.println(name + " uses Iron Guard!");
-            System.out.println("His armor hardens, reducing incoming damage.");
-        } else {
-            System.out.println(name + " uses Earth Shatter, stunning all players!");
-        }
-    }
-}
-
-static class Venomshade extends Boss {
-    public Venomshade() {
-        super("General Venomshade", 150000, 600, 12000, 5000, 8000);
-    }
-
-    @Override
-    public void useSkill(Character target) {
-        Random rand = new Random();
-        int skillChoice = rand.nextInt(3);
-        if (skillChoice == 0) {
-            System.out.println(name + " uses Toxic Spit on " + target.name + "!");
-            target.takeDamage(rand.nextInt(skillDamageMax - skillDamageMin) + skillDamageMin);
-        } else if (skillChoice == 1) {
-            System.out.println(name + " releases a Poison Veil!");
-            System.out.println("You are slowed and Venomshade's allies are healed.");
-        } else {
-            System.out.println(name + " uses Shadow Dash, leaving a poisonous trail!");
-        }
-    }
-}
-
-static class DrAlcaraz extends Boss {
-    public DrAlcaraz() {
-        super("Dr. Severino Alcaraz", 500000, 1000, 50000, 10000, 20000);
-    }
-
-    @Override
-    public void useSkill(Character target) {
-        Random rand = new Random();
-        int skillChoice = rand.nextInt(3);
-        if (skillChoice == 0) {
-            System.out.println(name + " unleashes Plague Nova!");
-            System.out.println("Your healing is reduced by 50% for 10 seconds.");
-        } else if (skillChoice == 1) {
-            System.out.println(name + " undergoes Genetic Overdrive!");
-            System.out.println("His attack speed and damage are doubled for 15 seconds.");
-        } else {
-            System.out.println(name + " uses his ultimate, Hand of Evolution on " + target.name + "!");
-            System.out.println(target.name + " is temporarily mutated and becomes a minion!");
-        }
-    }
-}
-
-public class Main {
-    public static void main(String[] args){
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Welcome to OUTBBREAK!");
-        System.out.println("Choose your party of 3");
-
-        List<Character> availableCharacters = new ArrayList<>();
-        availableCharacters.add(new Zor());
-        availableCharacters.add(new Leo());
-        availableCharacters.add(new Elara());
-        availableCharacters.add(new Kai());
-        availableCharacters.add(new Anya());
-
-        List<Character> playerParty = new ArrayList<>();
-
-        for (int i = 0; i < 3; i++) {
-            System.out.println("\nAvailable Characters:");
-            for (int j = 0; j < availableCharacters.size(); j++) {
-                System.out.println((j + 1) + ". " + availableCharacters.get(j).name + " - " + availableCharacters.get(j).backstory);
-            }
-
-            System.out.print("Choose character " + (i + 1) + " (by number): ");
-            int choice = scanner.nextInt() - 1;
-            if (choice >= 0 && choice < availableCharacters.size()) {
-                playerParty.add(availableCharacters.get(choice));
-                availableCharacters.remove(choice);
-            } else {
-                System.out.println("Invalid choice. Please try again.");
-                i--;
-            }
-        }
-
-        System.out.println("\nYour Party:");
-        for (Character member : playerParty) {
-            System.out.println("- " + member.name);
-        }
-    }
 }
