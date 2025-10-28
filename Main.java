@@ -326,14 +326,13 @@ public class Main {
     
     public void startGame() {
     	mainTitlePanel.setVisible(false); 
-    selectionButtonsPanel.setVisible(false); 
+        selectionButtonsPanel.setVisible(false); 
+        cardLayout.show(cardPanel, BATTLE_PANEL);
     
-    cardLayout.show(cardPanel, BATTLE_PANEL);
+         currentEnemy = new Carrier(); 
     
-    currentEnemy = new Carrier(); 
-    
-    updateBattleUI();
-    updatePlayerStatusUI(); 
+        updateBattleUI();
+        updatePlayerStatusUI(); 
     
     if (!playerParty.isEmpty()) {
         battleLogArea.setText("A " + currentEnemy.name + " approaches!\n\n");
@@ -436,44 +435,38 @@ public class Main {
     void performSkill(Character character, Skill skill) {
        
         if (character.currentResource < skill.cost) {
-        battleLogArea.append(character.name + " tried to use " + skill.name + " but is low on " + character.resourceName + "!\n");
-        return;
-    }
+            battleLogArea.append(character.name + " tried to use " + skill.name + " but is low on " + character.resourceName + "!\n");
+            return;
+         }
     
-    if (character.currentHP <= 0) {
-         battleLogArea.append(character.name + " is knocked out and cannot act!\n");
-        return;
-    }
+        if (character.currentHP <= 0) {
+            battleLogArea.append(character.name + " is knocked out and cannot act!\n");
+            return;
+        }
 
-    character.currentResource -= skill.cost;
+        character.currentResource -= skill.cost;
 
-    int damageDealt = skill.damage;
-    currentEnemy.takeDamage(damageDealt);
+        int damageDealt = skill.damage;
+        currentEnemy.takeDamage(damageDealt);
     
-    battleLogArea.append(character.name + " uses " + skill.name + ", dealing " + damageDealt + " damage to " + currentEnemy.name + ".\n");
+        battleLogArea.append(character.name + " uses " + skill.name + ", dealing " + damageDealt + " damage to " + currentEnemy.name + ".\n");
     
-    updateBattleUI();
-    updatePlayerStatusUI(); 
+        updateBattleUI();
+        updatePlayerStatusUI(); 
 
-    if (!currentEnemy.isAlive()) {
-        battleLogArea.append("\n" + currentEnemy.name + " has been defeated!\n");
-        endBattle(true);
-        return;
-    }
-
-
-    enemyTurn();
+        if (!currentEnemy.isAlive()) {
+            battleLogArea.append("\n" + currentEnemy.name + " has been defeated!\n");
+            endBattle(true);
+                return;
+        }
+        enemyTurn();
     }
 
     void switchToCharacterTurn(Character nextCharacter) {
     
-    this.activeCharacter = nextCharacter; 
-
-    
-    battleLogArea.append("\n" + activeCharacter.name + "'s turn to act.\n");
-
-   
-    setupCharacterActionButtons(activeCharacter); 
+        this.activeCharacter = nextCharacter; 
+        battleLogArea.append("\n" + activeCharacter.name + "'s turn to act.\n");
+        setupCharacterActionButtons(activeCharacter); 
 }
     
     void enemyTurn() {
@@ -510,155 +503,5 @@ public class Main {
         JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);  
         choicesPanel.setVisible(false);
     }
-
-
-static abstract class Character {
-    String name;
-    int maxHP;
-    int currentHP;
-    int maxResource;
-    int currentResource;
-    String resourceName;
-    String backstory;
-    List<Skill> skills = new ArrayList<>();
-
-    public Character(String name, int hp, int resource, String resourceName, String backstory) {
-        this.name = name;
-        this.maxHP = hp;
-        this.currentHP = hp;
-        this.maxResource = resource;
-        this.currentResource = resource;
-        this.resourceName = resourceName;
-        this.backstory = backstory;
-    }
-    public void takeDamage(int damage) {
-            this.currentHP -= damage;
-            if (this.currentHP < 0) {
-                this.currentHP = 0;
-            }
-        }
-}
-static class Zor extends Character {
-    public Zor() {
-        super("Zor", 100, 70, "Energy", "A former deep-cover operative, Zor's training focused on infiltration and espionage. He was one of the few who, due to a rare genetic anomaly, was naturally immune to the vaccine's effects. He uses his enhanced skills to fight for a government that abandoned its people, his only motivation a desire to see justice served.");
-        skills.add(new Skill("Sword Slash", 10, 0));
-        skills.add(new Skill("High-Jump", 0, 5));
-        skills.add(new Skill("Stealth", 0, 3));
-    }
-    
-   
-}
-
-static class Leo extends Character {
-    public Leo() {
-        super("Leo", 150, 80, "Stamina", "Leo was a combat medic on the front lines when the pandemic hit. He was among the first to be administered the vaccine, but it had no effect on him due to his unique genetics. The trauma of losing his entire unit when the Reavers first emerged fuels his relentless drive to protect others.");
-        skills.add(new Skill("Overhead Strike", 15, 10));
-        skills.add(new Skill("Basic Block", 0, 5));
-        skills.add(new Skill("Crowd Control", 10, 3));
-    }
-
-    
-}
-
-static class Elara extends Character {
-    public Elara() {
-        super("Elara", 95, 85, "Battery", "A brilliant but reclusive software engineer, Elara was immune to the vaccine due to a rare blood type. She was forced to watch as her entire family, who were not immune, turned into Reavers.");
-        skills.add(new Skill("Piercing Arrow", 17, 5));
-        skills.add(new Skill("Precision Aim", 0, 5));
-        skills.add(new Skill("Scout", 0, 3));
-    }
-
-}
-
-static class Kai extends Character {
-    public Kai() {
-        super("Kai", 100, 70, "Focus", "A former bio-hacker, Kai developed a unique neural interface that allows him to manipulate the mutated creatures' own biology. He has a complicated past, having been involved in the very corporation that created the vaccine, and seeks redemption by using his knowledge to undo the damage.");
-        skills.add(new Skill("Neural Shock", 15, 11));
-        skills.add(new Skill("Bio-Scan", 0, 5));
-        skills.add(new Skill("Mutagenic Surge", 20, 15));
-    }
-
-    
-}
-
-static class Anya extends Character {
-    public Anya() {
-        super("Anya", 100, 90, "Resolve", "An ex-special forces sniper, Anya is a master of stealth and long-range combat. She was on a classified mission when the vaccine was distributed, and her unique circumstances shielded her from its effects. Driven by the loss of her entire unit, she now fights to prevent anyone else from experiencing the same horror.");
-        skills.add(new Skill("Headshot", 20, 15));
-        skills.add(new Skill("Suppressive Fire", 10, 5));
-        skills.add(new Skill("Camouflage", 0, 2));
-    }
-
-    
-}
-static class Skill {
-    String name;
-    int damage;
-    int cost;
-
-    public Skill(String name, int damage, int cost) {
-        this.name = name;
-        this.damage = damage;
-        this.cost = cost;
-    }
-}
-
-
-static abstract class Enemy {
-    String name;
-    int maxHP;
-    int currentHP;
-    int damage;
-    String description;
-    
-    public Enemy(String name, int hp, int damage, String description) {
-        this.name = name;
-        this.maxHP = hp;
-        this.currentHP = hp;
-        this.damage = damage;
-        this.description = description;
-    }
-
-    public void takeDamage(int damage) {
-        this.currentHP -= damage;
-        if (this.currentHP < 0) {
-            this.currentHP = 0;
-        }
-    }
-
-    public boolean isAlive() {
-        return currentHP > 0;
-    }
-
-    public abstract void attack(Character target);
-}
-
-static class Carrier extends Enemy {
-    public Carrier() {
-        super("Carrier", 50, 10, "Slow but spreads the virus.");
-    }
-
-    @Override
-        public void attack(Character target) { target.takeDamage(damage); }
-}
-
-static class Boneclaw extends Enemy {
-    public Boneclaw() {
-        super("Boneclaw", 75, 14, "Fast and lethal ambusher.");
-    }
-
-    @Override
-        public void attack(Character target) { target.takeDamage(damage); }
-}
-
-static class Howler extends Enemy {
-    public Howler() {
-        super("Howler", 100, 10 , "Disorients enemies and summons more Carriers.");
-    }
-
-    @Override
-    public void attack(Character target) {target.takeDamage(damage);}
-
-}
 
 }
