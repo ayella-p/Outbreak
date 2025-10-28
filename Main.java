@@ -1,5 +1,7 @@
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -183,14 +185,18 @@ public class Main {
         battleLogArea.setLineWrap(true);
         battleLogArea.setWrapStyleWord(true);
         JScrollPane scrollPane = new JScrollPane(battleLogArea);
-        scrollPane.setPreferredSize(new Dimension(800, 300));
+        scrollPane.setPreferredSize(new Dimension(500, 200));
+        EmptyBorder logBorder = new EmptyBorder(20, 20, 20, 20);
+        battleLogArea.setBorder(logBorder);
 
         centerPanel.add(scrollPane);
 
         playerStatusPanel = new JPanel();
         playerStatusPanel.setLayout(new BoxLayout(playerStatusPanel, BoxLayout.Y_AXIS));
         playerStatusPanel.setBackground(Color.BLACK);
-        
+        EmptyBorder playerStatusBorder = new EmptyBorder(10, 10, 10, 10);
+        playerStatusPanel.setBorder(playerStatusBorder);
+
         centerPanel.add(playerStatusPanel);
         panel.add(centerPanel, BorderLayout.CENTER);
         panel.setBackground(Color.BLACK);
@@ -206,6 +212,7 @@ public class Main {
     public JPanel createDirectionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.BLACK);
+        
         
         directionLabel = new JLabel("You've now faced two direction choose one.", SwingConstants.CENTER);
         directionLabel.setFont(titleFont);
@@ -329,7 +336,7 @@ public class Main {
         selectionButtonsPanel.setVisible(false); 
         cardLayout.show(cardPanel, BATTLE_PANEL);
     
-         currentEnemy = new Carrier(); 
+        currentEnemy = new Carrier(); 
     
         updateBattleUI();
         updatePlayerStatusUI(); 
@@ -337,8 +344,7 @@ public class Main {
     if (!playerParty.isEmpty()) {
         battleLogArea.setText("A " + currentEnemy.name + " approaches!\n\n");
         
-        switchToCharacterTurn(playerParty.get(0)); 
-    }
+        }
     }
 
     void updateBattleUI() {
@@ -356,32 +362,63 @@ public class Main {
             charPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             charPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-            JLabel nameLabel = new JLabel(character.name.toUpperCase());
+            JLabel nameLabel = new JLabel(character.name.toUpperCase()); // hero name 
             nameLabel.setFont(normalFont.deriveFont(Font.BOLD));
-            nameLabel.setForeground(Color.CYAN);
+            nameLabel.setForeground(Color.CYAN); 
 
-            JLabel hpLabel = new JLabel("HP: " + character.currentHP + " / " + character.maxHP);
+            JLabel hpLabel = new JLabel("HP: " + character.currentHP + " / " + character.maxHP); // hero HP
             hpLabel.setFont(normalFont);
             hpLabel.setForeground(Color.GREEN);
             if (character.currentHP <= character.maxHP * 0.25 && character.currentHP > 0) { 
-                 hpLabel.setForeground(Color.RED);
+                 hpLabel.setForeground(Color.RED); // warning 
             } else if (character.currentHP <= 0 || character.currentResource <= 0) {
                  hpLabel.setText("DEFEATED");
-                 hpLabel.setForeground(Color.GRAY);
+                 hpLabel.setForeground(Color.GRAY); // defeated 
             }
             
             JLabel resourceLabel = new JLabel(character.resourceName + ": " + character.currentResource + " / " + character.maxResource);
-            resourceLabel.setFont(normalFont);
+            resourceLabel.setFont(normalFont); // hewr
             resourceLabel.setForeground(Color.YELLOW);
 
             charPanel.add(nameLabel);
             charPanel.add(hpLabel);
             charPanel.add(resourceLabel);
+
             
             playerStatusPanel.add(charPanel);
             playerStatusPanel.add(Box.createVerticalStrut(5));  
         }
         
+        JButton switchButton = new JButton("CHOOSE CHARACTER");
+        switchButton.setFont(normalFont.deriveFont(Font.BOLD));
+        switchButton.setBackground(Color.BLACK);
+        switchButton.setForeground(Color.WHITE);
+        switchButton.addActionListener(e -> {
+            battleLogArea.append("\nChoose a character to switch to:\n");
+            for (Character character : playerParty) {
+                if (character != activeCharacter && character.currentHP > 0) { 
+                    JButton charSwitchButton = new JButton(character.name);
+                    charSwitchButton.setFont(normalFont);
+                    charSwitchButton.setBackground(new Color(60, 60, 60));
+                    charSwitchButton.setForeground(Color.WHITE);
+                    charSwitchButton.setFocusPainted(false);
+                    
+                    charSwitchButton.addActionListener(ev -> {
+                        switchToCharacterTurn(character);
+                        battleLogArea.append(activeCharacter.name + " switched to " + character.name + ".\n");
+                    });
+                    
+                    playerStatusPanel.add(charSwitchButton); 
+                    playerStatusPanel.revalidate();
+                    playerStatusPanel.repaint();
+                }
+            }
+        });
+
+
+        
+
+        playerStatusPanel.add(switchButton);
         playerStatusPanel.revalidate();
         playerStatusPanel.repaint();
     }
@@ -389,10 +426,9 @@ public class Main {
     
     void setupCharacterActionButtons(Character character) {
         battleActionPanel.removeAll();
+        boolean isDefeated = character.currentHP <= 0;
 
-    boolean canAct = character.currentHP > 0 && character.skills.stream().anyMatch(s -> s.cost <= character.currentResource);
-    
-    if (canAct) {
+    if (!isDefeated) {
         JLabel turnLabel = new JLabel(character.name.toUpperCase() + "'s Turn");
         turnLabel.setForeground(Color.YELLOW);
         turnLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
@@ -401,33 +437,19 @@ public class Main {
         for (Skill skill : character.skills) {
             JButton skillButton = new JButton(skill.name + " (" + skill.cost + " " + character.resourceName + ")");
             skillButton.setFont(normalFont);
-            
             skillButton.setEnabled(character.currentResource >= skill.cost); 
-            
+
             skillButton.addActionListener(e -> performSkill(character, skill)); 
             battleActionPanel.add(skillButton);
         }
     } else {
-        JLabel promptLabel = new JLabel(character.name.toUpperCase() + " cannot act. Choose next squad member:");
+        JLabel promptLabel = new JLabel(character.name.toUpperCase() + " is defeated. Choose next squad member");
         promptLabel.setForeground(Color.RED);
         promptLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
         battleActionPanel.add(promptLabel);
-        
-        for (Character c : playerParty) {
-            JButton selectButton = new JButton(c.name.toUpperCase());
-            selectButton.setFont(normalFont);
-            
-            boolean isAvailable = c.currentHP > 0;
-            selectButton.setEnabled(isAvailable);
-            
-            selectButton.setBackground(isAvailable ? new Color(60, 60, 60) : Color.DARK_GRAY);
-            selectButton.setForeground(Color.WHITE);
-            
-            selectButton.addActionListener(e -> switchToCharacterTurn(c));
-            battleActionPanel.add(selectButton);
-        }
     }
 
+    
     battleActionPanel.revalidate();
     battleActionPanel.repaint();
     }
@@ -460,13 +482,26 @@ public class Main {
                 return;
         }
         enemyTurn();
+        setupCharacterActionButtons(this.activeCharacter);
+        int deadCount = 0;
+        for (Character c : playerParty) {
+            if (c.currentHP <= 0 || c.currentResource <= c.currentResource * 0.25) {
+                deadCount++;
+            }
+        }
+        if (deadCount == playerParty.size()) {
+            battleLogArea.append("\nAll squad members have been defeated!\n");
+            endBattle(false);
+            return;
+        }
+
     }
 
     void switchToCharacterTurn(Character nextCharacter) {
     
         this.activeCharacter = nextCharacter; 
         battleLogArea.append("\n" + activeCharacter.name + "'s turn to act.\n");
-        setupCharacterActionButtons(activeCharacter); 
+        setupCharacterActionButtons(this.activeCharacter);
 }
     
     void enemyTurn() {
@@ -489,7 +524,13 @@ public class Main {
             mainTitlePanel.setVisible(true); 
             mainTitleLabel.setText("MISSION SUCCESSFUL!");
         } else {
-            mainTitleLabel.setText("MISSION FAILED!");
+            JPanel gameOverPanel = new JPanel();
+            gameOverPanel.setBackground(Color.BLACK);
+            JLabel gameOverLabel = new JLabel("GAME OVER");
+            gameOverLabel.setFont(titleFont);
+            gameOverLabel.setForeground(Color.RED);
+            gameOverPanel.add(gameOverLabel);
+            con.add(gameOverPanel, BorderLayout.CENTER);
         }
     }
     
