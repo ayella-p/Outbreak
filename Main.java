@@ -17,9 +17,15 @@ public class Main {
 
     JPanel cardPanel;
     CardLayout cardLayout;
+    final static String TITLE_SCREEN_PANEL = "TITLE_SCREEN";
+    final static String HOW_TO_PLAY_PANEL = "HOW_TO_PLAY";
     final static String CHARACTER_SELECT_PANEL = "CHARACTER_SELECT";
     final static String BATTLE_PANEL = "BATTLE";
     final static String DIRECTIONAL_PANEL = "DIRECTION_CHOICE";
+    final static String GAME_OVER_PANEL = "GAME_OVER";
+
+    JPanel titleScreenPanel;
+    JPanel howToPlayPanel;
 
     JPanel battlePanel, battleInfoPanel, enemyPanel, battleActionPanel;
     JLabel enemyNameLabel, enemyHPLabel;
@@ -58,22 +64,171 @@ public class Main {
         window.setLayout(new BorderLayout());
         con = window.getContentPane();
         
+        cardLayout = new CardLayout();
+        cardPanel = new JPanel(cardLayout);
+        cardPanel.setBackground(Color.BLACK);
+        con.add(cardPanel, BorderLayout.CENTER);
+
+        titleScreenPanel = createTitleScreenPanel();
+        cardPanel.add(titleScreenPanel, TITLE_SCREEN_PANEL);
+
+        howToPlayPanel = createHowToPlayPanel();
+        cardPanel.add(howToPlayPanel, HOW_TO_PLAY_PANEL);
+
+        JPanel charSelectContainer = createCharacterSelectContainer();
+        cardPanel.add(charSelectContainer, CHARACTER_SELECT_PANEL);
+
+        battlePanel = createBattlePanel(); 
+        cardPanel.add(battlePanel, BATTLE_PANEL);
+
+        directionPanel = createDirectionPanel();
+        cardPanel.add(directionPanel, DIRECTIONAL_PANEL);
+
+        cardPanel.add(createGameOverPanel(), GAME_OVER_PANEL);
+
+        cardLayout.show(cardPanel, TITLE_SCREEN_PANEL);
+
+        
+        window.setLocationRelativeTo(null);
+        window.setVisible(true);
+    }
+
+    public JPanel createTitleScreenPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.BLACK);
+
+        JLabel title = new JLabel("OUTBREAK", SwingConstants.CENTER);
+        title.setFont(titleFont.deriveFont(Font.BOLD, 80f));
+        title.setForeground(Color.RED);
+        title.setBorder(BorderFactory.createEmptyBorder(100, 0, 50, 0));
+        panel.add(title, BorderLayout.NORTH);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setBackground(Color.BLACK);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
+
+        JButton startButton = new JButton("START MISSION");
+        startButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
+        startButton.setBackground(new Color(0, 150, 0));
+        startButton.setForeground(Color.WHITE);
+        startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        startButton.setMaximumSize(new Dimension(300, 70));
+        startButton.addActionListener(e -> cardLayout.show(cardPanel, CHARACTER_SELECT_PANEL));
+
+        JButton howToPlayButton = new JButton("HOW TO PLAY");
+        howToPlayButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
+        howToPlayButton.setBackground(new Color(50, 50, 150));
+        howToPlayButton.setForeground(Color.WHITE);
+        howToPlayButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        howToPlayButton.setMaximumSize(new Dimension(300, 70));
+        howToPlayButton.addActionListener(e -> cardLayout.show(cardPanel, HOW_TO_PLAY_PANEL));
+
+        JButton quitButton = new JButton("QUIT");
+        quitButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
+        quitButton.setBackground(new Color(150, 0, 0));
+        quitButton.setForeground(Color.WHITE);
+        quitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        quitButton.setMaximumSize(new Dimension(300, 70));
+        quitButton.addActionListener(e -> System.exit(0));
+
+        buttonPanel.add(startButton);
+        buttonPanel.add(Box.createVerticalStrut(20));
+        buttonPanel.add(howToPlayButton);
+        buttonPanel.add(Box.createVerticalStrut(20));
+        buttonPanel.add(quitButton);
+
+        panel.add(buttonPanel, BorderLayout.CENTER);
+        return panel;
+    }
+
+    public JPanel createHowToPlayPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.BLACK);
+
+        JLabel title = new JLabel("How to Play 'OUTBREAK'", SwingConstants.CENTER);
+        title.setFont(titleFont.deriveFont(Font.BOLD, 40f));
+        title.setForeground(Color.WHITE);
+        title.setBorder(BorderFactory.createEmptyBorder(50, 0, 30, 0));
+        panel.add(title, BorderLayout.NORTH);
+
+        JTextArea instructionsArea = new JTextArea(
+                "1. Choose Your Squad: Select 3 characters to form your team. Each character has unique stats and skills.\n\n" +
+                "2. Combat: You will face enemies in turn-based combat. Your goal is to defeat the enemy without losing your entire squad.\n\n" +
+                "3. Actions: During a character's turn, click a skill button to perform an action. Skills cost resources, so manage them wisely!\n\n" +
+                "4. Enemy Turn: After your character acts, the enemy will counter-attack one of your squad members.\n\n" +
+                "5. Victory/Defeat: Defeat the enemy to advance to a choice screen. If all your characters are defeated, the mission fails."
+        );
+        instructionsArea.setFont(normalFont.deriveFont(Font.PLAIN, 20f));
+        instructionsArea.setForeground(Color.LIGHT_GRAY);
+        instructionsArea.setBackground(Color.BLACK);
+        instructionsArea.setEditable(false);
+        instructionsArea.setWrapStyleWord(true);
+        instructionsArea.setLineWrap(true);
+        instructionsArea.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        panel.add(instructionsArea, BorderLayout.CENTER);
+
+        JButton backButton = new JButton("BACK TO TITLE");
+        backButton.setFont(titleFont.deriveFont(Font.BOLD, 25f));
+        backButton.setBackground(new Color(100, 100, 100));
+        backButton.setForeground(Color.WHITE);
+        backButton.addActionListener(e -> cardLayout.show(cardPanel, TITLE_SCREEN_PANEL));
+        
+        JPanel southPanel = new JPanel();
+        southPanel.setBackground(Color.BLACK);
+        southPanel.add(backButton);
+        southPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
+        
+        panel.add(southPanel, BorderLayout.SOUTH);
+        return panel;
+    }
+
+    public JPanel createGameOverPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(Color.BLACK);
+        
+        JLabel gameOverLabel = new JLabel("MISSION FAILED: GAME OVER");
+        gameOverLabel.setFont(titleFont.deriveFont(Font.BOLD, 60f));
+        gameOverLabel.setForeground(Color.RED);
+        
+        JButton backToTitleButton = new JButton("RETURN TO TITLE");
+        backToTitleButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
+        backToTitleButton.setBackground(new Color(150, 0, 0));
+        backToTitleButton.setForeground(Color.WHITE);
+        backToTitleButton.addActionListener(e -> System.exit(0));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0;
+        gbc.insets = new Insets(20, 0, 40, 0);
+        panel.add(gameOverLabel, gbc);
+
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        panel.add(backToTitleButton, gbc);
+
+        return panel;
+    }
+
+    public JPanel createCharacterSelectContainer() {
+        JPanel charSelectContainer = new JPanel(new BorderLayout());
+        charSelectContainer.setBackground(Color.BLACK);
+
+        
         mainTitlePanel = new JPanel();
         mainTitlePanel.setBackground(Color.BLACK);
         mainTitlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-
         mainTitleLabel = new JLabel("CHOOSE YOUR SQUAD (0/3)");
         mainTitleLabel.setForeground(Color.WHITE);
         mainTitleLabel.setFont(titleFont);
         mainTitlePanel.add(mainTitleLabel);
-        
-        con.add(mainTitlePanel, BorderLayout.NORTH);
+        charSelectContainer.add(mainTitlePanel, BorderLayout.NORTH);
 
+       
         charDisplayPanel = new JPanel();
         charDisplayPanel.setLayout(new BoxLayout(charDisplayPanel, BoxLayout.Y_AXIS));
         charDisplayPanel.setBackground(Color.BLACK);
         charDisplayPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        
+
         charNameLabel = new JLabel(" ");
         charNameLabel.setFont(new Font("Times New Roman", Font.BOLD, 36));
         charNameLabel.setForeground(Color.WHITE);
@@ -88,12 +243,10 @@ public class Main {
         charBackstoryArea.setFont(normalFont);
         charBackstoryArea.setForeground(Color.WHITE);
         charBackstoryArea.setBackground(Color.BLACK);
-        
         charBackstoryArea.setWrapStyleWord(true);
         charBackstoryArea.setLineWrap(true);
         charBackstoryArea.setEditable(false);
         charBackstoryArea.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
         charBackstoryArea.setMaximumSize(new Dimension(500, 100)); 
         charBackstoryArea.setPreferredSize(new Dimension(500, 100)); 
 
@@ -115,36 +268,17 @@ public class Main {
         charDisplayPanel.add(textAreaWrapper);
         charDisplayPanel.add(Box.createVerticalStrut(10));
         charDisplayPanel.add(detailsButtonPanel); 
-        
-        cardLayout = new CardLayout();
-        cardPanel = new JPanel(cardLayout);
-        cardPanel.setBackground(Color.BLACK);
 
-
-        JPanel charSelectContainer = new JPanel(new BorderLayout());
         charSelectContainer.add(charDisplayPanel, BorderLayout.CENTER);
-        
-        battlePanel = createBattlePanel(); 
-        directionPanel = createDirectionPanel();
-        
-        cardPanel.add(charSelectContainer, CHARACTER_SELECT_PANEL);
-        cardPanel.add(battlePanel, BATTLE_PANEL);
-        cardPanel.add(directionPanel, DIRECTIONAL_PANEL);
-        
-        con.add(cardPanel, BorderLayout.CENTER);
 
-        
-        
+       
         selectionButtonsPanel = new JPanel();
         selectionButtonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
         selectionButtonsPanel.setBackground(Color.BLACK);
+        createCharacterSelectionButtons(); // Populates selectionButtonsPanel
+        charSelectContainer.add(selectionButtonsPanel, BorderLayout.SOUTH);
         
-        createCharacterSelectionButtons();
-        
-        con.add(selectionButtonsPanel, BorderLayout.SOUTH);
-        
-        window.setLocationRelativeTo(null);
-        window.setVisible(true);
+        return charSelectContainer;
     }
 
     public JPanel createBattlePanel(){
