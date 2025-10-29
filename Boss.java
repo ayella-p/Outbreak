@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public abstract class Boss extends Enemy { 
     int maxMana;
