@@ -22,6 +22,7 @@ public class Main {
     final static String CHARACTER_SELECT_PANEL = "CHARACTER_SELECT";
     final static String BATTLE_PANEL = "BATTLE";
     final static String DIRECTIONAL_PANEL = "DIRECTION_CHOICE";
+    final static String MISSION_COMPLETE_PANEL = "MISSION_COMPLETE";
 
     JPanel titleScreenPanel;
     JPanel howToPlayPanel;
@@ -41,6 +42,8 @@ public class Main {
     List<Character> availableCharacters = new ArrayList<>();
     List<Character> playerParty = new ArrayList<>();
     int selectionCount = 0;
+    int currentFloor = 1; 
+
     
     private AtomicReference<Character> currentViewedCharacter = new AtomicReference<>(null);
     Character activeCharacter;
@@ -83,9 +86,10 @@ public class Main {
         directionPanel = createDirectionPanel();
         cardPanel.add(directionPanel, DIRECTIONAL_PANEL);
 
+        JPanel missionCompletePanel = createMissionCompletePanel();
+        cardPanel.add(missionCompletePanel, MISSION_COMPLETE_PANEL);
 
         cardLayout.show(cardPanel, TITLE_SCREEN_PANEL);
-
         
         window.setLocationRelativeTo(null);
         window.setVisible(true);
@@ -318,6 +322,47 @@ public class Main {
         return panel;
     }
 
+    public JPanel createMissionCompletePanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(new Color(30, 30, 50)); 
+        panel.setBorder(new EmptyBorder(50, 50, 50, 50));
+
+        JPanel centerContentPanel = new JPanel();
+        centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
+        centerContentPanel.setBackground(new Color(240, 240, 240));
+
+        JLabel titleLabel = new JLabel("MISSION SUCCESSFUL!");
+        titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 60f));
+        titleLabel.setForeground(Color.GREEN);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subLabel = new JLabel("Floor " + (currentFloor) + " Cleared! Prepare for the next challenge.");
+        subLabel.setFont(normalFont.deriveFont(Font.BOLD, 24f));
+        subLabel.setForeground(Color.YELLOW);
+        subLabel.setName("SUB_LABEL"); 
+        subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton nextFloorButton = new JButton("FLOOR " + (currentFloor + 1));
+        nextFloorButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
+        nextFloorButton.setBackground(new Color(0, 150, 0));
+        nextFloorButton.setForeground(Color.WHITE);
+        nextFloorButton.setName("FLOOR_BUTTON"); 
+        nextFloorButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        nextFloorButton.setMaximumSize(new Dimension(300, 70));
+        nextFloorButton.setMinimumSize(new Dimension(300, 70));
+        nextFloorButton.setPreferredSize(new Dimension(300, 70));
+
+        centerContentPanel.add(titleLabel);
+        centerContentPanel.add(Box.createVerticalStrut(20));
+        centerContentPanel.add(subLabel);
+        centerContentPanel.add(Box.createVerticalStrut(40));
+        centerContentPanel.add(nextFloorButton);
+
+                panel.add(centerContentPanel, BorderLayout.CENTER);
+
+    return panel;
+}
 
     public JPanel createDirectionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -440,7 +485,22 @@ public class Main {
     }
     
     public void startGame(Enemy enemy) {
-    	mainTitlePanel.setVisible(false); 
+    	List<Character> aliveParty = new ArrayList<>();
+        for (Character c : playerParty) {
+            if (c.currentHP > 0) { 
+                aliveParty.add(c);
+            }
+        }
+        playerParty.clear();
+        playerParty.addAll(aliveParty);
+    
+    if (playerParty.isEmpty()) {
+        endBattle(false);
+             return;
+        }
+
+   
+        mainTitlePanel.setVisible(false); 
         selectionButtonsPanel.setVisible(false); 
         cardLayout.show(cardPanel, BATTLE_PANEL);
 
@@ -448,14 +508,13 @@ public class Main {
     
         updateBattleUI();
         updatePlayerStatusUI(); 
-    
-    if (!playerParty.isEmpty()) {
-        battleLogArea.setText("A " + currentEnemy.name + " approaches!\n\n");
-        
-        }
-    }
 
-    void updateBattleUI() {
+        String enemyType = (currentEnemy instanceof Boss) ? "Boss" : "Enemy";
+
+        battleLogArea.setText("A " + currentEnemy.name + " approaches! (" + enemyType + " - Floor " + currentFloor + ")\n");
+        setupCharacterActionButtons(null);
+    }
+        void updateBattleUI() {
         enemyNameLabel.setText("Enemy: " + currentEnemy.name.toUpperCase());
         enemyHPLabel.setText("HP: " + currentEnemy.currentHP + " / " + currentEnemy.maxHP);
     }
@@ -536,7 +595,7 @@ public class Main {
     void setupCharacterActionButtons(Character character) {
         battleActionPanel.removeAll();
 
-        boolean isDefeated = character.currentHP <= 0 || character.currentResource <= 10;
+        boolean isDefeated = character == null || character.currentHP <= 0 || character.currentResource <= 10;
 
     if (!isDefeated) {
         JLabel turnLabel = new JLabel(character.name.toUpperCase() + "'s Turn");
@@ -592,6 +651,22 @@ public class Main {
                 return;
         }
         enemyTurn();
+         boolean canAnyCharacterFight = false;
+         for (Character c : playerParty) {
+            if (c.currentHP > 0 && c.currentResource > 10) { 
+            canAnyCharacterFight = true; 
+            break;
+        }
+    }
+    
+    if (!canAnyCharacterFight) {
+        battleLogArea.append("\nAll remaining squad members are unable to fight!\n");
+        endBattle(false);
+        return;
+    }
+    if (activeCharacter != null && activeCharacter.currentHP <= 0) {
+         this.activeCharacter = null;
+    } 
         setupCharacterActionButtons(this.activeCharacter);
         int deadCount = 0;
         for (Character c : playerParty) {
@@ -615,8 +690,18 @@ public class Main {
 }
     
     void enemyTurn() {
+        List<Character> aliveCharacters = new ArrayList<>();
+        for (Character c : playerParty) {
+            if (c.currentHP > 0) {
+                aliveCharacters.add(c);
+            }
+        }
+
+        if (aliveCharacters.isEmpty()) {
+            return;
+        }
         Random rand = new Random();
-        Character target = playerParty.get(rand.nextInt(playerParty.size())); 
+        Character target = aliveCharacters.get(rand.nextInt(aliveCharacters.size())); 
         currentEnemy.attack(target);
         
         battleLogArea.append(currentEnemy.name + " attacks " + target.name + ", dealing " + currentEnemy.damage + " damage.\n");
@@ -625,36 +710,94 @@ public class Main {
             battleLogArea.append(target.name + " is knocked out!\n");
         }
 
-        setupCharacterActionButtons(playerParty.get(0)); 
+         updatePlayerStatusUI();
+
+         if (activeCharacter != null && activeCharacter.currentHP <= 0) {
+             this.activeCharacter = null; // Force user to choose next character
+        } 
+        setupCharacterActionButtons(this.activeCharacter);
     }
 
     void endBattle(boolean win) {
         if (win) {
-            cardLayout.show(cardPanel, DIRECTIONAL_PANEL);
             mainTitlePanel.setVisible(true); 
             mainTitleLabel.setText("MISSION SUCCESSFUL!");
+        
+            if (currentEnemy instanceof Boss) {
+                for (Character c : playerParty) {
+                    if (c.currentHP > 0) {
+                        int healAmount = (int) (c.maxHP * 0.25);
+                        int resourceRestore = (int) (c.maxResource * 0.25);
+
+                        c.currentHP += healAmount;
+                        if (c.currentHP > c.maxHP) {
+                        c.currentHP = c.maxHP;
+                        }
+
+                        c.currentResource += resourceRestore;
+                        if (c.currentResource > c.maxResource) {
+                        c.currentResource = c.maxResource;
+                        }
+                    }
+                }
+                 cardLayout.show(cardPanel, MISSION_COMPLETE_PANEL);      
+                 } else if (currentEnemy instanceof Enemy) {
+                           cardLayout.show(cardPanel, DIRECTIONAL_PANEL);
+                           directionLabel.setText("You have defeated the first enemy. Which direction will you proceed?");
+          
+                           JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);
+                           for (Component comp : choicesPanel.getComponents()) {
+                           if (comp instanceof JButton) {
+                           comp.setEnabled(true);
+                     }
+                 }
+            } 
         } else {
             battlePanel.setVisible(false);
-            JPanel gameOverPanel = new JPanel();
-            gameOverPanel.setBackground(Color.BLACK);
-            JLabel gameOverLabel = new JLabel("GAME OVER");
-            gameOverLabel.setFont(titleFont);
-            gameOverLabel.setForeground(Color.RED);
-            gameOverPanel.add(gameOverLabel);
-            con.add(gameOverPanel, BorderLayout.CENTER);
-            
-        }
-    }
-    
-    public void chooseDirection(String choice) {
-        if (choice.equals("Health")) {
-            directionLabel.setText("Healed up! Preparing for next encounter...");
-        } else if (choice.equals("Boss")) {
-            directionLabel.setText("Proceeding to Boss Station! Good luck!");
-        }
-        
-        JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);  
-        choicesPanel.setVisible(false);
-    }
 
+            JPanel gameOverPanel = new JPanel();
+            gameOverPanel.setLayout(new BoxLayout(gameOverPanel, BoxLayout.Y_AXIS));
+            gameOverPanel.setBackground(Color.BLACK);
+            gameOverPanel.setBorder(new EmptyBorder(100, 0, 0, 0));
+
+            JLabel gameOverLabel = new JLabel("GAME OVER", SwingConstants.CENTER);
+            gameOverLabel.setFont(titleFont.deriveFont(Font.BOLD, 80f));
+            gameOverLabel.setForeground(Color.RED);
+            gameOverLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JButton backToTitleButton = new JButton("BACK TO TITLE");
+            backToTitleButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
+            backToTitleButton.setBackground(new Color(50, 50, 50));
+            backToTitleButton.setForeground(Color.WHITE);
+            backToTitleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            backToTitleButton.addActionListener(e -> {
+            window.dispose();
+            new Main(); 
+        });
+        
+        gameOverPanel.add(gameOverLabel);
+        gameOverPanel.add(Box.createVerticalStrut(50));
+        gameOverPanel.add(backToTitleButton);
+
+        
+        con.removeAll();
+        con.add(gameOverPanel, BorderLayout.CENTER);
+        con.revalidate(); 
+        con.repaint();
+        }
+    }
+            
+    public void chooseDirection(String choice) {
+        if (choice.equals("A")) { // EAST -> BOSS FIGHT (Floor 1 Boss)
+            directionLabel.setText("You proceed EAST and encounter the Floor " + currentFloor + " Boss: IronMaw!");
+            startGame(new IronMaw());        
+        } else if (choice.equals("B")) { // WEST -> HEAL & SKIP BOSS (Go to Floor 2 Carrier)
+            
+            currentFloor++;
+            directionLabel.setText("You proceed WEST and rest. HP and Resources fully restored! Proceeding to Floor " + currentFloor + ".");
+        } 
+    }
 }
+
+
+
