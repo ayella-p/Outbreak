@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
+import java.awt.event.ActionListener;
 
 public class Main {
     JFrame window;
@@ -324,12 +325,12 @@ public class Main {
 
     public JPanel createMissionCompletePanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(30, 30, 50)); 
+        panel.setBackground(Color.BLACK); 
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));
 
         JPanel centerContentPanel = new JPanel();
         centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
-        centerContentPanel.setBackground(new Color(240, 240, 240));
+        centerContentPanel.setBackground(Color.BLACK);
 
         JLabel titleLabel = new JLabel("MISSION SUCCESSFUL!");
         titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 60f));
@@ -786,15 +787,67 @@ public class Main {
         con.repaint();
         }
     }
+
+    public void handleWestHealing() {
+        for (Character character : playerParty) {
+            character.currentHP = character.maxHP;
+            character.currentResource = character.maxResource;
+        }
+        updatePlayerStatusUI();
+        directionPanel.removeAll();
+        directionPanel.setLayout(new BorderLayout());
+
+        JPanel messageContainer = new JPanel(new GridLayout(3, 1));
+        messageContainer.setBackground(Color.BLACK);
+        messageContainer.setBorder(BorderFactory.createEmptyBorder(100, 50, 50, 50));
+
+        JLabel titleLabel = new JLabel("HEALING INJECTION RECEIVED", SwingConstants.CENTER);
+        titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 40f));
+        titleLabel.setForeground(Color.YELLOW);
+
+        JLabel messageLabel = new JLabel("HP and Resources are fully restored!", SwingConstans.CENTER);
+        messageLabel.setFont(normalFont.deriveFont(Font.BOLD, 20f));
+        messageLabel.setForeground(Color.GREEN);
+
+        messageContainer.add(titleLabel);
+        messageContainer.add(Box.createVerticalStrut(20)); //Spacer
+        messageContainer.add(messageLabel);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 50));
+        buttonPanel.setBackground(Color.BLACK);
+
+        JButton nextFloorButton = new JButton("READY FOR NEXT FLOOR");
+        nextFloorButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
+        nextFloorButton.setBackground(new Color(0, 150, 0));
+        nextFloorButton.setForeground(Color.WHITE);
+        nextFloorButton.setPrefferedSize(new Dimension(400, 70));
+        nextFloorButton.setFocusPainted(false);
+
+        //Button Action: Proceed to the next floor combat
+
+        buttonPanel.add(nextFloorButton);
+
+        directionPanel.add(messageContainer, BorderLayout.CENTER);
+        directionPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        //Final refresh
+        directionPanel.revalidate();
+        directionPanel.repaint();
+    }
             
     public void chooseDirection(String choice) {
+
+        JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);
+        for (Component comp : choicesPanel.getComponents()) {
+            comp.setEnabled(false);
+        }
+
         if (choice.equals("A")) { // EAST -> BOSS FIGHT (Floor 1 Boss)
             directionLabel.setText("You proceed EAST and encounter the Floor " + currentFloor + " Boss: IronMaw!");
             startGame(new IronMaw());        
         } else if (choice.equals("B")) { // WEST -> HEAL & SKIP BOSS (Go to Floor 2 Carrier)
             
-            currentFloor++;
-            directionLabel.setText("You proceed WEST and rest. HP and Resources fully restored! Proceeding to Floor " + currentFloor + ".");
+            handleWestHealing();
         } 
     }
 }
