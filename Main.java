@@ -684,7 +684,8 @@ public class Main {
     }
 
     void switchToCharacterTurn(Character nextCharacter) {
-    
+        playerStatusPanel.removeAll();
+        updatePlayerStatusUI();
         this.activeCharacter = nextCharacter; 
         battleLogArea.append("\n" + activeCharacter.name + "'s turn to act.\n");
         setupCharacterActionButtons(this.activeCharacter);
@@ -805,7 +806,7 @@ public class Main {
         titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 40f));
         titleLabel.setForeground(Color.YELLOW);
 
-        JLabel messageLabel = new JLabel("HP and Resources are fully restored!", SwingConstans.CENTER);
+        JLabel messageLabel = new JLabel("HP and Resources are fully restored!", SwingConstants.CENTER);
         messageLabel.setFont(normalFont.deriveFont(Font.BOLD, 20f));
         messageLabel.setForeground(Color.GREEN);
 
@@ -820,7 +821,7 @@ public class Main {
         nextFloorButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
         nextFloorButton.setBackground(new Color(0, 150, 0));
         nextFloorButton.setForeground(Color.WHITE);
-        nextFloorButton.setPrefferedSize(new Dimension(400, 70));
+        nextFloorButton.setPreferredSize(new Dimension(400, 70));
         nextFloorButton.setFocusPainted(false);
 
         //Button Action: Proceed to the next floor combat
