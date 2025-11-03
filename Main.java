@@ -354,6 +354,8 @@ public class Main {
         nextFloorButton.setMinimumSize(new Dimension(300, 70));
         nextFloorButton.setPreferredSize(new Dimension(300, 70));
 
+        nextFloorButton.addActionListener(e -> newFloor());
+
         centerContentPanel.add(titleLabel);
         centerContentPanel.add(Box.createVerticalStrut(20));
         centerContentPanel.add(subLabel);
@@ -742,10 +744,13 @@ public class Main {
                         }
                     }
                 }
-                 cardLayout.show(cardPanel, MISSION_COMPLETE_PANEL);      
+                 if (currentEnemy instanceof DrAlcaraz) {
+                 } else { 
+                 cardLayout.show(cardPanel, MISSION_COMPLETE_PANEL); 
+                   }    
                  } else if (currentEnemy instanceof Enemy) {
                            cardLayout.show(cardPanel, DIRECTIONAL_PANEL);
-                           directionLabel.setText("You have defeated the first enemy. Which direction will you proceed?");
+                           directionLabel.setText("You have defeated the " +  currentFloor + " enemy. Which direction will you proceed?");
           
                            JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);
                            for (Component comp : choicesPanel.getComponents()) {
@@ -811,47 +816,85 @@ public class Main {
         messageLabel.setForeground(Color.GREEN);
 
         messageContainer.add(titleLabel);
-        messageContainer.add(Box.createVerticalStrut(20)); //Spacer
+        messageContainer.add(Box.createVerticalStrut(20)); 
         messageContainer.add(messageLabel);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 50));
         buttonPanel.setBackground(Color.BLACK);
 
-        JButton nextFloorButton = new JButton("READY FOR NEXT FLOOR");
+        JButton nextFloorButton = new JButton("NEXT FLOOR");
         nextFloorButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
         nextFloorButton.setBackground(new Color(0, 150, 0));
         nextFloorButton.setForeground(Color.WHITE);
         nextFloorButton.setPreferredSize(new Dimension(400, 70));
         nextFloorButton.setFocusPainted(false);
 
-        //Button Action: Proceed to the next floor combat
+        nextFloorButton.addActionListener(e -> startNextFloorTransition());
 
         buttonPanel.add(nextFloorButton);
 
         directionPanel.add(messageContainer, BorderLayout.CENTER);
         directionPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        //Final refresh
         directionPanel.revalidate();
         directionPanel.repaint();
     }
-            
-    public void chooseDirection(String choice) {
 
+    public void startNextFloorTransition() {
+       
+        directionPanel.removeAll();
+        directionPanel.setLayout(new BorderLayout());
+        newFloor();
+    }
+
+     public void newFloor() {
+        currentFloor++;
+
+        cardPanel.remove(directionPanel);
+        directionPanel = createDirectionPanel();
+        cardPanel.add(directionPanel, DIRECTIONAL_PANEL);
+
+        Enemy nextEnemy = null;
+
+         if (currentFloor == 2) {
+            // Floor 2: Start with Howler
+            nextEnemy = new Howler();
+            mainTitleLabel.setText("OUTBREAK - FLOOR 2");
+        } 
+
+       
+        startGame(nextEnemy);
+    }
+    
+    public void chooseDirection(String choice) {
         JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);
+
         for (Component comp : choicesPanel.getComponents()) {
             comp.setEnabled(false);
         }
 
-        if (choice.equals("A")) { // EAST -> BOSS FIGHT (Floor 1 Boss)
-            directionLabel.setText("You proceed EAST and encounter the Floor " + currentFloor + " Boss: IronMaw!");
-            startGame(new IronMaw());        
-        } else if (choice.equals("B")) { // WEST -> HEAL & SKIP BOSS (Go to Floor 2 Carrier)
-            
+        if (choice.equals("A")) { 
+            Enemy boss = null;
+            if (currentFloor == 1) {
+                directionLabel.setText("You proceed EAST and encounter the Floor 1 Boss: IronMaw!");
+                boss = new IronMaw(); 
+            } else if (currentFloor == 2) {
+                directionLabel.setText("You proceed EAST and encounter the Floor 2 Boss: Boneclaw!");
+                boss = new Boneclaw();
+            } 
+
+            if (boss != null) {
+                startGame(boss);
+            }
+        } else if (choice.equals("B")) { 
+            directionLabel.setText("You cautiously proceed WEST and discover a hidden supply drop...");
             handleWestHealing();
         } 
     }
 }
+
+   
+
 
 
 
