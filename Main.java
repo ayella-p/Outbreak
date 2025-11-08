@@ -43,6 +43,8 @@ public class Main {
     Font normalFont = new Font("Arial", Font.PLAIN, 16);
     Font smallFont = new Font("Arial", Font.ITALIC, 12);
     
+    Color oceanBlue = new Color(0, 119, 190);
+
     List<Character> availableCharacters = new ArrayList<>();
     List<Character> playerParty = new ArrayList<>();
     int selectionCount = 0;
@@ -311,7 +313,7 @@ public class Main {
 
         locationLabel = new JLabel("Abandoned Emergency Room", SwingConstants.CENTER);
         locationLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
-        locationLabel.setForeground(new Color(0, 150, 150)); // Teal color for location
+        locationLabel.setForeground(oceanBlue);
         locationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         enemyPanel.add(locationLabel);
 
@@ -609,7 +611,7 @@ public class Main {
 
         if (enemy instanceof DrAlcaraz) {
             mainTitleLabel.setText("OUTBREAK - FINAL BOSS: DR. ALCARAZ");
-            currentFloor = 4; // for logic
+            currentFloor = 4; 
         } else if (enemy instanceof Venomshade) {
              mainTitleLabel.setText("OUTBREAK - FLOOR 3 BOSS: VENOMSHADE");
         } else {
@@ -621,12 +623,18 @@ public class Main {
         cardLayout.show(cardPanel, BATTLE_PANEL);
 
         currentEnemy = enemy; 
-    
-       if (currentFloor == 1) {
-           locationLabel.setText("Abandoned Emergency Room");
-       } else if (currentFloor == 2) {
-           locationLabel.setText("Infectious ICU"); 
-       }
+        Color oceanBlue = new Color(0, 119, 190);
+
+        if (currentFloor == 1) {
+            locationLabel.setText("Abandoned Emergency Room");
+            locationLabel.setForeground(oceanBlue); 
+        } else if (currentFloor == 2) {
+            locationLabel.setText("Infectious ICU");
+            locationLabel.setForeground(oceanBlue); 
+        } else if (currentFloor == 3) {
+            locationLabel.setText("Underground Research Lab");
+            locationLabel.setForeground(oceanBlue); 
+        }
 
         updateBattleUI();
         updatePlayerStatusUI(); 
