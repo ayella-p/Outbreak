@@ -35,6 +35,7 @@ public class Main {
     JPanel playerStatusPanel;
     JPanel directionPanel;
     JLabel directionLabel;
+    JLabel locationLabel;
 
     Font titleFont = new Font("Courier New", Font.BOLD, 50);
     Font normalFont = new Font("Arial", Font.PLAIN, 16);
@@ -270,6 +271,12 @@ public class Main {
         enemyPanel.setLayout(new BoxLayout(enemyPanel, BoxLayout.Y_AXIS));
         enemyPanel.setBackground(Color.BLACK); 
         enemyPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        locationLabel = new JLabel("Abandoned Emergency Room", SwingConstants.CENTER);
+        locationLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
+        locationLabel.setForeground(new Color(0, 150, 150)); // Teal color for location
+        locationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        enemyPanel.add(locationLabel);
 
         enemyNameLabel = new JLabel("Enemy: ???");
         enemyNameLabel.setFont(titleFont.deriveFont(Font.BOLD, 40f));
@@ -509,6 +516,12 @@ public class Main {
 
         currentEnemy = enemy; 
     
+       if (currentFloor == 1) {
+           locationLabel.setText("Abandoned Emergency Room");
+       } else if (currentFloor == 2) {
+           locationLabel.setText("Infectious ICU"); 
+       }
+
         updateBattleUI();
         updatePlayerStatusUI(); 
 
