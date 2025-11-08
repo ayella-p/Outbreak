@@ -195,11 +195,17 @@ public class Main {
         panel.add(title, BorderLayout.NORTH);
 
         JTextArea instructionsArea = new JTextArea(
-                "1. Choose Your Squad: Select 3 characters to form your team. Each character has unique stats and skills.\n\n" +
-                "2. Combat: You will face enemies in turn-based combat. Your goal is to defeat the enemy without losing your entire squad.\n\n" +
-                "3. Actions: During a character's turn, click a skill button to perform an action. Skills cost resources, so manage them wisely!\n\n" +
-                "4. Enemy Turn: After your character acts, the enemy will counter-attack one of your squad members.\n\n" +
-                "5. Victory/Defeat: Defeat the enemy to advance to the next stage. If all your squad members are defeated, it's game over!\n\n"
+                " SETUP \n\n" +
+            "Form Your Squad: Choose 3 unique characters.\n" +
+            "Manage Resources: Use your character skills wisely — they cost resources!\n\n" +
+            " GAME FLOW \n\n" +
+            "1. Fight: Complete battles in the current level. You may face up to two enemies per level.\n" +
+            "2. Decide: Choose a path wisely; one will lead you to the next level, and the other will lead you to the boss of the current level.\n" +
+            "3. Win: Defeat the level enemies to advance. Win all levels to fight the Boss!\n\n" +
+            " VICTORY CONDITION \n\n" +
+            "WIN: Defeat the enemy squad.\n" +
+            "LOSE: If all 3 of your squad members are defeated, it's Game Over!\n"
+           
         );
         instructionsArea.setFont(normalFont.deriveFont(Font.PLAIN, 20f));
         instructionsArea.setForeground(new Color(50, 50, 50));
