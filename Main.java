@@ -317,7 +317,7 @@ public class Main {
         enemyPanel.setBackground(Color.BLACK); 
         enemyPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        locationLabel = new JLabel("Abandoned Emergency Room", SwingConstants.CENTER);
+        locationLabel = new JLabel("Floor 1: Abandoned Emergency Room", SwingConstants.CENTER);
         locationLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
         locationLabel.setForeground(oceanBlue);
         locationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -376,7 +376,6 @@ public class Main {
     }
 
     public JPanel createMissionCompletePanel() {
-        int completedFloor = currentFloor;
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.BLACK); 
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));
@@ -390,13 +389,13 @@ public class Main {
         titleLabel.setForeground(Color.GREEN);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subLabel = new JLabel("Floor " + (currentFloor - 1) + " Cleared! Prepare for the next challenge.");
+        JLabel subLabel = new JLabel("Floor " + (currentFloor) + " Cleared! Prepare for the next challenge.");
         subLabel.setFont(normalFont.deriveFont(Font.BOLD, 24f));
         subLabel.setForeground(Color.YELLOW);
         subLabel.setName("SUB_LABEL"); 
         subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        String nextButtonText = (currentFloor == 4) ? "FINAL BOSS" : "NEXT FLOOR";
+        String nextButtonText = (currentFloor == 4) ? "FINAL BOSS" : "FLOOR " + (currentFloor + 1);
         JButton nextFloorButton = new JButton(nextButtonText);
         nextFloorButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
         nextFloorButton.setBackground(new Color(0, 150, 0));
@@ -472,7 +471,7 @@ public class Main {
         textPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 20, 50));
 
         directionLabel = new JLabel("You have defeated the " + floorChoice + " enemy.", SwingConstants.CENTER);
-        directionLabel.setFont(titleFont);
+        directionLabel.setFont(titleFont.deriveFont(Font.BOLD, 35f));
         directionLabel.setForeground(Color.GREEN);
         directionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -632,13 +631,13 @@ public class Main {
         Color oceanBlue = new Color(0, 119, 190);
 
         if (currentFloor == 1) {
-            locationLabel.setText("Abandoned Emergency Room");
+            locationLabel.setText("Floor 1: Abandoned Emergency Room");
             locationLabel.setForeground(oceanBlue); 
         } else if (currentFloor == 2) {
-            locationLabel.setText("Infectious ICU");
+            locationLabel.setText("Floor 2: Infectious ICU");
             locationLabel.setForeground(oceanBlue); 
         } else if (currentFloor == 3) {
-            locationLabel.setText("Underground Research Lab");
+            locationLabel.setText("Final Level:Underground Research Lab");
             locationLabel.setForeground(oceanBlue); 
         }
 
