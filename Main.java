@@ -317,7 +317,7 @@ public class Main {
         enemyPanel.setBackground(Color.BLACK); 
         enemyPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        locationLabel = new JLabel("Floor 1: Abandoned Emergency Room", SwingConstants.CENTER);
+        locationLabel = new JLabel("Level 1: Abandoned Emergency Room", SwingConstants.CENTER);
         locationLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
         locationLabel.setForeground(oceanBlue);
         locationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -631,13 +631,13 @@ public class Main {
         Color oceanBlue = new Color(0, 119, 190);
 
         if (currentFloor == 1) {
-            locationLabel.setText("Floor 1: Abandoned Emergency Room");
+            locationLabel.setText("Level 1: Abandoned Emergency Room");
             locationLabel.setForeground(oceanBlue); 
         } else if (currentFloor == 2) {
-            locationLabel.setText("Floor 2: Infectious ICU");
+            locationLabel.setText("Level 2: Infectious ICU");
             locationLabel.setForeground(oceanBlue); 
         } else if (currentFloor == 3) {
-            locationLabel.setText("Final Level:Underground Research Lab");
+            locationLabel.setText("Final Level: Underground Research Lab");
             locationLabel.setForeground(oceanBlue); 
         }
 
