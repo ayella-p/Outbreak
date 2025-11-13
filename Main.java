@@ -6,8 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
-import java.awt.event.ActionListener;
 
+
+import game.core.Skill;
+import game.core.Character;
+import game.core.Enemy;
+import game.core.Boss;
+import game.characters.*;
+import game.enemies.*;
+import game.enemies.bosses.*;
 public class Main {
     JFrame window;
     Container con;
@@ -29,7 +36,7 @@ public class Main {
     JPanel titleScreenPanel;
     JPanel howToPlayPanel;
 
-    JPanel battlePanel, battleInfoPanel, enemyPanel, battleActionPanel;
+    JPanel battlePanel, enemyPanel, battleActionPanel;
     JLabel enemyNameLabel, enemyHPLabel;
     JTextArea battleLogArea;
 
@@ -41,7 +48,6 @@ public class Main {
 
     Font titleFont = new Font("Courier New", Font.BOLD, 50);
     Font normalFont = new Font("Arial", Font.PLAIN, 16);
-    Font smallFont = new Font("Arial", Font.ITALIC, 12);
     
     Color oceanBlue = new Color(0, 119, 190);
 
@@ -52,7 +58,7 @@ public class Main {
     String floorChoice = "";
 
     
-    private AtomicReference<Character> currentViewedCharacter = new AtomicReference<>(null);
+    final AtomicReference<Character> currentViewedCharacter = new AtomicReference<>(null);
     Character activeCharacter;
     Enemy currentEnemy;
     public static void main(String[] args){

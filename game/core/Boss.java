@@ -1,12 +1,12 @@
+package game.core;
 import java.util.ArrayList;
 import java.util.List;
-
 public abstract class Boss extends Enemy { 
-    int maxMana;
-    int currentMana;
-    int skillDamageMin;
-    int skillDamageMax;
-    List<Skill> skills = new ArrayList<>(); 
+    public int maxMana;
+    public int currentMana;
+    public int skillDamageMin;
+    public int skillDamageMax;
+    public List<Skill> skills = new ArrayList<>();
     public int lastSkillUsed = -1; 
 
     public Boss(String name, int hp, int damage, String description, int mana, int skillDmgMin, int skillDmgMax) {

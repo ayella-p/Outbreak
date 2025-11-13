@@ -1,8 +1,11 @@
+package game.enemies.bosses;
+import game.core.Character;
+import game.core.Boss;
 import java.util.Random;
 
-public class Venomshade extends Boss {
-    public Venomshade() {
-        super("General Venomshade", 215, 20, "Boss monster.", 115, 10, 20);
+public class Boneclaw extends Boss {
+    public Boneclaw() {
+        super("General Boneclaw", 175, 20, "Boss monster.", 115, 10, 20);
     }
 
     @Override

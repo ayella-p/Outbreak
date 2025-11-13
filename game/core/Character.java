@@ -1,15 +1,16 @@
+package game.core;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Character {
-    String name;
-    int maxHP;
-    int currentHP;
-    int maxResource;
-    int currentResource;
-    String resourceName;
-    String backstory;
-    List<Skill> skills = new ArrayList<>();
+    public String name;
+    public int maxHP;
+    public int currentHP;
+    public int maxResource;
+    public int currentResource;
+    public String resourceName;
+    public String backstory;
+    public List<Skill> skills = new ArrayList<>();
 
     public Character(String name, int hp, int resource, String resourceName, String backstory) {
         this.name = name;
