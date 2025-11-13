@@ -3,7 +3,7 @@
 *$.class 
 .idea/
 out/
-.iml
+*.iml
 .log
 # Ignore the previously problematic gitignore path
 Outbreak_Refractor/.gitignore/
