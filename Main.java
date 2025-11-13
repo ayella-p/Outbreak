@@ -33,6 +33,9 @@ public class Main {
     final static String MISSION_COMPLETE_PANEL = "MISSION_COMPLETE";
     final static String FINAL_VICTORY_PANEL = "FINAL_VICTORY";
     final static String GAME_OVER_PANEL = "GAME_OVER";
+    
+    // ADD THIS NEW CONSTANT:
+    final static String BOSS_PREP_PANEL = "BOSS_PREP";
     JPanel titleScreenPanel;
     JPanel howToPlayPanel;
 
@@ -107,9 +110,15 @@ public class Main {
         
         gameOverPanel = createGameOverPanel();
         cardPanel.add(gameOverPanel, GAME_OVER_PANEL);
-
         cardLayout.show(cardPanel, TITLE_SCREEN_PANEL);
-        
+
+        directionPanel = createDirectionPanel();
+        cardPanel.add(directionPanel, DIRECTIONAL_PANEL);
+
+        // ADD THIS NEW PANEL TO THE CARDLAYOUT:
+        JPanel bossPrepPanel = createBossPrepPanel();
+        cardPanel.add(bossPrepPanel, BOSS_PREP_PANEL);
+    
         window.setLocationRelativeTo(null);
         window.setVisible(true);
     }
@@ -422,6 +431,45 @@ public class Main {
 
     return panel;
 }
+
+    public JPanel createBossPrepPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.RED.darker().darker()); 
+        panel.setBorder(new EmptyBorder(50, 50, 50, 50));
+
+        JLabel titleLabel = new JLabel("BOSS APPROACHING!", SwingConstants.CENTER);
+        titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 70f));
+        titleLabel.setForeground(Color.RED); 
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subLabel = new JLabel("You will face the boss of this level. Prepare to fight!", SwingConstants.CENTER);
+        subLabel.setFont(normalFont.deriveFont(Font.BOLD, 30f));
+        subLabel.setForeground(Color.WHITE); 
+        subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton continueButton = new JButton("ENGAGE!");
+        continueButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
+        continueButton.setBackground(Color.BLACK);
+        continueButton.setForeground(Color.RED);
+        continueButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        continueButton.setPreferredSize(new Dimension(400, 70));
+        
+
+        JPanel centerContentPanel = new JPanel();
+        centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
+        centerContentPanel.setBackground(panel.getBackground());
+        centerContentPanel.add(Box.createVerticalGlue());
+        centerContentPanel.add(titleLabel);
+        centerContentPanel.add(Box.createVerticalStrut(30));
+        centerContentPanel.add(subLabel);
+        centerContentPanel.add(Box.createVerticalStrut(50));
+        centerContentPanel.add(continueButton);
+        centerContentPanel.add(Box.createVerticalGlue());
+
+        panel.add(centerContentPanel, BorderLayout.CENTER);
+        return panel;
+    }
+
     public JPanel createFinalVictoryPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(20, 20, 40)); 
@@ -1031,36 +1079,27 @@ public class Main {
     public void missionComplete() {
         cardLayout.show(cardPanel, FINAL_VICTORY_PANEL);
     }
-    
+        // Locate this existing method
     public void chooseDirection(String choice) {
-        JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);
-
-        for (Component comp : choicesPanel.getComponents()) {
-            comp.setEnabled(false);
+        if ("A".equals(choice)) { // EAST
+            // The user chose the boss route
+            System.out.println("Choosing EAST (Boss route) for Floor " + currentFloor);
+            
+            // TRANSITION CODE ADDED HERE:
+            cardLayout.show(cardPanel, BOSS_PREP_PANEL); 
+            
+        } else if ("B".equals(choice)) { // WEST
+            // The user chose the next floor route
+            System.out.println("Choosing WEST (Next floor route) for Floor " + currentFloor);
+            currentFloor++; 
+            floorChoice = ""; 
+            
+            // Go to the Mission Complete screen to advance the floor
+            createMissionCompletePanel(); 
+            cardLayout.show(cardPanel, MISSION_COMPLETE_PANEL);
         }
-
-        if (choice.equals("A")) { 
-            Enemy boss = null;
-            if (currentFloor == 1) {
-                directionLabel.setText("You proceed EAST and encounter the Floor 1 Boss: IronMaw!");
-                boss = new IronMaw(); 
-            } else if (currentFloor == 2) {
-                directionLabel.setText("You proceed EAST and encounter the Floor 2 Boss: Boneclaw!");
-                boss = new Boneclaw();
-            } else if (currentFloor == 3) {
-                directionLabel.setText("You proceed EAST and encounter the Floor 3 Boss: Venomshade!");
-                boss = new Venomshade(); 
-            }
-
-            if (boss != null) {
-                startGame(boss);
-            }
-        } else if (choice.equals("B")) { 
-            directionLabel.setText("You cautiously proceed WEST and discover a hidden supply drop...");
-            handleWestHealing();
-        } 
     }
-}
+    }
 
    
 
