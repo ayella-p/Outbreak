@@ -3,6 +3,7 @@
 *$.class 
 .idea/
 out/
+
 *.iml
 .log
 # Ignore the previously problematic gitignore path
