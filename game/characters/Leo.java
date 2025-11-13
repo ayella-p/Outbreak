@@ -1,3 +1,7 @@
+package game.characters;
+
+import game.core.Character;
+import game.core.Skill;
 public class Leo extends Character {
     public Leo() {
         super("Leo", 150, 80, "Stamina", "Leo was a combat medic on the front lines when the pandemic hit. He was among the first to be administered the vaccine, but it had no effect on him due to his unique genetics. The trauma of losing his entire unit when the Reavers first emerged fuels his relentless drive to protect others.");

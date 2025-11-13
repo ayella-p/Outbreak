@@ -1,6 +1,9 @@
 # Ignore all compiled Java class files
 *.class
 *$.class 
-
+.idea/
+out/
+.iml
+.log
 # Ignore the previously problematic gitignore path
 Outbreak_Refractor/.gitignore/

@@ -1,8 +1,11 @@
+package game.enemies.bosses;
+import game.core.Character;
+import game.core.Boss;
 import java.util.Random;
 
 public class DrAlcaraz extends Boss {
     public DrAlcaraz() {
-        super("Dr. Severino Alcaraz", 300, 18, "Boss monster.", 200, 13, 20);
+        super("Dr. Severino Alcaraz", 250, 18, "Boss monster.", 200, 13, 20);
     }
 
     @Override

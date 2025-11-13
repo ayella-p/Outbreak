@@ -1,7 +1,8 @@
+package game.core;
 public class Skill {
-    String name;
-    int damage;
-    int cost;
+    public String name;
+    public int damage;
+    public int cost;
 
     public Skill(String name, int damage, int cost) {
         this.name = name;
