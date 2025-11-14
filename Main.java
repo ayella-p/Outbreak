@@ -67,10 +67,15 @@ public class Main {
     public static void main(String[] args){
          SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new Main();
+                try {
+                    new Main();
+                } catch (Exception e) {
+                    System.err.println("Fatal error during application startup: " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
         });
-    }
+}
     public Main() {
         initializeCharacters();
 
@@ -788,40 +793,44 @@ public class Main {
     void setupCharacterActionButtons(Character character) {
         battleActionPanel.removeAll();
 
+        try {
         boolean isDefeated = character == null || character.currentHP <= 0 || character.currentResource <= 2;
+        if (!isDefeated) {
+                JLabel turnLabel = new JLabel(character.name.toUpperCase() + "'s Turn");
+                turnLabel.setForeground(Color.YELLOW);
+                turnLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
+                battleActionPanel.add(turnLabel);
 
-    if (!isDefeated) {
-        JLabel turnLabel = new JLabel(character.name.toUpperCase() + "'s Turn");
-        turnLabel.setForeground(Color.YELLOW);
-        turnLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
-        battleActionPanel.add(turnLabel);
+                for (Skill skill : character.skills) {
+                    JButton skillButton = new JButton(skill.name + " (" + skill.cost + " " + character.resourceName + ")");
+                    skillButton.setFont(normalFont);
+                    skillButton.setEnabled(character.currentResource >= skill.cost); 
 
-        for (Skill skill : character.skills) {
-            JButton skillButton = new JButton(skill.name + " (" + skill.cost + " " + character.resourceName + ")");
-            skillButton.setFont(normalFont);
-            skillButton.setEnabled(character.currentResource >= skill.cost); 
-
-            skillButton.addActionListener(e -> performSkill(character, skill)); 
-            battleActionPanel.add(skillButton);
+                    skillButton.addActionListener(e -> performSkill(character, skill)); 
+                    battleActionPanel.add(skillButton);
+                }
+            } else {
+                JLabel promptLabel;
+                if(character == null){
+                    promptLabel = new JLabel("Select a character to take action.");
+                } else if (character.currentHP <= 0) {
+                    promptLabel = new JLabel(character.name + " is knocked out! Choose another character.");
+                } else {
+                    promptLabel = new JLabel(character.name + " is low on " + character.resourceName + "! Choose another character.");
+                }
+                promptLabel.setForeground(Color.RED);
+                promptLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
+                battleActionPanel.add(promptLabel);
         }
-    } else {
-        JLabel promptLabel;
-        if(character == null){
-            promptLabel = new JLabel("Select a character to take action.");
-        } else if (character.currentHP <= 0) {
-            promptLabel = new JLabel(character.name + " is knocked out! Choose another character.");
-        } else {
-            promptLabel = new JLabel(character.name + " is low on " + character.resourceName + "! Choose another character.");
+        } catch (Exception e) {
+            System.err.println("Error setting up action buttons: " + e.getMessage());
         }
-        promptLabel.setForeground(Color.RED);
-        promptLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
-        battleActionPanel.add(promptLabel);
-    }
 
     
-    battleActionPanel.revalidate();
-    battleActionPanel.repaint();
+        battleActionPanel.revalidate();
+        battleActionPanel.repaint();
     }
+
     
     void performSkill(Character character, Skill skill) {
        
@@ -972,15 +981,19 @@ public class Main {
 
                 if (currentEnemy instanceof Enemy) {
                 cardLayout.show(cardPanel, DIRECTIONAL_PANEL);
-                JPanel textPanel = (JPanel)((BorderLayout)directionPanel.getLayout()).getLayoutComponent(directionPanel, BorderLayout.NORTH);
-                if (textPanel != null && textPanel.getComponentCount() > 0 && textPanel.getComponent(0) instanceof JLabel) {
-                    ((JLabel)textPanel.getComponent(0)).setText("You have defeated the " + floorChoice + " enemy.");
-                }
-                JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);
-                for (Component comp : choicesPanel.getComponents()) {
-                    if (comp instanceof JButton) {
-                        comp.setEnabled(true);
+               try {
+                    JPanel textPanel = (JPanel)((BorderLayout)directionPanel.getLayout()).getLayoutComponent(directionPanel, BorderLayout.NORTH);
+                    if (textPanel != null && textPanel.getComponentCount() > 0 && textPanel.getComponent(0) instanceof JLabel) {
+                        ((JLabel)textPanel.getComponent(0)).setText("You have defeated the " + floorChoice + " enemy.");
                     }
+                    JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);
+                    for (Component comp : choicesPanel.getComponents()) {
+                        if (comp instanceof JButton) {
+                            comp.setEnabled(true);
+                        }
+                    }
+                } catch (ClassCastException | NullPointerException e) {
+                    System.err.println("Error updating Direction Panel components: " + e.getMessage());
                 }
             } 
         } else {
