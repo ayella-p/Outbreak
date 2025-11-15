@@ -1,7 +1,8 @@
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -15,6 +16,7 @@ import game.core.Boss;
 import game.characters.*;
 import game.enemies.*;
 import game.enemies.bosses.*;
+
 public class Main {
     JFrame window;
     Container con;
@@ -33,7 +35,10 @@ public class Main {
     final static String MISSION_COMPLETE_PANEL = "MISSION_COMPLETE";
     final static String FINAL_VICTORY_PANEL = "FINAL_VICTORY";
     final static String GAME_OVER_PANEL = "GAME_OVER";
-    JPanel titleScreenPanel;
+    
+    // The Title Screen is now the FallingSnowPanel
+    FallingSnowPanel titleScreenPanel; 
+    
     JPanel howToPlayPanel;
 
     JPanel battlePanel, enemyPanel, battleActionPanel;
@@ -61,8 +66,117 @@ public class Main {
     final AtomicReference<Character> currentViewedCharacter = new AtomicReference<>(null);
     Character activeCharacter;
     Enemy currentEnemy;
+
+
+    // ==========================================================
+    // SNOW EFFECT CODE START
+    // ==========================================================
+
+    /**
+     * Represents a single snowflake/particle on the screen.
+     */
+    private class Particle {
+        int x, y;
+        final int size;
+        final int speed;
+        private final Random rand = new Random();
+
+        public Particle(int width, int height) {
+            this.size = rand.nextInt(3) + 1; // Size 1 to 3
+            this.speed = rand.nextInt(3) + 1; // Speed 1 to 3
+            reset(width, height);
+        }
+
+        public void fall(int height) {
+            y += speed;
+            if (y > height) {
+                // Reset to top when it falls off screen
+                reset(window.getWidth(), height);
+            }
+        }
+
+        public void reset(int width, int height) {
+            x = rand.nextInt(width);
+            y = rand.nextInt(height / 2) - height / 2; // Start above or near the top
+        }
+    }
+
+    /**
+     * Custom JPanel to draw the falling snow animation.
+     */
+    private class FallingSnowPanel extends JPanel implements ActionListener {
+        private final List<Particle> particles = new ArrayList<>();
+        private final Timer timer;
+        private final JPanel contentPanel;
+        
+        public FallingSnowPanel(JPanel content) {
+            // Set up the panel for animation
+            this.setLayout(new BorderLayout());
+            this.setBackground(Color.BLACK);
+            this.contentPanel = content;
+            
+            // This panel holds the title/buttons transparently over the snow
+            contentPanel.setOpaque(false); 
+            this.add(contentPanel, BorderLayout.CENTER);
+
+            // Initialize particles
+            initializeParticles();
+            
+            // Set up the animation timer (about 30 FPS)
+            timer = new Timer(33, this);
+            timer.start();
+        }
+        
+        // Ensure particles are correctly sized when the panel is first shown
+        @Override
+        public void addNotify() {
+            super.addNotify();
+            // Re-initialize particles if the size is zero (before first draw)
+            if (particles.isEmpty() && getWidth() > 0 && getHeight() > 0) {
+                 initializeParticles();
+            }
+        }
+
+        private void initializeParticles() {
+            int numParticles = 100; // Total number of snowflakes
+            for (int i = 0; i < numParticles; i++) {
+                particles.add(new Particle(1000, 700)); // Use default large size initially
+            }
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            
+            if (getWidth() <= 0 || getHeight() <= 0) return;
+
+            g.setColor(Color.WHITE);
+            for (Particle p : particles) {
+                // Draw each particle as a small square or oval
+                g.fillOval(p.x, p.y, p.size, p.size); 
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int width = getWidth();
+            int height = getHeight();
+            
+            if (width > 0 && height > 0) {
+                for (Particle p : particles) {
+                    p.fall(height);
+                }
+            }
+            // Trigger redraw
+            repaint(); 
+        }
+    }
+    // ==========================================================
+    // SNOW EFFECT CODE END
+    // ==========================================================
+
     public static void main(String[] args){
-         SwingUtilities.invokeLater(new Runnable() {
+          SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
                     new Main();
@@ -72,7 +186,8 @@ public class Main {
                 }
             }
         });
-}
+    }
+
     public Main() {
         initializeCharacters();
 
@@ -80,45 +195,50 @@ public class Main {
         window.setSize(1000, 700); 
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setTitle("OUTBREAK");
-        window.getContentPane().setBackground(Color.BLACK);
+        window.getContentPane().setBackground(Color.BLACK); // MAYII ARII
         window.setLayout(new BorderLayout());
         con = window.getContentPane();
         
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
-        cardPanel.setBackground(Color.BLACK);
+        cardPanel.setBackground(Color.BLACK); 
         con.add(cardPanel, BorderLayout.CENTER);
 
-        titleScreenPanel = createTitleScreenPanel();
-        titleScreenPanel.setBackground(Color.BLACK);
+        // --- TITLE SCREEN SETUP ---
+        // 1. Create the content panel (titles and buttons)
+        JPanel titleContent = createTitleScreenContent();
+        // 2. Wrap the content panel in the custom Snow Panel
+        titleScreenPanel = new FallingSnowPanel(titleContent);
+        titleScreenPanel.setBackground(Color.BLACK); 
         cardPanel.add(titleScreenPanel, TITLE_SCREEN_PANEL);
+        // --------------------------
 
         howToPlayPanel = createHowToPlayPanel();
-        howToPlayPanel.setBackground(Color.BLACK);
+        howToPlayPanel.setBackground(Color.BLACK); 
         cardPanel.add(howToPlayPanel, HOW_TO_PLAY_PANEL);
 
         JPanel charSelectContainer = createCharacterSelectContainer();
-        charSelectContainer.setBackground(Color.BLACK);
+        charSelectContainer.setBackground(Color.BLACK); 
         cardPanel.add(charSelectContainer, CHARACTER_SELECT_PANEL);
 
         battlePanel = createBattlePanel(); 
-        battlePanel.setBackground(Color.BLACK);
+        battlePanel.setBackground(Color.BLACK); 
         cardPanel.add(battlePanel, BATTLE_PANEL);
 
         directionPanel = createDirectionPanel();
-        directionPanel.setBackground(Color.BLACK);
+        directionPanel.setBackground(Color.BLACK); 
         cardPanel.add(directionPanel, DIRECTIONAL_PANEL);
 
         JPanel missionCompletePanel = createMissionCompletePanel();
-        missionCompletePanel.setBackground(Color.BLACK);
+        missionCompletePanel.setBackground(Color.BLACK); 
         cardPanel.add(missionCompletePanel, MISSION_COMPLETE_PANEL);
 
         JPanel finalVictoryPanel = createFinalVictoryPanel(); 
-        finalVictoryPanel.setBackground(Color.BLACK);
+        finalVictoryPanel.setBackground(Color.BLACK); 
         cardPanel.add(finalVictoryPanel, FINAL_VICTORY_PANEL);
         
         gameOverPanel = createGameOverPanel();
-        gameOverPanel.setBackground(Color.BLACK);
+        gameOverPanel.setBackground(Color.BLACK); 
         cardPanel.add(gameOverPanel, GAME_OVER_PANEL);
 
         cardLayout.show(cardPanel, TITLE_SCREEN_PANEL);
@@ -130,7 +250,7 @@ public class Main {
     public JPanel createGameOverPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.BLACK);
+        panel.setBackground(Color.BLACK); // MAYII ARII
         panel.setBorder(new EmptyBorder(100, 0, 0, 0));
 
         JLabel gameOverLabel = new JLabel("GAME OVER", SwingConstants.CENTER);
@@ -155,9 +275,10 @@ public class Main {
         return panel;
     }
 
-    public JPanel createTitleScreenPanel() {
+    // This method creates the content (Title/Buttons) and is now passed to FallingSnowPanel
+    public JPanel createTitleScreenContent() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK);
+        panel.setOpaque(false); // Make content transparent so snow shows through
 
         JLabel title = new JLabel("OUTBREAK", SwingConstants.CENTER);
         title.setFont(titleFont.deriveFont(Font.BOLD, 80f));
@@ -167,12 +288,12 @@ public class Main {
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-        buttonPanel.setBackground(Color.BLACK);
+        buttonPanel.setOpaque(false); // Make button panel transparent
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
 
         JButton startButton = new JButton("START MISSION");
         startButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        startButton.setBackground(new Color(0, 150, 0));
+        startButton.setBackground(new Color(0, 150, 0)); // MAYII ARII - Green
         startButton.setForeground(Color.WHITE);
         startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         startButton.setFocusPainted(false);
@@ -181,7 +302,7 @@ public class Main {
 
         JButton howToPlayButton = new JButton("HOW TO PLAY");
         howToPlayButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        howToPlayButton.setBackground(new Color(0, 100, 150));
+        howToPlayButton.setBackground(new Color(60, 120, 160)); // MAYII ARII - Paler Blue
         howToPlayButton.setForeground(Color.WHITE);
         howToPlayButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         howToPlayButton.setMaximumSize(new Dimension(300, 70));
@@ -207,7 +328,7 @@ public class Main {
 
     public JPanel createHowToPlayPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK);
+        panel.setBackground(Color.BLACK); // MAYII ARII
 
         JLabel title = new JLabel("How to Play", SwingConstants.CENTER);
         title.setFont(titleFont.deriveFont(Font.BOLD, 40f));
@@ -217,20 +338,20 @@ public class Main {
 
         JTextArea instructionsArea = new JTextArea(
                 " SETUP \n\n" +
-            "Form Your Squad: Choose 3 unique characters.\n" +
-            "Manage Resources: Use your character skills wisely — they cost resources!\n\n" +
-            " GAME FLOW \n\n" +
-            "1. Fight: Complete battles in the current level. You may face up to two enemies per level.\n" +
-            "2. Decide: Choose a path wisely; one will lead you to the next level, and the other will lead you to the boss of the current level.\n" +
-            "3. Win: Defeat the level enemies to advance. Win all levels to fight the Boss!\n\n" +
-            " VICTORY CONDITION \n\n" +
-            "WIN: Defeat the enemy squad.\n" +
-            "LOSE: If all 3 of your squad members are defeated, it's Game Over!\n"
-           
+                "Form Your Squad: Choose 3 unique characters.\n" +
+                "Manage Resources: Use your character skills wisely — they cost resources!\n\n" +
+                " GAME FLOW \n\n" +
+                "1. Fight: Complete battles in the current level. You may face up to two enemies per level.\n" +
+                "2. Decide: Choose a path wisely; one will lead you to the next level, and the other will lead you to the boss of the current level.\n" +
+                "3. Win: Defeat the level enemies to advance. Win all levels to fight the Boss!\n\n" +
+                " VICTORY CONDITION \n\n" +
+                "WIN: Defeat the enemy squad.\n" +
+                "LOSE: If all 3 of your squad members are defeated, it's Game Over!\n"
+                
         );
         instructionsArea.setFont(normalFont.deriveFont(Font.PLAIN, 20f));
-        instructionsArea.setForeground(Color.LIGHT_GRAY);
-        instructionsArea.setBackground(Color.DARK_GRAY);
+        instructionsArea.setForeground(Color.LIGHT_GRAY); // MAYII ARII
+        instructionsArea.setBackground(Color.DARK_GRAY); // MAYII ARII
         instructionsArea.setWrapStyleWord(true);
         instructionsArea.setLineWrap(true);
         instructionsArea.setEditable(false);
@@ -244,7 +365,7 @@ public class Main {
         backButton.addActionListener(e -> cardLayout.show(cardPanel, TITLE_SCREEN_PANEL));
         
         JPanel southPanel = new JPanel();
-        southPanel.setBackground(Color.BLACK);
+        southPanel.setBackground(Color.BLACK); // MAYII ARII
         southPanel.add(backButton);
         southPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
         
@@ -256,38 +377,38 @@ public class Main {
 
     public JPanel createCharacterSelectContainer() {
         JPanel charSelectContainer = new JPanel(new BorderLayout());
-        charSelectContainer.setBackground(new Color(240, 240, 240));
+        charSelectContainer.setBackground(Color.BLACK); // MAYII ARII
 
         
         mainTitlePanel = new JPanel();
-        mainTitlePanel.setBackground(Color.BLACK);
+        mainTitlePanel.setBackground(Color.BLACK); // MAYII ARII
         mainTitlePanel.setBorder(BorderFactory.createLineBorder(new Color(0, 100, 150), 2));
         mainTitleLabel = new JLabel("CHOOSE YOUR SQUAD (0/3)");
-        mainTitleLabel.setForeground(Color.WHITE);
+        mainTitleLabel.setForeground(Color.WHITE); // MAYII ARII
         mainTitleLabel.setFont(titleFont);
         mainTitlePanel.add(mainTitleLabel);
         charSelectContainer.add(mainTitlePanel, BorderLayout.NORTH);
 
-       
+        
         charDisplayPanel = new JPanel();
         charDisplayPanel.setLayout(new BoxLayout(charDisplayPanel, BoxLayout.Y_AXIS));
-        charDisplayPanel.setBackground(Color.BLACK);
+        charDisplayPanel.setBackground(Color.BLACK); // MAYII ARII
         charDisplayPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         charNameLabel = new JLabel(" ");
         charNameLabel.setFont(new Font("Times New Roman", Font.BOLD, 36));
-        charNameLabel.setForeground(Color.WHITE);
+        charNameLabel.setForeground(Color.WHITE); // MAYII ARII
         charNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         charStatsLabel = new JLabel(" ");
         charStatsLabel.setFont(normalFont);
-        charStatsLabel.setForeground(Color.GREEN);
+        charStatsLabel.setForeground(Color.GREEN); // MAYII ARII - Light Green Stats Text
         charStatsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         charBackstoryArea = new JTextArea(" ");
         charBackstoryArea.setFont(normalFont);
-        charBackstoryArea.setForeground(Color.LIGHT_GRAY);
-        charBackstoryArea.setBackground(Color.DARK_GRAY);
+        charBackstoryArea.setForeground(Color.LIGHT_GRAY); // MAYII ARII
+        charBackstoryArea.setBackground(Color.DARK_GRAY); // MAYII ARII - Dark Gray Background
         charBackstoryArea.setWrapStyleWord(true);
         charBackstoryArea.setLineWrap(true);
         charBackstoryArea.setEditable(false);
@@ -297,12 +418,12 @@ public class Main {
 
         JPanel textAreaWrapper = new JPanel();
         textAreaWrapper.setLayout(new GridBagLayout());
-        textAreaWrapper.setBackground(Color.DARK_GRAY);
+        textAreaWrapper.setBackground(Color.DARK_GRAY); // MAYII ARII - Dark Gray Background
         textAreaWrapper.add(charBackstoryArea);
         textAreaWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         detailsButtonPanel = new JPanel();
-        detailsButtonPanel.setBackground(Color.DARK_GRAY);
+        detailsButtonPanel.setBackground(Color.DARK_GRAY); // MAYII ARII - Dark Gray Background
         detailsButtonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 
@@ -316,10 +437,10 @@ public class Main {
 
         charSelectContainer.add(charDisplayPanel, BorderLayout.CENTER);
 
-       
+        
         selectionButtonsPanel = new JPanel();
         selectionButtonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        selectionButtonsPanel.setBackground(Color.DARK_GRAY);
+        selectionButtonsPanel.setBackground(Color.DARK_GRAY); // MAYII ARII - Dark Gray Background
         createCharacterSelectionButtons(); 
         charSelectContainer.add(selectionButtonsPanel, BorderLayout.SOUTH);
         
@@ -328,7 +449,7 @@ public class Main {
 
     public JPanel createBattlePanel(){
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.DARK_GRAY);
+        panel.setBackground(Color.BLACK); // MAYII ARII
 
         
         enemyPanel = new JPanel();
@@ -358,7 +479,7 @@ public class Main {
         panel.add(enemyPanel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel(new GridLayout(1, 2, 10, 0));
-        centerPanel.setBackground(Color.DARK_GRAY);
+        centerPanel.setBackground(Color.BLACK); // MAYII ARII
         centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 
@@ -396,12 +517,12 @@ public class Main {
 
     public JPanel createMissionCompletePanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK); 
+        panel.setBackground(Color.BLACK); // MAYII ARII
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));
 
         JPanel centerContentPanel = new JPanel();
         centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
-        centerContentPanel.setBackground(Color.BLACK);
+        centerContentPanel.setBackground(Color.BLACK); // MAYII ARII
 
         JLabel titleLabel = new JLabel("MISSION SUCCESSFUL!");
         titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 60f));
@@ -437,12 +558,12 @@ public class Main {
 }
     public JPanel createFinalVictoryPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(20, 20, 40)); 
+        panel.setBackground(Color.BLACK); // MAYII ARII
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));
 
         JPanel centerContentPanel = new JPanel();
         centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
-        centerContentPanel.setBackground(new Color(20, 20, 40));
+        centerContentPanel.setBackground(Color.BLACK); // MAYII ARII
 
         // Big, celebratory title
         JLabel titleLabel = new JLabel("OUTBREAK ELIMINATED!", SwingConstants.CENTER);
@@ -482,11 +603,11 @@ public class Main {
 
     public JPanel createDirectionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK);
+        panel.setBackground(Color.BLACK); // MAYII ARII
         
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-        textPanel.setBackground(Color.BLACK);
+        textPanel.setBackground(Color.BLACK); // MAYII ARII
         textPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 20, 50));
 
         directionLabel = new JLabel("You have defeated the " + floorChoice + " enemy.", SwingConstants.CENTER);
@@ -507,7 +628,7 @@ public class Main {
 
 
         JPanel choicesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 50));
-        choicesPanel.setBackground(Color.BLACK);
+        choicesPanel.setBackground(Color.BLACK); // MAYII ARII
 
         JButton choiceAButton = new JButton("EAST");
         choiceAButton.setFont(new Font("Times New Roman", Font.BOLD, 20));
@@ -544,7 +665,7 @@ public class Main {
         JButton selectButton = new JButton("SELECT " + c.name.toUpperCase());
         selectButton.setFont(normalFont.deriveFont(Font.BOLD));
 
-      if (selectionCount < 3) {
+     if (selectionCount < 3) {
             selectButton.setForeground(Color.BLACK);
             
             selectButton.addActionListener(e -> selectCharacter(sourceButton, c));
@@ -567,7 +688,7 @@ public class Main {
     public void createCharacterSelectionButtons() {
         JButton startButton = new JButton("START MISSION");
         startButton.setFont(new Font("Times New Roman", Font.BOLD, 24));
-        startButton.setBackground(new Color(150, 0, 0));
+        startButton.setBackground(new Color(150, 0, 0)); // MAYII ARII - Red Background
         startButton.setForeground(Color.WHITE);
         startButton.setEnabled(false);
         startButton.addActionListener(e -> startGame(new Carrier()));
@@ -594,16 +715,17 @@ public class Main {
             playerParty.add(c);
             selectionCount++;
             mainTitleLabel.setText("CHOOSE YOUR SQUAD (" + selectionCount + "/3)");
-           
+            
             button.setEnabled(false);
             button.setBackground(Color.BLACK);
-            button.setForeground(Color.GREEN);
-  
+            button.setForeground(Color.GREEN); // MAYII ARII - Selected character text turns green
+            
+ 
             displayCharacterDetails(c, button);
 
             if (selectionCount == 3) {
                 for (Component comp : selectionButtonsPanel.getComponents()) {
-                   
+                    
                     if (comp instanceof JButton) {
                         JButton btn = (JButton) comp;
                         
@@ -619,7 +741,7 @@ public class Main {
     }
     
     public void startGame(Enemy enemy) {
-    	List<Character> aliveParty = new ArrayList<>();
+        List<Character> aliveParty = new ArrayList<>();
         for (Character c : playerParty) {
             if (c.currentHP > 0) { 
                 aliveParty.add(c);
@@ -630,16 +752,16 @@ public class Main {
     
     if (playerParty.isEmpty()) {
         endBattle(false);
-             return;
+              return;
         }
 
         if (enemy instanceof DrAlcaraz) {
             mainTitleLabel.setText("OUTBREAK - FINAL BOSS: DR. ALCARAZ");
             currentFloor = 4; 
         } else if (enemy instanceof Venomshade) {
-             mainTitleLabel.setText("OUTBREAK - FLOOR 3 BOSS: VENOMSHADE");
+              mainTitleLabel.setText("OUTBREAK - FLOOR 3 BOSS: VENOMSHADE");
         } else {
-             mainTitleLabel.setText("OUTBREAK - FLOOR " + currentFloor);
+              mainTitleLabel.setText("OUTBREAK - FLOOR " + currentFloor);
         }
 
         mainTitlePanel.setVisible(false); 
@@ -666,9 +788,9 @@ public class Main {
         String enemyType = (currentEnemy instanceof Boss) ? "Boss" : "Enemy";
 
         if (currentEnemy instanceof DrAlcaraz) {
-             battleLogArea.setText("A " + currentEnemy.name + " approaches! (FINAL BOSS)\n");
+              battleLogArea.setText("A " + currentEnemy.name + " approaches! (FINAL BOSS)\n");
         } else {
-             battleLogArea.setText("A " + currentEnemy.name + " approaches! (" + enemyType + " - Floor " + currentFloor + ")\n");
+              battleLogArea.setText("A " + currentEnemy.name + " approaches! (" + enemyType + " - Floor " + currentFloor + ")\n");
         }
     }
 
@@ -711,7 +833,7 @@ public class Main {
 
             
             playerStatusPanel.add(charPanel);
-            playerStatusPanel.add(Box.createVerticalStrut(5));  
+            playerStatusPanel.add(Box.createVerticalStrut(5)); 
         }
         
         JButton switchButton = new JButton("CHOOSE CHARACTER");
@@ -756,32 +878,32 @@ public class Main {
         try {
         boolean isDefeated = character == null || character.currentHP <= 0 || character.currentResource <= 2;
         if (!isDefeated) {
-                JLabel turnLabel = new JLabel(character.name.toUpperCase() + "'s Turn");
-                turnLabel.setForeground(Color.YELLOW);
-                turnLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
-                battleActionPanel.add(turnLabel);
+                 JLabel turnLabel = new JLabel(character.name.toUpperCase() + "'s Turn");
+                 turnLabel.setForeground(Color.YELLOW);
+                 turnLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
+                 battleActionPanel.add(turnLabel);
 
-                for (Skill skill : character.skills) {
-                    JButton skillButton = new JButton(skill.name + " (" + skill.cost + " " + character.resourceName + ")");
-                    skillButton.setFont(normalFont);
-                    skillButton.setEnabled(character.currentResource >= skill.cost); 
+                 for (Skill skill : character.skills) {
+                     JButton skillButton = new JButton(skill.name + " (" + skill.cost + " " + character.resourceName + ")");
+                     skillButton.setFont(normalFont);
+                     skillButton.setEnabled(character.currentResource >= skill.cost); 
 
-                    skillButton.addActionListener(e -> performSkill(character, skill)); 
-                    battleActionPanel.add(skillButton);
-                }
+                     skillButton.addActionListener(e -> performSkill(character, skill)); 
+                     battleActionPanel.add(skillButton);
+                 }
             } else {
-                JLabel promptLabel;
-                if(character == null){
-                    promptLabel = new JLabel("Select a character to take action.");
-                } else if (character.currentHP <= 0) {
-                    promptLabel = new JLabel(character.name + " is knocked out! Choose another character.");
-                } else {
-                    promptLabel = new JLabel(character.name + " is low on " + character.resourceName + "! Choose another character.");
-                }
-                promptLabel.setForeground(Color.RED);
-                promptLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
-                battleActionPanel.add(promptLabel);
-        }
+                 JLabel promptLabel;
+                 if(character == null){
+                     promptLabel = new JLabel("Select a character to take action.");
+                 } else if (character.currentHP <= 0) {
+                     promptLabel = new JLabel(character.name + " is knocked out! Choose another character.");
+                 } else {
+                     promptLabel = new JLabel(character.name + " is low on " + character.resourceName + "! Choose another character.");
+                 }
+                 promptLabel.setForeground(Color.RED);
+                 promptLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
+                 battleActionPanel.add(promptLabel);
+            }
         } catch (Exception e) {
             System.err.println("Error setting up action buttons: " + e.getMessage());
         }
@@ -792,11 +914,11 @@ public class Main {
     }
     
     void performSkill(Character character, Skill skill) {
-       
+        
         if (character.currentResource < skill.cost) {
             battleLogArea.append(character.name + " tried to use " + skill.name + " but is low on " + character.resourceName + "!\n");
             return;
-         }
+           }
     
         if (character.currentHP <= 0) {
             battleLogArea.append(character.name + " is knocked out and cannot act!\n");
@@ -816,11 +938,11 @@ public class Main {
         if (!currentEnemy.isAlive()) {
             battleLogArea.append("\n" + currentEnemy.name + " has been defeated!\n");
             endBattle(true);
-                return;
+                  return;
         }
         enemyTurn();
-         List<Character> aliveCharacters = new ArrayList<>();
-         for (Character c : playerParty) {
+          List<Character> aliveCharacters = new ArrayList<>();
+          for (Character c : playerParty) {
             if (c.currentHP > 0 && c.currentResource > 2) {
                 aliveCharacters.add(c);
             }
@@ -833,7 +955,7 @@ public class Main {
         return;
     }
     if (activeCharacter != null && activeCharacter.currentHP <= 0) {
-         this.activeCharacter = null;
+          this.activeCharacter = null;
     } 
         setupCharacterActionButtons(this.activeCharacter);
 
@@ -868,10 +990,10 @@ public class Main {
             battleLogArea.append(target.name + " is knocked out!\n");
         }
 
-         updatePlayerStatusUI();
+          updatePlayerStatusUI();
 
-         List<Character> postAttackAliveCharacters = new ArrayList<>();
-         for (Character c : playerParty) {
+          List<Character> postAttackAliveCharacters = new ArrayList<>();
+          for (Character c : playerParty) {
             if (c.currentHP > 0) { 
                 postAttackAliveCharacters.add(c);
             }
@@ -920,42 +1042,42 @@ public class Main {
                         }
                     }
                 }
-                 if (currentEnemy instanceof DrAlcaraz) {
-                    missionComplete();
-                    return;
-                 } 
-                 
-                 if (currentEnemy instanceof Venomshade) {
-                    currentFloor = 4;
-                    battleLogArea.append("\nVenomshade defeated! The true threat, Dr. Alcaraz, emerges!\n");
-                    startGame(new DrAlcaraz()); 
-                    return; 
-                }
-                 
-                 } 
-                 if (currentEnemy instanceof Boss) {
-                    cardLayout.show(cardPanel, MISSION_COMPLETE_PANEL); // Standard Floor Cleared screen
-                    return; 
-                }
+                   if (currentEnemy instanceof DrAlcaraz) {
+                       missionComplete();
+                       return;
+                   } 
+                   
+                   if (currentEnemy instanceof Venomshade) {
+                       currentFloor = 4;
+                       battleLogArea.append("\nVenomshade defeated! The true threat, Dr. Alcaraz, emerges!\n");
+                       startGame(new DrAlcaraz()); 
+                       return; 
+                    }
+                   
+                   } 
+                   if (currentEnemy instanceof Boss) {
+                       cardLayout.show(cardPanel, MISSION_COMPLETE_PANEL); // Standard Floor Cleared screen
+                       return; 
+                    }
 
-                if (currentEnemy instanceof Enemy) {
-                cardLayout.show(cardPanel, DIRECTIONAL_PANEL);
-                try {
-                    JPanel textPanel = (JPanel)((BorderLayout)directionPanel.getLayout()).getLayoutComponent(directionPanel, BorderLayout.NORTH);
-                    if (textPanel != null && textPanel.getComponentCount() > 0 && textPanel.getComponent(0) instanceof JLabel) {
-                        ((JLabel)textPanel.getComponent(0)).setText("You have defeated the " + floorChoice + " enemy.");
-                    }
-                    JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);
-                    for (Component comp : choicesPanel.getComponents()) {
-                        if (comp instanceof JButton) {
-                            comp.setEnabled(true);
+                    if (currentEnemy instanceof Enemy) {
+                    cardLayout.show(cardPanel, DIRECTIONAL_PANEL);
+                    try {
+                        JPanel textPanel = (JPanel)((BorderLayout)directionPanel.getLayout()).getLayoutComponent(directionPanel, BorderLayout.NORTH);
+                        if (textPanel != null && textPanel.getComponentCount() > 0 && textPanel.getComponent(0) instanceof JLabel) {
+                            ((JLabel)textPanel.getComponent(0)).setText("You have defeated the " + floorChoice + " enemy.");
                         }
+                        JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);
+                        for (Component comp : choicesPanel.getComponents()) {
+                            if (comp instanceof JButton) {
+                                comp.setEnabled(true);
+                            }
+                        }
+                    } catch (ClassCastException | NullPointerException e) {
+                        System.err.println("Error updating Direction Panel components: " + e.getMessage());
+                        
                     }
-                } catch (ClassCastException | NullPointerException e) {
-                    System.err.println("Error updating Direction Panel components: " + e.getMessage());
-                    
-                }
-            } 
+                } 
         } else {
             cardLayout.show(cardPanel, GAME_OVER_PANEL);
         }
@@ -971,7 +1093,7 @@ public class Main {
         directionPanel.setLayout(new BorderLayout());
 
         JPanel messageContainer = new JPanel(new GridLayout(3, 1));
-        messageContainer.setBackground(Color.BLACK);
+        messageContainer.setBackground(Color.BLACK); // MAYII ARII
         messageContainer.setBorder(BorderFactory.createEmptyBorder(100, 50, 50, 50));
 
         JLabel titleLabel = new JLabel("HEALING INJECTION RECEIVED", SwingConstants.CENTER);
@@ -987,7 +1109,7 @@ public class Main {
         messageContainer.add(messageLabel);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 50));
-        buttonPanel.setBackground(Color.BLACK);
+        buttonPanel.setBackground(Color.BLACK); // MAYII ARII
 
         JButton nextFloorButton = new JButton("NEXT FLOOR");
         nextFloorButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
@@ -1016,13 +1138,13 @@ public class Main {
     }
 
     public void startNextFloorTransition() {
-       
+        
         directionPanel.removeAll();
         directionPanel.setLayout(new BorderLayout());
         newFloor();
     }
 
-     public void newFloor() {
+      public void newFloor() {
         currentFloor++;
 
         cardPanel.remove(directionPanel);
@@ -1035,7 +1157,7 @@ public class Main {
             missionComplete();
             return;
         }
-         if (currentFloor == 2) {
+          if (currentFloor == 2) {
             // Floor 2: Start with Howler
             nextEnemy = new Howler();
             mainTitleLabel.setText("OUTBREAK - FLOOR 2");
@@ -1044,9 +1166,9 @@ public class Main {
             mainTitleLabel.setText("OUTBREAK - FLOOR 3");
         } 
 
-       if(nextEnemy != null){
-           startGame(nextEnemy);
-       }
+        if(nextEnemy != null){
+            startGame(nextEnemy);
+        }
     }
 
     public void missionComplete() {
@@ -1082,9 +1204,3 @@ public class Main {
         } 
     }
 }
-
-   
-
-
-
-
