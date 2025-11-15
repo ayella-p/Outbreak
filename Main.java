@@ -1,5 +1,6 @@
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,6 +56,7 @@ public class Main {
     Font normalFont = new Font("Arial", Font.PLAIN, 16);
     
     Color oceanBlue = new Color(0, 119, 190);
+    Color darkBlue = new Color(0, 0, 139);
 
     List<Character> availableCharacters = new ArrayList<>();
     List<Character> playerParty = new ArrayList<>();
@@ -67,11 +69,8 @@ public class Main {
     Character activeCharacter;
     Enemy currentEnemy;
 
-
-    // ==========================================================
     // SNOW EFFECT CODE START
-    // ==========================================================
-
+    
     /**
      * Represents a single snowflake/particle on the screen.
      */
@@ -82,22 +81,21 @@ public class Main {
         private final Random rand = new Random();
 
         public Particle(int width, int height) {
-            this.size = rand.nextInt(3) + 1; // Size 1 to 3
-            this.speed = rand.nextInt(3) + 1; // Speed 1 to 3
+            this.size = rand.nextInt(3) + 1; 
+            this.speed = rand.nextInt(3) + 1; 
             reset(width, height);
         }
 
         public void fall(int height) {
             y += speed;
             if (y > height) {
-                // Reset to top when it falls off screen
                 reset(window.getWidth(), height);
             }
         }
 
         public void reset(int width, int height) {
             x = rand.nextInt(width);
-            y = rand.nextInt(height / 2) - height / 2; // Start above or near the top
+            y = rand.nextInt(height / 2) - height / 2; 
         }
     }
 
@@ -110,28 +108,22 @@ public class Main {
         private final JPanel contentPanel;
         
         public FallingSnowPanel(JPanel content) {
-            // Set up the panel for animation
             this.setLayout(new BorderLayout());
             this.setBackground(Color.BLACK);
             this.contentPanel = content;
             
-            // This panel holds the title/buttons transparently over the snow
             contentPanel.setOpaque(false); 
             this.add(contentPanel, BorderLayout.CENTER);
 
-            // Initialize particles
             initializeParticles();
             
-            // Set up the animation timer (about 30 FPS)
             timer = new Timer(33, this);
             timer.start();
         }
         
-        // Ensure particles are correctly sized when the panel is first shown
         @Override
         public void addNotify() {
             super.addNotify();
-            // Re-initialize particles if the size is zero (before first draw)
             if (particles.isEmpty() && getWidth() > 0 && getHeight() > 0) {
                  initializeParticles();
             }
@@ -140,7 +132,7 @@ public class Main {
         private void initializeParticles() {
             int numParticles = 100; // Total number of snowflakes
             for (int i = 0; i < numParticles; i++) {
-                particles.add(new Particle(1000, 700)); // Use default large size initially
+                particles.add(new Particle(1000, 700)); 
             }
         }
 
@@ -152,7 +144,6 @@ public class Main {
 
             g.setColor(Color.WHITE);
             for (Particle p : particles) {
-                // Draw each particle as a small square or oval
                 g.fillOval(p.x, p.y, p.size, p.size); 
             }
         }
@@ -167,13 +158,10 @@ public class Main {
                     p.fall(height);
                 }
             }
-            // Trigger redraw
             repaint(); 
         }
     }
-    // ==========================================================
     // SNOW EFFECT CODE END
-    // ==========================================================
 
     public static void main(String[] args){
           SwingUtilities.invokeLater(new Runnable() {
@@ -195,7 +183,7 @@ public class Main {
         window.setSize(1000, 700); 
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setTitle("OUTBREAK");
-        window.getContentPane().setBackground(Color.BLACK); // MAYII ARII
+        window.getContentPane().setBackground(Color.BLACK); 
         window.setLayout(new BorderLayout());
         con = window.getContentPane();
         
@@ -250,7 +238,7 @@ public class Main {
     public JPanel createGameOverPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.BLACK); // MAYII ARII
+        panel.setBackground(Color.BLACK); 
         panel.setBorder(new EmptyBorder(100, 0, 0, 0));
 
         JLabel gameOverLabel = new JLabel("GAME OVER", SwingConstants.CENTER);
@@ -293,7 +281,7 @@ public class Main {
 
         JButton startButton = new JButton("START MISSION");
         startButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        startButton.setBackground(new Color(0, 150, 0)); // MAYII ARII - Green
+        startButton.setBackground(new Color(0, 150, 0)); 
         startButton.setForeground(Color.WHITE);
         startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         startButton.setFocusPainted(false);
@@ -302,7 +290,7 @@ public class Main {
 
         JButton howToPlayButton = new JButton("HOW TO PLAY");
         howToPlayButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        howToPlayButton.setBackground(new Color(60, 120, 160)); // MAYII ARII - Paler Blue
+        howToPlayButton.setBackground(new Color(60, 120, 160)); 
         howToPlayButton.setForeground(Color.WHITE);
         howToPlayButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         howToPlayButton.setMaximumSize(new Dimension(300, 70));
@@ -328,7 +316,7 @@ public class Main {
 
     public JPanel createHowToPlayPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK); // MAYII ARII
+        panel.setBackground(Color.BLACK);
 
         JLabel title = new JLabel("How to Play", SwingConstants.CENTER);
         title.setFont(titleFont.deriveFont(Font.BOLD, 40f));
@@ -350,8 +338,8 @@ public class Main {
                 
         );
         instructionsArea.setFont(normalFont.deriveFont(Font.PLAIN, 20f));
-        instructionsArea.setForeground(Color.LIGHT_GRAY); // MAYII ARII
-        instructionsArea.setBackground(Color.DARK_GRAY); // MAYII ARII
+        instructionsArea.setForeground(Color.LIGHT_GRAY); 
+        instructionsArea.setBackground(Color.DARK_GRAY); 
         instructionsArea.setWrapStyleWord(true);
         instructionsArea.setLineWrap(true);
         instructionsArea.setEditable(false);
@@ -365,7 +353,7 @@ public class Main {
         backButton.addActionListener(e -> cardLayout.show(cardPanel, TITLE_SCREEN_PANEL));
         
         JPanel southPanel = new JPanel();
-        southPanel.setBackground(Color.BLACK); // MAYII ARII
+        southPanel.setBackground(Color.BLACK); 
         southPanel.add(backButton);
         southPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
         
@@ -377,14 +365,14 @@ public class Main {
 
     public JPanel createCharacterSelectContainer() {
         JPanel charSelectContainer = new JPanel(new BorderLayout());
-        charSelectContainer.setBackground(Color.BLACK); // MAYII ARII
+        charSelectContainer.setOpaque(false);
 
         
         mainTitlePanel = new JPanel();
-        mainTitlePanel.setBackground(Color.BLACK); // MAYII ARII
+        mainTitlePanel.setOpaque(false);
         mainTitlePanel.setBorder(BorderFactory.createLineBorder(new Color(0, 100, 150), 2));
         mainTitleLabel = new JLabel("CHOOSE YOUR SQUAD (0/3)");
-        mainTitleLabel.setForeground(Color.WHITE); // MAYII ARII
+        mainTitleLabel.setForeground(Color.WHITE); 
         mainTitleLabel.setFont(titleFont);
         mainTitlePanel.add(mainTitleLabel);
         charSelectContainer.add(mainTitlePanel, BorderLayout.NORTH);
@@ -392,23 +380,23 @@ public class Main {
         
         charDisplayPanel = new JPanel();
         charDisplayPanel.setLayout(new BoxLayout(charDisplayPanel, BoxLayout.Y_AXIS));
-        charDisplayPanel.setBackground(Color.BLACK); // MAYII ARII
+        charDisplayPanel.setBackground(Color.BLACK); 
         charDisplayPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         charNameLabel = new JLabel(" ");
         charNameLabel.setFont(new Font("Times New Roman", Font.BOLD, 36));
-        charNameLabel.setForeground(Color.WHITE); // MAYII ARII
+        charNameLabel.setForeground(Color.WHITE); 
         charNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         charStatsLabel = new JLabel(" ");
         charStatsLabel.setFont(normalFont);
-        charStatsLabel.setForeground(Color.GREEN); // MAYII ARII - Light Green Stats Text
+        charStatsLabel.setForeground(Color.GREEN); 
         charStatsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         charBackstoryArea = new JTextArea(" ");
         charBackstoryArea.setFont(normalFont);
-        charBackstoryArea.setForeground(Color.LIGHT_GRAY); // MAYII ARII
-        charBackstoryArea.setBackground(Color.DARK_GRAY); // MAYII ARII - Dark Gray Background
+        charBackstoryArea.setForeground(Color.LIGHT_GRAY); 
+        charBackstoryArea.setBackground(Color.DARK_GRAY); 
         charBackstoryArea.setWrapStyleWord(true);
         charBackstoryArea.setLineWrap(true);
         charBackstoryArea.setEditable(false);
@@ -418,12 +406,12 @@ public class Main {
 
         JPanel textAreaWrapper = new JPanel();
         textAreaWrapper.setLayout(new GridBagLayout());
-        textAreaWrapper.setBackground(Color.DARK_GRAY); // MAYII ARII - Dark Gray Background
+        textAreaWrapper.setBackground(Color.DARK_GRAY); 
         textAreaWrapper.add(charBackstoryArea);
         textAreaWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         detailsButtonPanel = new JPanel();
-        detailsButtonPanel.setBackground(Color.DARK_GRAY); // MAYII ARII - Dark Gray Background
+        detailsButtonPanel.setOpaque(false);
         detailsButtonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 
@@ -440,7 +428,7 @@ public class Main {
         
         selectionButtonsPanel = new JPanel();
         selectionButtonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        selectionButtonsPanel.setBackground(Color.DARK_GRAY); // MAYII ARII - Dark Gray Background
+        selectionButtonsPanel.setOpaque(false);
         createCharacterSelectionButtons(); 
         charSelectContainer.add(selectionButtonsPanel, BorderLayout.SOUTH);
         
@@ -449,13 +437,16 @@ public class Main {
 
     public JPanel createBattlePanel(){
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK); // MAYII ARII
+        panel.setBackground(Color.BLACK); 
 
         
         enemyPanel = new JPanel();
         enemyPanel.setLayout(new BoxLayout(enemyPanel, BoxLayout.Y_AXIS));
         enemyPanel.setBackground(Color.BLACK); 
-        enemyPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        enemyPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
 
         locationLabel = new JLabel("Level 1: Abandoned Emergency Room", SwingConstants.CENTER);
         locationLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
@@ -479,7 +470,7 @@ public class Main {
         panel.add(enemyPanel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel(new GridLayout(1, 2, 10, 0));
-        centerPanel.setBackground(Color.BLACK); // MAYII ARII
+        centerPanel.setBackground(Color.BLACK); 
         centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 
@@ -491,6 +482,7 @@ public class Main {
         battleLogArea.setLineWrap(true);
         battleLogArea.setWrapStyleWord(true);
         JScrollPane scrollPane = new JScrollPane(battleLogArea);
+        scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2));
         scrollPane.setBorder(null);
         scrollPane.setPreferredSize(new Dimension(500, 200));
         EmptyBorder logBorder = new EmptyBorder(20, 20, 20, 20);
@@ -501,8 +493,7 @@ public class Main {
         playerStatusPanel = new JPanel();
         playerStatusPanel.setLayout(new BoxLayout(playerStatusPanel, BoxLayout.Y_AXIS));
         playerStatusPanel.setBackground(Color.BLACK);
-        EmptyBorder playerStatusBorder = new EmptyBorder(10, 10, 10, 10);
-        playerStatusPanel.setBorder(playerStatusBorder);
+        playerStatusPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2));
 
         centerPanel.add(playerStatusPanel);
         panel.add(centerPanel, BorderLayout.CENTER);
@@ -510,7 +501,9 @@ public class Main {
         
         battleActionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         battleActionPanel.setBackground(Color.BLACK);
+        battleActionPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2));
         panel.add(battleActionPanel, BorderLayout.SOUTH);
+
 
         return panel;
     }
@@ -573,7 +566,7 @@ public class Main {
         
         panel.setBackground(Color.BLACK);
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));
-        
+    
        
         panel.add(Box.createVerticalGlue());
 
@@ -707,7 +700,7 @@ public class Main {
     public void createCharacterSelectionButtons() {
         JButton startButton = new JButton("START MISSION");
         startButton.setFont(new Font("Times New Roman", Font.BOLD, 24));
-        startButton.setBackground(new Color(150, 0, 0)); // MAYII ARII - Red Background
+        startButton.setBackground(new Color(150, 0, 0)); 
         startButton.setForeground(Color.WHITE);
         startButton.setEnabled(false);
         startButton.addActionListener(e -> startGame(new Carrier()));
@@ -737,7 +730,7 @@ public class Main {
             
             button.setEnabled(false);
             button.setBackground(Color.BLACK);
-            button.setForeground(Color.GREEN); // MAYII ARII - Selected character text turns green
+            button.setForeground(Color.GREEN); 
             
  
             displayCharacterDetails(c, button);
@@ -792,13 +785,13 @@ public class Main {
 
         if (currentFloor == 1) {
             locationLabel.setText("Level 1: Abandoned Emergency Room");
-            locationLabel.setForeground(oceanBlue); 
+            locationLabel.setForeground(darkBlue); 
         } else if (currentFloor == 2) {
             locationLabel.setText("Level 2: Infectious ICU");
-            locationLabel.setForeground(oceanBlue); 
+            locationLabel.setForeground(darkBlue); 
         } else if (currentFloor == 3) {
             locationLabel.setText("Final Level: Underground Research Lab");
-            locationLabel.setForeground(oceanBlue); 
+            locationLabel.setForeground(darkBlue); 
         }
 
         updateBattleUI();
@@ -1112,7 +1105,7 @@ public class Main {
         directionPanel.setLayout(new BorderLayout());
 
         JPanel messageContainer = new JPanel(new GridLayout(3, 1));
-        messageContainer.setBackground(Color.BLACK); // MAYII ARII
+        messageContainer.setBackground(Color.BLACK); 
         messageContainer.setBorder(BorderFactory.createEmptyBorder(100, 50, 50, 50));
 
         JLabel titleLabel = new JLabel("HEALING INJECTION RECEIVED", SwingConstants.CENTER);
@@ -1128,7 +1121,7 @@ public class Main {
         messageContainer.add(messageLabel);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 50));
-        buttonPanel.setBackground(Color.BLACK); // MAYII ARII
+        buttonPanel.setBackground(Color.BLACK); 
 
         JButton nextFloorButton = new JButton("NEXT FLOOR");
         nextFloorButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
