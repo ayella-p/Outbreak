@@ -557,11 +557,11 @@ public class Main {
     return panel;
 }
     public JPanel createFinalVictoryPanel() {
-       Color victoryBackground = new Color(20, 0, 40);        
-        Color titleColor = new Color(150, 0, 0);               // Red 
-        Color subtextColor = new Color(173, 216, 230);          // Light Blue
-        Color buttonColor = new Color(0, 51, 102);              // Dark Blue
-        Color messageColor = new Color(0, 255, 255);           // light mlue
+       Color titleColor = new Color(150, 0, 0); //red              
+        Color subtextColor = new Color(173, 216, 230); //mule
+        Color buttonColor = new Color(0, 51, 102); //dark mule
+        Color messageColor = new Color(0, 255, 255); //mule ni
+
         
         Font mainTitleFont = titleFont.deriveFont(Font.BOLD, 90f);
         Font subTitleFont = normalFont.deriveFont(Font.BOLD, 30f);
@@ -569,7 +569,8 @@ public class Main {
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(victoryBackground);
+        
+        panel.setBackground(Color.BLACK);
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));
         
        
@@ -581,13 +582,11 @@ public class Main {
         titleLabel.setForeground(titleColor);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-       
         JLabel subLabel = new JLabel("OUTBREAK ELIMINATED! Facility Secured.", SwingConstants.CENTER);
         subLabel.setFont(subTitleFont);
         subLabel.setForeground(subtextColor);
         subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-       
         JLabel messageLabel = new JLabel("You have defeated Dr. Alcaraz.", SwingConstants.CENTER);
         messageLabel.setFont(normalFont.deriveFont(Font.ITALIC, 30f)); 
         messageLabel.setForeground(messageColor); //mlue
@@ -618,7 +617,7 @@ public class Main {
         panel.add(Box.createVerticalGlue());
 
         return panel;
-    }
+}
 
     public JPanel createDirectionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
