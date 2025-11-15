@@ -230,11 +230,11 @@ public class Main {
         cardPanel.add(directionPanel, DIRECTIONAL_PANEL);
 
         JPanel missionCompletePanel = createMissionCompletePanel();
-        missionCompletePanel.setBackground(Color.BLACK); 
+        missionCompletePanel.setBackground(new Color(20, 0, 40)); 
         cardPanel.add(missionCompletePanel, MISSION_COMPLETE_PANEL);
 
         JPanel finalVictoryPanel = createFinalVictoryPanel(); 
-        finalVictoryPanel.setBackground(Color.BLACK); 
+        finalVictoryPanel.setBackground(new Color(20, 0, 40)); 
         cardPanel.add(finalVictoryPanel, FINAL_VICTORY_PANEL);
         
         gameOverPanel = createGameOverPanel();
@@ -516,13 +516,14 @@ public class Main {
     }
 
     public JPanel createMissionCompletePanel() {
+        Color darkPurple = new Color(20, 0, 40);
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK); // MAYII ARII
+        panel.setBackground(darkPurple);
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));
 
         JPanel centerContentPanel = new JPanel();
         centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
-        centerContentPanel.setBackground(Color.BLACK); // MAYII ARII
+        centerContentPanel.setBackground(darkPurple);
 
         JLabel titleLabel = new JLabel("MISSION SUCCESSFUL!");
         titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 60f));
@@ -557,7 +558,7 @@ public class Main {
     return panel;
 }
     public JPanel createFinalVictoryPanel() {
-       Color titleColor = new Color(150, 0, 0); //red              
+       Color titleColor = new Color(0, 150, 0); //green              
         Color subtextColor = new Color(173, 216, 230); //mule
         Color buttonColor = new Color(0, 51, 102); //dark mule
         Color messageColor = new Color(0, 255, 255); //mule ni
