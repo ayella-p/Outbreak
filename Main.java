@@ -557,57 +557,76 @@ public class Main {
     return panel;
 }
     public JPanel createFinalVictoryPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK); // MAYII ARII
+       Color victoryBackground = new Color(20, 0, 40);        
+        Color titleColor = new Color(150, 0, 0);               // Red 
+        Color subtextColor = new Color(173, 216, 230);          // Light Blue
+        Color buttonColor = new Color(0, 51, 102);              // Dark Blue
+        Color messageColor = new Color(0, 255, 255);           // light mlue
+        
+        Font mainTitleFont = titleFont.deriveFont(Font.BOLD, 90f);
+        Font subTitleFont = normalFont.deriveFont(Font.BOLD, 30f);
+        Font buttonFont = titleFont.deriveFont(Font.BOLD, 35f);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(victoryBackground);
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));
+        
+       
+        panel.add(Box.createVerticalGlue());
 
-        JPanel centerContentPanel = new JPanel();
-        centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
-        centerContentPanel.setBackground(Color.BLACK); // MAYII ARII
-
-        // Big, celebratory title
-        JLabel titleLabel = new JLabel("OUTBREAK ELIMINATED!", SwingConstants.CENTER);
-        titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 70f));
-        titleLabel.setForeground(new Color(255, 215, 0)); // Gold color
+       
+        JLabel titleLabel = new JLabel("VICTORY!", SwingConstants.CENTER);
+        titleLabel.setFont(mainTitleFont);
+        titleLabel.setForeground(titleColor);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subLabel = new JLabel("You have defeated Dr. Alcaraz and secured the facility!", SwingConstants.CENTER);
-        subLabel.setFont(normalFont.deriveFont(Font.BOLD, 30f));
-        subLabel.setForeground(new Color(0, 255, 0)); // Bright Green
+       
+        JLabel subLabel = new JLabel("OUTBREAK ELIMINATED! Facility Secured.", SwingConstants.CENTER);
+        subLabel.setFont(subTitleFont);
+        subLabel.setForeground(subtextColor);
         subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton finishButton = new JButton("RETURN TO TITLE");
-        finishButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        finishButton.setBackground(new Color(150, 0, 0)); // Red button
+       
+        JLabel messageLabel = new JLabel("You have defeated Dr. Alcaraz.", SwingConstants.CENTER);
+        messageLabel.setFont(normalFont.deriveFont(Font.ITALIC, 30f)); 
+        messageLabel.setForeground(messageColor); //mlue
+        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton finishButton = new JButton("RESTART GAME");
+        finishButton.setFont(buttonFont);
+        finishButton.setBackground(buttonColor);
         finishButton.setForeground(Color.WHITE);
         finishButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        finishButton.setMaximumSize(new Dimension(400, 70));
-        finishButton.setPreferredSize(new Dimension(400, 70));
+        finishButton.setMaximumSize(new Dimension(500, 80));
+        finishButton.setPreferredSize(new Dimension(500, 80));
 
         finishButton.addActionListener(e -> {
             window.dispose();
-            new Main(); 
+            new Main();
         });
 
-        centerContentPanel.add(titleLabel);
-        centerContentPanel.add(Box.createVerticalStrut(30));
-        centerContentPanel.add(subLabel);
-        centerContentPanel.add(Box.createVerticalStrut(50));
-        centerContentPanel.add(finishButton);
-
-        panel.add(centerContentPanel, BorderLayout.CENTER);
+       panel.add(titleLabel);
+        panel.add(Box.createVerticalStrut(30));
+        panel.add(subLabel);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(messageLabel);
+        panel.add(Box.createVerticalStrut(60));
+        panel.add(finishButton);
+        
+        
+        panel.add(Box.createVerticalGlue());
 
         return panel;
     }
 
-
     public JPanel createDirectionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK); // MAYII ARII
+        panel.setBackground(Color.BLACK); 
         
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-        textPanel.setBackground(Color.BLACK); // MAYII ARII
+        textPanel.setBackground(Color.BLACK); 
         textPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 20, 50));
 
         directionLabel = new JLabel("You have defeated the " + floorChoice + " enemy.", SwingConstants.CENTER);
@@ -628,7 +647,7 @@ public class Main {
 
 
         JPanel choicesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 50));
-        choicesPanel.setBackground(Color.BLACK); // MAYII ARII
+        choicesPanel.setBackground(Color.BLACK); 
 
         JButton choiceAButton = new JButton("EAST");
         choiceAButton.setFont(new Font("Times New Roman", Font.BOLD, 20));
