@@ -80,37 +80,45 @@ public class Main {
         window.setSize(1000, 700); 
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setTitle("OUTBREAK");
-        window.getContentPane().setBackground(new Color(240, 240, 240));
+        window.getContentPane().setBackground(Color.BLACK);
         window.setLayout(new BorderLayout());
         con = window.getContentPane();
         
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
-        cardPanel.setBackground(Color.WHITE);
+        cardPanel.setBackground(Color.BLACK);
         con.add(cardPanel, BorderLayout.CENTER);
 
         titleScreenPanel = createTitleScreenPanel();
+        titleScreenPanel.setBackground(Color.BLACK);
         cardPanel.add(titleScreenPanel, TITLE_SCREEN_PANEL);
 
         howToPlayPanel = createHowToPlayPanel();
+        howToPlayPanel.setBackground(Color.BLACK);
         cardPanel.add(howToPlayPanel, HOW_TO_PLAY_PANEL);
 
         JPanel charSelectContainer = createCharacterSelectContainer();
+        charSelectContainer.setBackground(Color.BLACK);
         cardPanel.add(charSelectContainer, CHARACTER_SELECT_PANEL);
 
         battlePanel = createBattlePanel(); 
+        battlePanel.setBackground(Color.BLACK);
         cardPanel.add(battlePanel, BATTLE_PANEL);
 
         directionPanel = createDirectionPanel();
+        directionPanel.setBackground(Color.BLACK);
         cardPanel.add(directionPanel, DIRECTIONAL_PANEL);
 
         JPanel missionCompletePanel = createMissionCompletePanel();
+        missionCompletePanel.setBackground(Color.BLACK);
         cardPanel.add(missionCompletePanel, MISSION_COMPLETE_PANEL);
 
         JPanel finalVictoryPanel = createFinalVictoryPanel(); 
+        finalVictoryPanel.setBackground(Color.BLACK);
         cardPanel.add(finalVictoryPanel, FINAL_VICTORY_PANEL);
         
         gameOverPanel = createGameOverPanel();
+        gameOverPanel.setBackground(Color.BLACK);
         cardPanel.add(gameOverPanel, GAME_OVER_PANEL);
 
         cardLayout.show(cardPanel, TITLE_SCREEN_PANEL);
@@ -149,7 +157,7 @@ public class Main {
 
     public JPanel createTitleScreenPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
+        panel.setBackground(Color.BLACK);
 
         JLabel title = new JLabel("OUTBREAK", SwingConstants.CENTER);
         title.setFont(titleFont.deriveFont(Font.BOLD, 80f));
@@ -159,12 +167,12 @@ public class Main {
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setBackground(Color.BLACK);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
 
         JButton startButton = new JButton("START MISSION");
         startButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        startButton.setBackground(new Color(200, 0, 0));
+        startButton.setBackground(new Color(0, 150, 0));
         startButton.setForeground(Color.WHITE);
         startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         startButton.setFocusPainted(false);
@@ -199,7 +207,7 @@ public class Main {
 
     public JPanel createHowToPlayPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
+        panel.setBackground(Color.BLACK);
 
         JLabel title = new JLabel("How to Play", SwingConstants.CENTER);
         title.setFont(titleFont.deriveFont(Font.BOLD, 40f));
@@ -221,8 +229,8 @@ public class Main {
            
         );
         instructionsArea.setFont(normalFont.deriveFont(Font.PLAIN, 20f));
-        instructionsArea.setForeground(new Color(50, 50, 50));
-        instructionsArea.setBackground(new Color(240, 240, 240));
+        instructionsArea.setForeground(Color.LIGHT_GRAY);
+        instructionsArea.setBackground(Color.DARK_GRAY);
         instructionsArea.setWrapStyleWord(true);
         instructionsArea.setLineWrap(true);
         instructionsArea.setEditable(false);
@@ -236,7 +244,7 @@ public class Main {
         backButton.addActionListener(e -> cardLayout.show(cardPanel, TITLE_SCREEN_PANEL));
         
         JPanel southPanel = new JPanel();
-        southPanel.setBackground(Color.WHITE);
+        southPanel.setBackground(Color.BLACK);
         southPanel.add(backButton);
         southPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
         
@@ -252,10 +260,10 @@ public class Main {
 
         
         mainTitlePanel = new JPanel();
-        mainTitlePanel.setBackground(new Color(240, 240, 240));
+        mainTitlePanel.setBackground(Color.BLACK);
         mainTitlePanel.setBorder(BorderFactory.createLineBorder(new Color(0, 100, 150), 2));
         mainTitleLabel = new JLabel("CHOOSE YOUR SQUAD (0/3)");
-        mainTitleLabel.setForeground(new Color(50, 50, 50));
+        mainTitleLabel.setForeground(Color.WHITE);
         mainTitleLabel.setFont(titleFont);
         mainTitlePanel.add(mainTitleLabel);
         charSelectContainer.add(mainTitlePanel, BorderLayout.NORTH);
@@ -263,23 +271,23 @@ public class Main {
        
         charDisplayPanel = new JPanel();
         charDisplayPanel.setLayout(new BoxLayout(charDisplayPanel, BoxLayout.Y_AXIS));
-        charDisplayPanel.setBackground(new Color(240, 240, 240));
+        charDisplayPanel.setBackground(Color.BLACK);
         charDisplayPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         charNameLabel = new JLabel(" ");
         charNameLabel.setFont(new Font("Times New Roman", Font.BOLD, 36));
-        charNameLabel.setForeground(new Color(50, 50, 50));
+        charNameLabel.setForeground(Color.WHITE);
         charNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         charStatsLabel = new JLabel(" ");
         charStatsLabel.setFont(normalFont);
-        charStatsLabel.setForeground(new Color(50, 50, 50));
+        charStatsLabel.setForeground(Color.GREEN);
         charStatsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         charBackstoryArea = new JTextArea(" ");
         charBackstoryArea.setFont(normalFont);
-        charBackstoryArea.setForeground(new Color(50, 50, 50));
-        charBackstoryArea.setBackground(new Color(240, 240, 240));
+        charBackstoryArea.setForeground(Color.LIGHT_GRAY);
+        charBackstoryArea.setBackground(Color.DARK_GRAY);
         charBackstoryArea.setWrapStyleWord(true);
         charBackstoryArea.setLineWrap(true);
         charBackstoryArea.setEditable(false);
@@ -289,12 +297,12 @@ public class Main {
 
         JPanel textAreaWrapper = new JPanel();
         textAreaWrapper.setLayout(new GridBagLayout());
-        textAreaWrapper.setBackground(new Color(240, 240, 240));
+        textAreaWrapper.setBackground(Color.DARK_GRAY);
         textAreaWrapper.add(charBackstoryArea);
         textAreaWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         detailsButtonPanel = new JPanel();
-        detailsButtonPanel.setBackground(new Color(240, 240, 240));
+        detailsButtonPanel.setBackground(Color.DARK_GRAY);
         detailsButtonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 
@@ -311,7 +319,7 @@ public class Main {
        
         selectionButtonsPanel = new JPanel();
         selectionButtonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        selectionButtonsPanel.setBackground(new Color(240, 240, 240));
+        selectionButtonsPanel.setBackground(Color.DARK_GRAY);
         createCharacterSelectionButtons(); 
         charSelectContainer.add(selectionButtonsPanel, BorderLayout.SOUTH);
         
@@ -589,7 +597,7 @@ public class Main {
            
             button.setEnabled(false);
             button.setBackground(Color.BLACK);
-            
+            button.setForeground(Color.GREEN);
   
             displayCharacterDetails(c, button);
 
