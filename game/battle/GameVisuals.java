@@ -52,56 +52,67 @@ public class GameVisuals {
     public final AtomicReference<Character> currentViewedCharacter = new AtomicReference<>(null);
 
     // managers
-    private final CharacterSelection charSelectionManager;
+    private CharacterSelection charSelectionManager;
     public Battle battleManager;
 
     public GameVisuals() {
-        this.charSelectionManager = new CharacterSelection(this); // this = referencing to gamevisuals gui
-        this.battleManager = new Battle(this, new Carrier()); // first floor enemy carrier
+        try {
+            this.charSelectionManager = new CharacterSelection(this); // this = referencing to gamevisuals gui
+            this.battleManager = new Battle(this, new Carrier()); // first floor enemy carrier
 
-        initializeCharacters();
+            initializeCharacters();
 
-        //window
-        window = new JFrame();
-        window.setSize(1000, 700);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setTitle("OUTBREAK");
-        window.getContentPane().setBackground(new Color(240, 240, 240));
-        window.setLayout(new BorderLayout());
-        con = window.getContentPane();
-
-
-        cardLayout = new CardLayout();
-        cardPanel = new JPanel(cardLayout);
-        cardPanel.setBackground(Color.WHITE);
-        con.add(cardPanel, BorderLayout.CENTER);
+            //window
+            window = new JFrame();
+            window.setSize(1000, 700);
+            window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            window.setTitle("OUTBREAK");
+            window.getContentPane().setBackground(new Color(240, 240, 240));
+            window.setLayout(new BorderLayout());
+            con = window.getContentPane();
 
 
-        cardPanel.add(createTitleScreenPanel(), TITLE_SCREEN_PANEL);
-        cardPanel.add(createHowToPlayPanel(), HOW_TO_PLAY_PANEL);
-        cardPanel.add(charSelectionManager.createCharacterSelectContainer(), CHARACTER_SELECT_PANEL);
-        battlePanel = createBattlePanel();
-        cardPanel.add(battlePanel, BATTLE_PANEL);
-        directionPanel = createDirectionPanel();
-        cardPanel.add(directionPanel, DIRECTIONAL_PANEL);
-        cardPanel.add(createMissionCompletePanel(), MISSION_COMPLETE_PANEL);
-        cardPanel.add(createFinalVictoryPanel(), FINAL_VICTORY_PANEL);
-        gameOverPanel = createGameOverPanel();
-        cardPanel.add(gameOverPanel, GAME_OVER_PANEL);
+            cardLayout = new CardLayout();
+            cardPanel = new JPanel(cardLayout);
+            cardPanel.setBackground(Color.WHITE);
+            con.add(cardPanel, BorderLayout.CENTER);
 
-        // start screen
-        cardLayout.show(cardPanel, TITLE_SCREEN_PANEL);
-        window.setLocationRelativeTo(null);
-        window.setVisible(true);
+
+            cardPanel.add(createTitleScreenPanel(), TITLE_SCREEN_PANEL);
+            cardPanel.add(createHowToPlayPanel(), HOW_TO_PLAY_PANEL);
+            cardPanel.add(charSelectionManager.createCharacterSelectContainer(), CHARACTER_SELECT_PANEL);
+            battlePanel = createBattlePanel();
+            cardPanel.add(battlePanel, BATTLE_PANEL);
+            directionPanel = createDirectionPanel();
+            cardPanel.add(directionPanel, DIRECTIONAL_PANEL);
+            cardPanel.add(createMissionCompletePanel(), MISSION_COMPLETE_PANEL);
+            cardPanel.add(createFinalVictoryPanel(), FINAL_VICTORY_PANEL);
+            gameOverPanel = createGameOverPanel();
+            cardPanel.add(gameOverPanel, GAME_OVER_PANEL);
+
+            // start screen
+            cardLayout.show(cardPanel, TITLE_SCREEN_PANEL);
+            window.setLocationRelativeTo(null);
+            window.setVisible(true);
+        } catch (Exception e) {
+            System.err.println("CRITICAL ERROR during GameVisuals initialization: " + e.getMessage());
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
 
     public void initializeCharacters() {
-        availableCharacters.add(new Zor());
-        availableCharacters.add(new Leo());
-        availableCharacters.add(new Elara());
-        availableCharacters.add(new Kai());
-        availableCharacters.add(new Anya());
+        try {
+            availableCharacters.add(new Zor());
+            availableCharacters.add(new Leo());
+            availableCharacters.add(new Elara());
+            availableCharacters.add(new Kai());
+            availableCharacters.add(new Anya());
+        } catch (Exception e) {
+            System.err.println("Error initializing characters: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     // card switching
