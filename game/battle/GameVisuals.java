@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import game.core.Character;
 import game.characters.*;
 import game.enemies.*;
-import game.enemies.bosses.*;
 
 public class GameVisuals {
     public JFrame window;
