@@ -83,13 +83,20 @@ public class CharacterSelection {
     }
 
     public void createCharacterSelectionButtons() {
+        try {
         JButton startButton = new JButton("START MISSION");
         startButton.setFont(new Font("Times New Roman", Font.BOLD, 24));
         startButton.setBackground(new Color(150, 0, 0));
         startButton.setForeground(Color.WHITE);
         startButton.setEnabled(false);
         // This button initiates the game loop with the first enemy
-        startButton.addActionListener(e -> gui.battleManager.startGame(new Carrier()));
+        startButton.addActionListener(e -> {
+            try {
+                gui.battleManager.startGame(new Carrier());
+            } catch (Exception ex) {
+                System.err.println("Error starting game: " + ex.getMessage());
+            }
+        });
         startButton.setName("START_BUTTON");
         gui.selectionButtonsPanel.add(startButton);
 
@@ -101,12 +108,21 @@ public class CharacterSelection {
             charButton.setFocusPainted(false);
 
             charButton.addActionListener(e -> {
-                displayCharacterDetails(character, charButton); // display character is here lang
+                try {
+                    displayCharacterDetails(character, charButton); // display character is here lang
+                } catch (Exception ex) {
+                    System.err.println("Error displaying details for " + character.name + ": " + ex.getMessage());
+                    ex.printStackTrace();
+                }
             });
 
             gui.selectionButtonsPanel.add(charButton, gui.selectionButtonsPanel.getComponentCount() - 1); // - 1 to put the Start Mission further
         }
+    }catch (Exception e) {
+        System.err.println("Error creating character selection buttons: " + e.getMessage());
+        e.printStackTrace();
     }
+}
 
     public void displayCharacterDetails(Character c, JButton sourceButton) {
         gui.charNameLabel.setText(c.name.toUpperCase());
@@ -118,20 +134,33 @@ public class CharacterSelection {
     }
 
     void updateDetailsButtonPanel(Character c, JButton sourceButton) {
-        gui.detailsButtonPanel.removeAll();
+    try {
+    gui.detailsButtonPanel.removeAll();
         JButton selectButton = new JButton("SELECT " + c.name.toUpperCase());
         selectButton.setFont(gui.normalFont.deriveFont(Font.BOLD));
 
         if (gui.selectionCount < 3) {
             selectButton.setForeground(Color.BLACK);
-            selectButton.addActionListener(e -> selectCharacter(sourceButton, c));
+            selectButton.addActionListener(e -> {
+                try {
+                    selectCharacter(sourceButton, c);
+                } catch (Exception ex) {
+                    System.err.println("Error in selectCharacter logic: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+            });
             gui.detailsButtonPanel.add(selectButton);
         } else {
             gui.detailsButtonPanel.removeAll();
         }
         gui.detailsButtonPanel.revalidate();
         gui.detailsButtonPanel.repaint();
+    } catch (Exception e) {
+        System.err.println("Error updating details button panel: " + e.getMessage());
+        e.printStackTrace();
     }
+    }
+
 
     public void selectCharacter(JButton button, Character c) {
         if (gui.selectionCount < 3 && !gui.playerParty.contains(c)) {

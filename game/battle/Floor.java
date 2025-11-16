@@ -20,41 +20,54 @@ public class Floor {
     }
 
     public void endBattle(boolean win) {
-        if (win) {
-            // apply healing
-            int floor = gui.currentFloor + 1;
-            for (Character c : gui.playerParty) {
-                if (c.currentHP >= 0) {
-                    int healAmount = (int) (c.maxHP * 0.25);
-                    int resourceRestore = (int) (c.maxResource * 0.25);
-                    c.currentHP = Math.min(c.currentHP + healAmount, c.maxHP); // returns the min, and returns equals if over the maxHP
-                    c.currentResource = Math.min(c.currentResource + resourceRestore, c.maxResource); // same here
+        try {
+            if (win) {
+                // apply healing
+                int floor = gui.currentFloor + 1;
+                for (Character c : gui.playerParty) {
+                    if (c.currentHP >= 0) {
+                        int healAmount = (int) (c.maxHP * 0.25);
+                        int resourceRestore = (int) (c.maxResource * 0.25);
+                        c.currentHP = Math.min(c.currentHP + healAmount, c.maxHP); // returns the min, and returns equals if over the maxHP
+                        c.currentResource = Math.min(c.currentResource + resourceRestore, c.maxResource); // same here
+                    }
                 }
-            }
-            manager.updatePlayerStatusUI(); // update player status
+                manager.updatePlayerStatusUI(); // update player status
 
 
-            if(floor == 1) gui.floorChoice = "First Floor";
-            else if (floor == 2) gui.floorChoice = "Second Floor";
-            else if (floor == 3) gui.floorChoice = "Third Floor";
-            else if (floor == 4) gui.floorChoice = "Final Floor";
+                if (gui.currentFloor == 1) gui.floorChoice = "First Floor";
+                else if (gui.currentFloor == 2) gui.floorChoice = "Second Floor";
+                else if (gui.currentFloor == 3) gui.floorChoice = "Third Floor";
+                else if (gui.currentFloor == 4) gui.floorChoice = "Final Floor";
 
-            // boss transition (special for the Final Boss)
-            if (manager.getCurrentEnemy() instanceof DrAlcaraz) {
-                gui.showCard(GameVisuals.FINAL_VICTORY_PANEL); // victory
-            } else if (manager.getCurrentEnemy() instanceof Venomshade) {
-                gui.currentFloor = 4; // to go to final Lebel
-                gui.battleLogArea.append("\nVenomshade defeated! The true threat, Dr. Alcaraz, emerges!\n");
-                manager.startGame(new DrAlcaraz());
-            } else if (manager.getCurrentEnemy() instanceof Boss) {
-                gui.showCard(GameVisuals.MISSION_COMPLETE_PANEL);
+                // boss transition (special for the Final Boss)
+                Enemy currentEnemy = manager.getCurrentEnemy();
+                if (currentEnemy instanceof DrAlcaraz) {
+                    gui.showCard(GameVisuals.FINAL_VICTORY_PANEL); // victory
+                } else if (currentEnemy instanceof Venomshade) {
+                    gui.currentFloor = 4; // to go to final Lebel
+                    gui.battleLogArea.append("\nVenomshade defeated! The true threat, Dr. Alcaraz, emerges!\n");
+                    manager.startGame(new DrAlcaraz());
+                } else if (currentEnemy instanceof Boss) {
+                    gui.showCard(GameVisuals.MISSION_COMPLETE_PANEL);
+                } else {
+                    gui.showCard(GameVisuals.DIRECTIONAL_PANEL); // regular enemy
+                }
             } else {
-                gui.showCard(GameVisuals.DIRECTIONAL_PANEL); // regular enemy
+                gui.showCard(GameVisuals.GAME_OVER_PANEL);
             }
-        } else {
-            gui.showCard(GameVisuals.GAME_OVER_PANEL);
+        } catch (NullPointerException e) {
+            System.err.println("Specific Error: Null reference encountered during endBattle (UI or Manager access): " + e.getMessage());
+            e.printStackTrace();
+
+            if (gui != null) gui.showCard(GameVisuals.GAME_OVER_PANEL);
+        } catch (Exception e) {
+            System.err.println("General Error during endBattle execution: " + e.getMessage());
+            e.printStackTrace();
+            if (gui != null) gui.showCard(GameVisuals.GAME_OVER_PANEL);
         }
     }
+
 
 
     public void chooseDirection(String choice) {
@@ -132,33 +145,49 @@ public class Floor {
 
 
     public void startNextFloorTransition() {
-        gui.directionPanel.removeAll();
-        gui.directionPanel.setLayout(new BorderLayout());
-        newFloor();
+        try {
+            gui.directionPanel.removeAll();
+            gui.directionPanel.setLayout(new BorderLayout());
+            newFloor();
+        } catch (Exception e) {
+            System.err.println("Error in startNExtFloorTransition: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 
     public void newFloor() {
-        gui.currentFloor++;
-        gui.cardPanel.remove(gui.directionPanel);
-        gui.directionPanel = gui.createDirectionPanel();
-        gui.cardPanel.add(gui.directionPanel, GameVisuals.DIRECTIONAL_PANEL);
+        try {
+            gui.currentFloor++;
+            gui.cardPanel.remove(gui.directionPanel);
+            gui.directionPanel = gui.createDirectionPanel();
+            gui.cardPanel.add(gui.directionPanel, GameVisuals.DIRECTIONAL_PANEL);
 
-        Enemy nextEnemy = null;
+            if (gui.currentFloor > 4) {
+                gui.showCard(GameVisuals.FINAL_VICTORY_PANEL); //victory
+                return;
+            }
 
-        if (gui.currentFloor > 4) {
-            gui.showCard(GameVisuals.FINAL_VICTORY_PANEL); //victory
-            return;
-        }
+            Enemy nextEnemy = null;
+            if (gui.currentFloor == 2) {
+                nextEnemy = new Howler();
+            } else if (gui.currentFloor == 3) {
+                nextEnemy = new Carrier();
+            }
 
-        if (gui.currentFloor == 2) {
-            nextEnemy = new Howler();
-        } else if (gui.currentFloor == 3) {
-            nextEnemy = new Carrier();
-        }
-
-        if (nextEnemy != null) {
-            manager.startGame(nextEnemy);
+            if (nextEnemy != null) {
+                manager.startGame(nextEnemy);
+            } else {
+                gui.showCard(GameVisuals.MISSION_COMPLETE_PANEL);
+            }
+        } catch (NullPointerException e) {
+            System.err.println("Specific Error: Null reference during newFloor setup (UI component access): " + e.getMessage());
+            e.printStackTrace();
+            gui.showCard(GameVisuals.GAME_OVER_PANEL);
+        } catch (Exception e) {
+            System.err.println("General Error during newFloor: " + e.getMessage());
+            e.printStackTrace();
+            gui.showCard(GameVisuals.GAME_OVER_PANEL);
         }
     }
 

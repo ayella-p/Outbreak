@@ -83,39 +83,50 @@ public class Battle {
     }
 
     public void performSkill(Character character, Skill skill) {
-
-        boolean enemyAlive = combatResolver.resolvePlayerAction(character, skill, currentEnemy);
-
-        updateBattleUI(); // update enemy hp
-        updatePlayerStatusUI(); // update character hp/resources
-
-        if (!enemyAlive) {
-            progressionManager.endBattle(true);
-            return;
-        }
-
-        // enemy turn after player's
-        enemyTurn();
-
-        // Check for party wipe after enemy turn
-        List<Character> aliveCharacters = new ArrayList<>();
-        for (Character c : playerParty) {
-            if (c.currentHP > 0) {
-                aliveCharacters.add(c);
+        try {
+            if (combatResolver == null || progressionManager == null) {
+                gui.battleLogArea.append("\n[ERROR] Game managers not initialized. Cannot perform action.\n");
+                return;
             }
-        }
 
-        if (aliveCharacters.isEmpty()) {
-            gui.battleLogArea.append("\nAll remaining squad members are defeated!\n");
-            progressionManager.endBattle(false);
-            return;
-        }
+            boolean enemyAlive = combatResolver.resolvePlayerAction(character, skill, currentEnemy);
 
-        // If active character was defeated, clear turn and prompt new selection
-        if (activeCharacter != null && activeCharacter.currentHP <= 0) {
-            this.activeCharacter = null;
+            updateBattleUI(); // update enemy hp
+            updatePlayerStatusUI(); // update character hp/resources
+
+            if (!enemyAlive) {
+                progressionManager.endBattle(true);
+                return;
+            }
+
+            // enemy turn after player's
+            enemyTurn();
+
+            // Check for party wipe after enemy turn
+            List<Character> aliveCharacters = new ArrayList<>();
+            for (Character c : playerParty) {
+                if (c.currentHP > 0) {
+                    aliveCharacters.add(c);
+                }
+            }
+
+            if (aliveCharacters.isEmpty()) {
+                gui.battleLogArea.append("\nAll remaining squad members are defeated!\n");
+                progressionManager.endBattle(false);
+                return;
+            }
+
+            // If active character was defeated, clear turn and prompt new selection
+            if (activeCharacter != null && activeCharacter.currentHP <= 0) {
+                this.activeCharacter = null;
+            }
+            setupCharacterActionButtons(this.activeCharacter);
+        } catch (IndexOutOfBoundsException e) {
+            System.err.println("Specific Error: Index out of bounds during skill performance or list iteration: " + e.getLocalizedMessage());
+            e.printStackTrace();
+            gui.battleLogArea.append("\n[ERROR] Data access error encountered. Selecting new action.\n");
+            setupCharacterActionButtons(null);
         }
-        setupCharacterActionButtons(this.activeCharacter);
     }
 
     public void enemyTurn() {

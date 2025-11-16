@@ -17,16 +17,32 @@ public class Attack {
     }
 
     public boolean resolvePlayerAction(Character character, Skill skill, Enemy currentEnemy) {
-        if (character.currentHP <= 0) {
-            gui.battleLogArea.append(character.name + " is knocked out and cannot act!\n");
-            character.currentResource = 0;
-            return true;
+        try {
+            if (character == null || skill == null || currentEnemy == null) {
+                gui.battleLogArea.append("[ERROR] Invalid action: Character, skill, or enemy is missing.\n");
+                return currentEnemy != null && currentEnemy.isAlive();
+            }
+            if (character.currentHP <= 0) {
+                gui.battleLogArea.append(character.name + " is knocked out and cannot act!\n");
+                character.currentResource = 0;
+                return true;
+            }
+            if (character.currentResource < skill.cost) {
+                gui.battleLogArea.append("[ERROR] " + character.name + " attempted to use " + skill.name + " but lacked the resources!\n");
+                return true;
+            }
+
+            character.currentResource -= skill.cost;
+            int damageDealt = skill.damage;
+            currentEnemy.takeDamage(damageDealt);
+            gui.battleLogArea.append(character.name + " uses " + skill.name + ", dealing " + damageDealt + " damage to " + currentEnemy.name + ".\n");
+            return currentEnemy.isAlive();
+        } catch (Exception e) {
+            System.err.println("Error resolving player action: " + e.getMessage());
+            e.printStackTrace();
+            gui.battleLogArea.append("[ERROR] An unexpected error stopped the player's action.\n");
+            return currentEnemy != null && currentEnemy.isAlive();
         }
-        character.currentResource -= skill.cost;
-        int damageDealt = skill.damage;
-        currentEnemy.takeDamage(damageDealt);
-        gui.battleLogArea.append(character.name + " uses " + skill.name + ", dealing " + damageDealt + " damage to " + currentEnemy.name + ".\n");
-        return currentEnemy.isAlive();
     }
 
 
@@ -51,10 +67,15 @@ public class Attack {
 
     private List<Character> getAliveCharacters(List<Character> party) {
         List<Character> alive = new ArrayList<>();
-        for (Character c : party) {
-            if (c.currentHP > 0) {
-                alive.add(c);
+        try {
+            for (Character c : party) {
+                if (c.currentHP > 0) {
+                    alive.add(c);
+                }
             }
+        } catch (Exception e) {
+            System.err.println("Error while filtering alive characters: " + e.getMessage());
+            e.printStackTrace();
         }
         return alive;
     }
