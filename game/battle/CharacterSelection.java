@@ -1,0 +1,160 @@
+package game.battle;
+import java.awt.*;
+import javax.swing.*;
+import game.core.Character;
+import game.enemies.*;
+
+public class CharacterSelection {
+
+    private final GameVisuals gui;
+
+    public CharacterSelection(GameVisuals gui) {
+        this.gui = gui;
+    }
+    // use gui to access GameVisuals which is already public
+
+    public JPanel createCharacterSelectContainer() {
+        gui.charDisplayPanel = new JPanel();
+        gui.charDisplayPanel.setLayout(new BoxLayout(gui.charDisplayPanel, BoxLayout.Y_AXIS));
+        gui.charDisplayPanel.setBackground(new Color(240, 240, 240));
+        gui.charDisplayPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        gui.mainTitlePanel = new JPanel();
+        gui.mainTitlePanel.setBackground(new Color(240, 240, 240));
+        gui.mainTitlePanel.setBorder(BorderFactory.createLineBorder(new Color(0, 100, 150), 2));
+        gui.mainTitleLabel = new JLabel("CHOOSE YOUR SQUAD (0/3)");
+        gui.mainTitleLabel.setForeground(new Color(50, 50, 50));
+        gui.mainTitleLabel.setFont(gui.titleFont);
+        gui.mainTitlePanel.add(gui.mainTitleLabel);
+
+        gui.charNameLabel = new JLabel(" ");
+        gui.charNameLabel.setFont(new Font("Times New Roman", Font.BOLD, 36));
+        gui.charNameLabel.setForeground(new Color(50, 50, 50));
+        gui.charNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        gui.charStatsLabel = new JLabel(" ");
+        gui.charStatsLabel.setFont(gui.normalFont);
+        gui.charStatsLabel.setForeground(new Color(50, 50, 50));
+        gui.charStatsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        gui.charBackstoryArea = new JTextArea(" ");
+        gui.charBackstoryArea.setFont(gui.normalFont);
+        gui.charBackstoryArea.setForeground(new Color(50, 50, 50));
+        gui.charBackstoryArea.setBackground(new Color(240, 240, 240));
+        gui.charBackstoryArea.setWrapStyleWord(true);
+        gui.charBackstoryArea.setLineWrap(true);
+        gui.charBackstoryArea.setEditable(false);
+        gui.charBackstoryArea.setAlignmentX(Component.CENTER_ALIGNMENT);
+        gui.charBackstoryArea.setMaximumSize(new Dimension(500, 100));
+        gui.charBackstoryArea.setPreferredSize(new Dimension(500, 100));
+
+        JPanel textAreaWrapper = new JPanel();
+        textAreaWrapper.setLayout(new GridBagLayout());
+        textAreaWrapper.setBackground(new Color(240, 240, 240));
+        textAreaWrapper.add(gui.charBackstoryArea);
+        textAreaWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        gui.detailsButtonPanel = new JPanel();
+        gui.detailsButtonPanel.setBackground(new Color(240, 240, 240));
+        gui.detailsButtonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+
+        gui.charDisplayPanel.add(gui.charNameLabel);
+        gui.charDisplayPanel.add(Box.createVerticalStrut(10));
+        gui.charDisplayPanel.add(gui.charStatsLabel);
+        gui.charDisplayPanel.add(Box.createVerticalStrut(20));
+        gui.charDisplayPanel.add(textAreaWrapper);
+        gui.charDisplayPanel.add(Box.createVerticalStrut(10));
+        gui.charDisplayPanel.add(gui.detailsButtonPanel);
+
+        // Container Panel
+        JPanel charSelectContainer = new JPanel(new BorderLayout());
+        charSelectContainer.setBackground(new Color(240, 240, 240));
+        charSelectContainer.add(gui.mainTitlePanel, BorderLayout.NORTH);
+        charSelectContainer.add(gui.charDisplayPanel, BorderLayout.CENTER);
+
+        gui.selectionButtonsPanel = new JPanel();
+        gui.selectionButtonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        gui.selectionButtonsPanel.setBackground(new Color(240, 240, 240));
+        createCharacterSelectionButtons();
+        charSelectContainer.add(gui.selectionButtonsPanel, BorderLayout.SOUTH);
+
+        return charSelectContainer;
+    }
+
+    public void createCharacterSelectionButtons() {
+        JButton startButton = new JButton("START MISSION");
+        startButton.setFont(new Font("Times New Roman", Font.BOLD, 24));
+        startButton.setBackground(new Color(150, 0, 0));
+        startButton.setForeground(Color.WHITE);
+        startButton.setEnabled(false);
+        // This button initiates the game loop with the first enemy
+        startButton.addActionListener(e -> gui.battleManager.startGame(new Carrier()));
+        startButton.setName("START_BUTTON");
+        gui.selectionButtonsPanel.add(startButton);
+
+        for (Character character : gui.availableCharacters) {
+            JButton charButton = new JButton(character.name);
+            charButton.setFont(gui.normalFont);
+            charButton.setBackground(new Color(60, 60, 60));
+            charButton.setForeground(Color.WHITE);
+            charButton.setFocusPainted(false);
+
+            charButton.addActionListener(e -> {
+                displayCharacterDetails(character, charButton); // display character is here lang
+            });
+
+            gui.selectionButtonsPanel.add(charButton, gui.selectionButtonsPanel.getComponentCount() - 1); // - 1 to put the Start Mission further
+        }
+    }
+
+    public void displayCharacterDetails(Character c, JButton sourceButton) {
+        gui.charNameLabel.setText(c.name.toUpperCase());
+        gui.charStatsLabel.setText("HP: " + c.maxHP + " | " + c.resourceName + ": " + c.maxResource);
+        gui.charBackstoryArea.setText(c.backstory);
+        gui.currentViewedCharacter.set(c);
+
+        updateDetailsButtonPanel(c, sourceButton);
+    }
+
+    void updateDetailsButtonPanel(Character c, JButton sourceButton) {
+        gui.detailsButtonPanel.removeAll();
+        JButton selectButton = new JButton("SELECT " + c.name.toUpperCase());
+        selectButton.setFont(gui.normalFont.deriveFont(Font.BOLD));
+
+        if (gui.selectionCount < 3) {
+            selectButton.setForeground(Color.BLACK);
+            selectButton.addActionListener(e -> selectCharacter(sourceButton, c));
+            gui.detailsButtonPanel.add(selectButton);
+        } else {
+            gui.detailsButtonPanel.removeAll();
+        }
+        gui.detailsButtonPanel.revalidate();
+        gui.detailsButtonPanel.repaint();
+    }
+
+    public void selectCharacter(JButton button, Character c) {
+        if (gui.selectionCount < 3 && !gui.playerParty.contains(c)) {
+            gui.playerParty.add(c);
+            gui.selectionCount++;
+            gui.mainTitleLabel.setText("CHOOSE YOUR SQUAD (" + gui.selectionCount + "/3)");
+
+            button.setEnabled(false);
+            button.setBackground(Color.BLACK);
+
+            displayCharacterDetails(c, button);
+
+            if (gui.selectionCount == 3) {
+                // Find and enable the START_BUTTON
+                for (Component comp : gui.selectionButtonsPanel.getComponents()) {
+                    if (comp instanceof JButton && "START_BUTTON".equals(comp.getName())) { // to locate the Start Button
+                        JButton btn = (JButton) comp; // cast from generic component to a JButton, it allows to modify properties
+                        btn.setEnabled(true);
+                        btn.setBackground(new Color(0, 150, 0)); // the modified property
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
