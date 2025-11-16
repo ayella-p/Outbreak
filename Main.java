@@ -1,6 +1,5 @@
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
-
 
 import game.core.Skill;
 import game.core.Character;
@@ -25,7 +23,6 @@ public class Main {
     JLabel mainTitleLabel, charNameLabel, charStatsLabel;
     JTextArea charBackstoryArea; 
 
-
     JPanel cardPanel;
     CardLayout cardLayout;
     final static String TITLE_SCREEN_PANEL = "TITLE_SCREEN";
@@ -37,8 +34,8 @@ public class Main {
     final static String FINAL_VICTORY_PANEL = "FINAL_VICTORY";
     final static String GAME_OVER_PANEL = "GAME_OVER";
     
-    // The Title Screen is now the FallingSnowPanel
-    FallingSnowPanel titleScreenPanel; 
+    // The Title Screen with snowfall and minimal blood
+    FallingSnowWithBloodPanel titleScreenPanel; 
     
     JPanel howToPlayPanel;
 
@@ -56,7 +53,6 @@ public class Main {
     Font normalFont = new Font("Arial", Font.PLAIN, 16);
     
     Color oceanBlue = new Color(0, 119, 190);
-    Color darkBlue = new Color(0, 0, 139);
 
     List<Character> availableCharacters = new ArrayList<>();
     List<Character> playerParty = new ArrayList<>();
@@ -69,8 +65,10 @@ public class Main {
     Character activeCharacter;
     Enemy currentEnemy;
 
-    // SNOW EFFECT CODE START
-    
+    // ==========================================================
+    // SNOW EFFECT WITH MINIMAL BLOOD BACKGROUND
+    // ==========================================================
+
     /**
      * Represents a single snowflake/particle on the screen.
      */
@@ -81,8 +79,8 @@ public class Main {
         private final Random rand = new Random();
 
         public Particle(int width, int height) {
-            this.size = rand.nextInt(3) + 1; 
-            this.speed = rand.nextInt(3) + 1; 
+            this.size = rand.nextInt(3) + 1;
+            this.speed = rand.nextInt(3) + 1;
             reset(width, height);
         }
 
@@ -95,19 +93,20 @@ public class Main {
 
         public void reset(int width, int height) {
             x = rand.nextInt(width);
-            y = rand.nextInt(height / 2) - height / 2; 
+            y = rand.nextInt(height / 2) - height / 2;
         }
     }
 
     /**
-     * Custom JPanel to draw the falling snow animation.
+     * Custom JPanel to draw falling snow with minimal blood effects
      */
-    private class FallingSnowPanel extends JPanel implements ActionListener {
+    private class FallingSnowWithBloodPanel extends JPanel implements ActionListener {
         private final List<Particle> particles = new ArrayList<>();
         private final Timer timer;
         private final JPanel contentPanel;
+        private final Random rand = new Random();
         
-        public FallingSnowPanel(JPanel content) {
+        public FallingSnowWithBloodPanel(JPanel content) {
             this.setLayout(new BorderLayout());
             this.setBackground(Color.BLACK);
             this.contentPanel = content;
@@ -130,50 +129,119 @@ public class Main {
         }
 
         private void initializeParticles() {
-            int numParticles = 100; // Total number of snowflakes
+            int numParticles = 200;
             for (int i = 0; i < numParticles; i++) {
-                particles.add(new Particle(1000, 700)); 
+                particles.add(new Particle(1000, 700));
             }
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g;
             
-            if (getWidth() <= 0 || getHeight() <= 0) return;
-
-            g.setColor(Color.WHITE);
-            for (Particle p : particles) {
-                g.fillOval(p.x, p.y, p.size, p.size); 
-            }
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
             int width = getWidth();
             int height = getHeight();
             
-            if (width > 0 && height > 0) {
-                for (Particle p : particles) {
-                    p.fall(height);
-                }
+            if (width <= 0 || height <= 0) return;
+
+            // Draw dark background
+            g2d.setColor(new Color(5, 5, 10));
+            g2d.fillRect(0, 0, width, height);
+
+            
+
+             g2d.setColor(new Color(200, 200, 220)); // Slightly blue-ish snow para eerie effect
+            for (Particle p : particles) {
+            g2d.fillOval(p.x, p.y, p.size, p.size); 
             }
-            repaint(); 
+        }
+
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        int width = getWidth();
+        int height = getHeight();
+        
+        if (width > 0 && height > 0) {
+            for (Particle p : particles) {
+                p.fall(height);
+                // Add some horizontal movement for more dynamic snow
+                p.x += rand.nextInt(3) - 1;
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+            }
+        }
+        repaint(); 
+    }
+}
+
+    
+
+private class FlickeringTitleLabel extends JLabel {
+    private final Timer flickerTimer;
+    private boolean textVisible = true;
+    private final Random rand = new Random();
+    
+    public FlickeringTitleLabel(String text) {
+        super(text, SwingConstants.CENTER);
+        setFont(titleFont.deriveFont(Font.BOLD, 80f));
+        setForeground(new Color(255, 0, 0)); // Bright red
+        setBorder(BorderFactory.createEmptyBorder(100, 0, 50, 0));
+        
+        flickerTimer = new Timer(500, e -> {
+            textVisible = !textVisible;
+            repaint();
+        });
+        flickerTimer.start();
+    }
+
+   @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Clear background
+        g2d.setColor(new Color(0, 0, 0, 0));
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        
+        if (textVisible) {
+            // Draw glowing effect around the complete text
+            g2d.setColor(new Color(255, 0, 0, 80)); // Red glow
+            for (int i = 1; i <= 5; i++) {
+                g2d.setFont(getFont().deriveFont(80f + i * 3));
+                String text = getText();
+                int textWidth = g2d.getFontMetrics().stringWidth(text);
+                int x = getWidth()/2 - textWidth/2;
+                int y = getHeight()/2 + g2d.getFontMetrics().getHeight()/4;
+                g2d.drawString(text, x, y);
+            }
+            
+            // Draw main text on top
+            g2d.setColor(getForeground());
+            g2d.setFont(getFont());
+            super.paintComponent(g);
+        }
+        
+        // Random flicker effect
+        if (rand.nextFloat() > 0.9) {
+            Timer quickFlicker = new Timer(100, e2 -> {
+                textVisible = !textVisible;
+                repaint();
+                Timer restore = new Timer(100, e3 -> {
+                    textVisible = true;
+                    repaint();
+                });
+                restore.setRepeats(false);
+                restore.start();
+            });
+            quickFlicker.setRepeats(false);
+            quickFlicker.start();
         }
     }
-    // SNOW EFFECT CODE END
-
+}
     public static void main(String[] args){
-          SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new Main();
-                } catch (Exception e) {
-                    System.err.println("Fatal error during application startup: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        });
+        new Main();
     }
 
     public Main() {
@@ -183,7 +251,7 @@ public class Main {
         window.setSize(1000, 700); 
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setTitle("OUTBREAK");
-        window.getContentPane().setBackground(Color.BLACK); 
+        window.getContentPane().setBackground(Color.BLACK);
         window.setLayout(new BorderLayout());
         con = window.getContentPane();
         
@@ -192,127 +260,234 @@ public class Main {
         cardPanel.setBackground(Color.BLACK); 
         con.add(cardPanel, BorderLayout.CENTER);
 
-        // --- TITLE SCREEN SETUP ---
-        // 1. Create the content panel (titles and buttons)
         JPanel titleContent = createTitleScreenContent();
-        // 2. Wrap the content panel in the custom Snow Panel
-        titleScreenPanel = new FallingSnowPanel(titleContent);
-        titleScreenPanel.setBackground(Color.BLACK); 
+        titleScreenPanel = new FallingSnowWithBloodPanel(titleContent);
         cardPanel.add(titleScreenPanel, TITLE_SCREEN_PANEL);
-        // --------------------------
 
         howToPlayPanel = createHowToPlayPanel();
-        howToPlayPanel.setBackground(Color.BLACK); 
         cardPanel.add(howToPlayPanel, HOW_TO_PLAY_PANEL);
 
         JPanel charSelectContainer = createCharacterSelectContainer();
-        charSelectContainer.setBackground(Color.BLACK); 
         cardPanel.add(charSelectContainer, CHARACTER_SELECT_PANEL);
 
         battlePanel = createBattlePanel(); 
-        battlePanel.setBackground(Color.BLACK); 
         cardPanel.add(battlePanel, BATTLE_PANEL);
 
         directionPanel = createDirectionPanel();
-        directionPanel.setBackground(Color.BLACK); 
         cardPanel.add(directionPanel, DIRECTIONAL_PANEL);
 
         JPanel missionCompletePanel = createMissionCompletePanel();
-        missionCompletePanel.setBackground(new Color(20, 0, 40)); 
         cardPanel.add(missionCompletePanel, MISSION_COMPLETE_PANEL);
 
         JPanel finalVictoryPanel = createFinalVictoryPanel(); 
-        finalVictoryPanel.setBackground(new Color(20, 0, 40)); 
         cardPanel.add(finalVictoryPanel, FINAL_VICTORY_PANEL);
         
         gameOverPanel = createGameOverPanel();
-        gameOverPanel.setBackground(Color.BLACK); 
         cardPanel.add(gameOverPanel, GAME_OVER_PANEL);
 
         cardLayout.show(cardPanel, TITLE_SCREEN_PANEL);
-        
         window.setLocationRelativeTo(null);
         window.setVisible(true);
     }
 
-    public JPanel createGameOverPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.BLACK); 
-        panel.setBorder(new EmptyBorder(100, 0, 0, 0));
+   public JPanel createTitleScreenContent() {
+    JPanel panel = new JPanel(new BorderLayout());
+    panel.setOpaque(false);
 
-        JLabel gameOverLabel = new JLabel("GAME OVER", SwingConstants.CENTER);
-        gameOverLabel.setFont(titleFont.deriveFont(Font.BOLD, 80f));
-        gameOverLabel.setForeground(Color.RED);
-        gameOverLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    JLabel title = new FlickeringTitleLabel("OUTBREAK");
+    panel.add(title, BorderLayout.NORTH);
 
-        JButton backToTitleButton = new JButton("BACK TO TITLE");
-        backToTitleButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        backToTitleButton.setBackground(new Color(50, 50, 50));
-        backToTitleButton.setForeground(Color.WHITE);
-        backToTitleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        backToTitleButton.addActionListener(e -> {
-            window.dispose();
-            new Main(); 
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+    buttonPanel.setOpaque(false);
+    buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
+
+    // Create glitchy buttons with original colors
+    JButton startButton = createGlitchyButton("START MISSION", new Color(0, 150, 0), e -> 
+        cardLayout.show(cardPanel, CHARACTER_SELECT_PANEL));
+    
+    JButton howToPlayButton = createGlitchyButton("HOW TO PLAY", new Color(60, 120, 160), e -> 
+        cardLayout.show(cardPanel, HOW_TO_PLAY_PANEL));
+    
+    JButton quitButton = createGlitchyButton("QUIT", new Color(50, 50, 50), e -> 
+        System.exit(0));
+
+    buttonPanel.add(startButton);
+    buttonPanel.add(Box.createVerticalStrut(20));
+    buttonPanel.add(howToPlayButton);
+    buttonPanel.add(Box.createVerticalStrut(20));
+    buttonPanel.add(quitButton);
+
+    panel.add(buttonPanel, BorderLayout.CENTER);
+    return panel;
+}
+
+private JButton createGlitchyButton(String text, Color baseColor, ActionListener action) {
+    return new GlitchyScaryButton(text, baseColor, action);
+}
+
+// Custom glitchy button class without disappearing
+private class GlitchyScaryButton extends JButton {
+    private final Timer glitchTimer;
+    private final Timer staticTimer;
+    private final Random rand = new Random();
+    private final Color baseColor;
+    private int glitchOffset = 0;
+    private boolean showStatic = false;
+    private String displayText;
+    
+    public GlitchyScaryButton(String text, Color baseColor, ActionListener action) {
+        super(text);
+        this.baseColor = baseColor;
+        this.displayText = text;
+        
+        setFont(titleFont.deriveFont(Font.BOLD, 30f));
+        setBackground(baseColor);
+        setForeground(Color.WHITE);
+        setAlignmentX(Component.CENTER_ALIGNMENT);
+        setMaximumSize(new Dimension(300, 70));
+        setFocusPainted(false);
+        setBorder(BorderFactory.createLineBorder(new Color(100, 100, 100), 2));
+        addActionListener(action);
+        
+        // Add hover effect
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                setBackground(baseColor.brighter());
+                setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+            }
+            
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                setBackground(baseColor);
+                setBorder(BorderFactory.createLineBorder(new Color(100, 100, 100), 2));
+            }
         });
         
-        panel.add(gameOverLabel);
-        panel.add(Box.createVerticalStrut(50));
-        panel.add(backToTitleButton);
+        // Glitch timer - random horizontal shifts
+        glitchTimer = new Timer(150, e -> {
+            if (rand.nextFloat() > 0.8) { // 20% chance to glitch each tick
+                glitchOffset = rand.nextInt(7) - 3; // -3 to +3 pixels
+                repaint();
+                
+                // Reset after short delay
+                Timer resetTimer = new Timer(80, e2 -> {
+                    glitchOffset = 0;
+                    repaint();
+                });
+                resetTimer.setRepeats(false);
+                resetTimer.start();
+            }
+        });
+        glitchTimer.start();
         
-        return panel;
+        // Static effect timer
+        staticTimer = new Timer(100, e -> {
+            if (rand.nextFloat() > 0.7) { // 30% chance for static
+                showStatic = true;
+                repaint();
+                
+                Timer hideStatic = new Timer(50, e2 -> {
+                    showStatic = false;
+                    repaint();
+                });
+                hideStatic.setRepeats(false);
+                hideStatic.start();
+            }
+            
+            // Occasionally corrupt text
+            if (rand.nextFloat() > 0.9) {
+                displayText = corruptText(getText());
+                repaint();
+                
+                Timer restoreText = new Timer(200, e2 -> {
+                    displayText = getText();
+                    repaint();
+                });
+                restoreText.setRepeats(false);
+                restoreText.start();
+            }
+        });
+        staticTimer.start();
     }
-
-    // This method creates the content (Title/Buttons) and is now passed to FallingSnowPanel
-    public JPanel createTitleScreenContent() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false); // Make content transparent so snow shows through
-
-        JLabel title = new JLabel("OUTBREAK", SwingConstants.CENTER);
-        title.setFont(titleFont.deriveFont(Font.BOLD, 80f));
-        title.setForeground(new Color(200, 0, 0));
-        title.setBorder(BorderFactory.createEmptyBorder(100, 0, 50, 0));
-        panel.add(title, BorderLayout.NORTH);
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-        buttonPanel.setOpaque(false); // Make button panel transparent
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
-
-        JButton startButton = new JButton("START MISSION");
-        startButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        startButton.setBackground(new Color(0, 150, 0)); 
-        startButton.setForeground(Color.WHITE);
-        startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        startButton.setFocusPainted(false);
-        startButton.setMaximumSize(new Dimension(300, 70));
-        startButton.addActionListener(e -> cardLayout.show(cardPanel, CHARACTER_SELECT_PANEL));
-
-        JButton howToPlayButton = new JButton("HOW TO PLAY");
-        howToPlayButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        howToPlayButton.setBackground(new Color(60, 120, 160)); 
-        howToPlayButton.setForeground(Color.WHITE);
-        howToPlayButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        howToPlayButton.setMaximumSize(new Dimension(300, 70));
-        howToPlayButton.addActionListener(e -> cardLayout.show(cardPanel, HOW_TO_PLAY_PANEL));
-
-        JButton quitButton = new JButton("QUIT");
-        quitButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        quitButton.setBackground(new Color(50, 50, 50));
-        quitButton.setForeground(Color.WHITE);
-        quitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        quitButton.setMaximumSize(new Dimension(300, 70));
-        quitButton.addActionListener(e -> System.exit(0));
-
-        buttonPanel.add(startButton);
-        buttonPanel.add(Box.createVerticalStrut(20));
-        buttonPanel.add(howToPlayButton);
-        buttonPanel.add(Box.createVerticalStrut(20));
-        buttonPanel.add(quitButton);
-
-        panel.add(buttonPanel, BorderLayout.CENTER);
-        return panel;
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Draw main button background (always visible)
+        g2d.setColor(getBackground());
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        
+        // Apply glitch offset to content only (not the background)
+        if (glitchOffset != 0) {
+            g2d.translate(glitchOffset, 0);
+        }
+        
+        // Draw static effect (over the button but doesn't hide it completely)
+        if (showStatic) {
+            g2d.setColor(new Color(255, 255, 255, rand.nextInt(80) + 30));
+            for (int i = 0; i < 8; i++) {
+                int x = rand.nextInt(getWidth());
+                int y = rand.nextInt(getHeight());
+                int size = rand.nextInt(3) + 1;
+                g2d.fillRect(x, y, size, size);
+            }
+        }
+        
+        // Draw text
+        g2d.setColor(getForeground());
+        g2d.setFont(getFont());
+        
+        FontMetrics fm = g2d.getFontMetrics();
+        int textWidth = fm.stringWidth(displayText);
+        int x = (getWidth() - textWidth) / 2;
+        int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+        
+        g2d.drawString(displayText, x, y);
+        
+        // Add occasional red "error" flicker instead of blood drips
+        if (rand.nextFloat() > 0.95 && showStatic) {
+            g2d.setColor(new Color(255, 0, 0, 100));
+            g2d.fillRect(0, 0, getWidth(), getHeight());
+        }
+        
+        g2d.dispose();
     }
+    
+    private String corruptText(String text) {
+        if (text.length() < 3) return text;
+        
+        char[] chars = text.toCharArray();
+        int corruptCount = rand.nextInt(2) + 1; // Corrupt 1-2 characters
+        
+        for (int i = 0; i < corruptCount; i++) {
+            int corruptPos = rand.nextInt(chars.length);
+            
+            // Replace with random character or symbol, but keep it readable
+            String corruptChars = "!@#$%^&*[]{}?/";
+            if (chars[corruptPos] != ' ') {
+                chars[corruptPos] = corruptChars.charAt(rand.nextInt(corruptChars.length()));
+            }
+        }
+        
+        return new String(chars);
+    }
+    
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (enabled) {
+            glitchTimer.start();
+            staticTimer.start();
+        } else {
+            glitchTimer.stop();
+            staticTimer.stop();
+        }
+    }
+}
 
     public JPanel createHowToPlayPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -335,11 +510,10 @@ public class Main {
                 " VICTORY CONDITION \n\n" +
                 "WIN: Defeat the enemy squad.\n" +
                 "LOSE: If all 3 of your squad members are defeated, it's Game Over!\n"
-                
         );
         instructionsArea.setFont(normalFont.deriveFont(Font.PLAIN, 20f));
-        instructionsArea.setForeground(Color.LIGHT_GRAY); 
-        instructionsArea.setBackground(Color.DARK_GRAY); 
+        instructionsArea.setForeground(Color.LIGHT_GRAY);
+        instructionsArea.setBackground(Color.DARK_GRAY);
         instructionsArea.setWrapStyleWord(true);
         instructionsArea.setLineWrap(true);
         instructionsArea.setEditable(false);
@@ -353,7 +527,7 @@ public class Main {
         backButton.addActionListener(e -> cardLayout.show(cardPanel, TITLE_SCREEN_PANEL));
         
         JPanel southPanel = new JPanel();
-        southPanel.setBackground(Color.BLACK); 
+        southPanel.setBackground(Color.BLACK);
         southPanel.add(backButton);
         southPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
         
@@ -361,42 +535,38 @@ public class Main {
         return panel;
     }
 
-    
-
     public JPanel createCharacterSelectContainer() {
         JPanel charSelectContainer = new JPanel(new BorderLayout());
         charSelectContainer.setOpaque(false);
 
-        
         mainTitlePanel = new JPanel();
         mainTitlePanel.setOpaque(false);
         mainTitlePanel.setBorder(BorderFactory.createLineBorder(new Color(0, 100, 150), 2));
         mainTitleLabel = new JLabel("CHOOSE YOUR SQUAD (0/3)");
-        mainTitleLabel.setForeground(Color.WHITE); 
+        mainTitleLabel.setForeground(Color.WHITE);
         mainTitleLabel.setFont(titleFont);
         mainTitlePanel.add(mainTitleLabel);
         charSelectContainer.add(mainTitlePanel, BorderLayout.NORTH);
 
-        
         charDisplayPanel = new JPanel();
         charDisplayPanel.setLayout(new BoxLayout(charDisplayPanel, BoxLayout.Y_AXIS));
-        charDisplayPanel.setBackground(Color.BLACK); 
+        charDisplayPanel.setOpaque(false);
         charDisplayPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         charNameLabel = new JLabel(" ");
         charNameLabel.setFont(new Font("Times New Roman", Font.BOLD, 36));
-        charNameLabel.setForeground(Color.WHITE); 
+        charNameLabel.setForeground(Color.WHITE);
         charNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         charStatsLabel = new JLabel(" ");
         charStatsLabel.setFont(normalFont);
-        charStatsLabel.setForeground(Color.GREEN); 
+        charStatsLabel.setForeground(Color.GREEN);
         charStatsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         charBackstoryArea = new JTextArea(" ");
         charBackstoryArea.setFont(normalFont);
-        charBackstoryArea.setForeground(Color.LIGHT_GRAY); 
-        charBackstoryArea.setBackground(Color.DARK_GRAY); 
+        charBackstoryArea.setForeground(Color.LIGHT_GRAY);
+        charBackstoryArea.setBackground(Color.DARK_GRAY);
         charBackstoryArea.setWrapStyleWord(true);
         charBackstoryArea.setLineWrap(true);
         charBackstoryArea.setEditable(false);
@@ -406,14 +576,14 @@ public class Main {
 
         JPanel textAreaWrapper = new JPanel();
         textAreaWrapper.setLayout(new GridBagLayout());
-        textAreaWrapper.setBackground(Color.DARK_GRAY); 
+        textAreaWrapper.setOpaque(true);
+        textAreaWrapper.setBackground(Color.DARK_GRAY);
         textAreaWrapper.add(charBackstoryArea);
         textAreaWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         detailsButtonPanel = new JPanel();
         detailsButtonPanel.setOpaque(false);
         detailsButtonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
 
         charDisplayPanel.add(charNameLabel);
         charDisplayPanel.add(Box.createVerticalStrut(10));
@@ -425,7 +595,6 @@ public class Main {
 
         charSelectContainer.add(charDisplayPanel, BorderLayout.CENTER);
 
-        
         selectionButtonsPanel = new JPanel();
         selectionButtonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
         selectionButtonsPanel.setOpaque(false);
@@ -437,9 +606,8 @@ public class Main {
 
     public JPanel createBattlePanel(){
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK); 
+        panel.setBackground(Color.BLACK);
 
-        
         enemyPanel = new JPanel();
         enemyPanel.setLayout(new BoxLayout(enemyPanel, BoxLayout.Y_AXIS));
         enemyPanel.setBackground(Color.BLACK); 
@@ -470,9 +638,8 @@ public class Main {
         panel.add(enemyPanel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel(new GridLayout(1, 2, 10, 0));
-        centerPanel.setBackground(Color.BLACK); 
+        centerPanel.setBackground(Color.BLACK);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
 
         battleLogArea = new JTextArea(" ");
         battleLogArea.setFont(normalFont);
@@ -483,7 +650,6 @@ public class Main {
         battleLogArea.setWrapStyleWord(true);
         JScrollPane scrollPane = new JScrollPane(battleLogArea);
         scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2));
-        scrollPane.setBorder(null);
         scrollPane.setPreferredSize(new Dimension(500, 200));
         EmptyBorder logBorder = new EmptyBorder(20, 20, 20, 20);
         battleLogArea.setBorder(logBorder);
@@ -504,114 +670,36 @@ public class Main {
         battleActionPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 2));
         panel.add(battleActionPanel, BorderLayout.SOUTH);
 
-
         return panel;
     }
 
-    public JPanel createMissionCompletePanel() {
-        Color darkPurple = new Color(20, 0, 40);
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(darkPurple);
-        panel.setBorder(new EmptyBorder(50, 50, 50, 50));
-
-        JPanel centerContentPanel = new JPanel();
-        centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
-        centerContentPanel.setBackground(darkPurple);
-
-        JLabel titleLabel = new JLabel("MISSION SUCCESSFUL!");
-        titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 60f));
-        titleLabel.setForeground(Color.GREEN);
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel subLabel = new JLabel("Floor " + (currentFloor) + " Cleared! Prepare for the next challenge.");
-        subLabel.setFont(normalFont.deriveFont(Font.BOLD, 24f));
-        subLabel.setForeground(Color.YELLOW);
-        subLabel.setName("SUB_LABEL"); 
-        subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        String nextButtonText = (currentFloor == 4) ? "FINAL BOSS" : "FLOOR " + (currentFloor + 1);
-        JButton nextFloorButton = new JButton(nextButtonText);
-        nextFloorButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        nextFloorButton.setBackground(new Color(0, 150, 0));
-        nextFloorButton.setForeground(Color.WHITE);
-        nextFloorButton.setName("FLOOR_BUTTON"); 
-        nextFloorButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        nextFloorButton.setPreferredSize(new Dimension(400, 70));
-        nextFloorButton.addActionListener(e -> newFloor());
-
-        centerContentPanel.add(titleLabel);
-        centerContentPanel.add(Box.createVerticalStrut(20));
-        centerContentPanel.add(subLabel);
-        centerContentPanel.add(Box.createVerticalStrut(40));
-        centerContentPanel.add(nextFloorButton);
-
-                panel.add(centerContentPanel, BorderLayout.CENTER);
-
-    return panel;
-}
-    public JPanel createFinalVictoryPanel() {
-       Color titleColor = new Color(0, 150, 0); //green              
-        Color subtextColor = new Color(173, 216, 230); //mule
-        Color buttonColor = new Color(0, 51, 102); //dark mule
-        Color messageColor = new Color(0, 255, 255); //mule ni
-
-        
-        Font mainTitleFont = titleFont.deriveFont(Font.BOLD, 90f);
-        Font subTitleFont = normalFont.deriveFont(Font.BOLD, 30f);
-        Font buttonFont = titleFont.deriveFont(Font.BOLD, 35f);
-
+    public JPanel createGameOverPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        
         panel.setBackground(Color.BLACK);
-        panel.setBorder(new EmptyBorder(50, 50, 50, 50));
-    
-       
-        panel.add(Box.createVerticalGlue());
+        panel.setBorder(new EmptyBorder(100, 0, 0, 0));
 
-       
-        JLabel titleLabel = new JLabel("VICTORY!", SwingConstants.CENTER);
-        titleLabel.setFont(mainTitleFont);
-        titleLabel.setForeground(titleColor);
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel gameOverLabel = new JLabel("GAME OVER", SwingConstants.CENTER);
+        gameOverLabel.setFont(titleFont.deriveFont(Font.BOLD, 80f));
+        gameOverLabel.setForeground(Color.RED);
+        gameOverLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subLabel = new JLabel("OUTBREAK ELIMINATED! Facility Secured.", SwingConstants.CENTER);
-        subLabel.setFont(subTitleFont);
-        subLabel.setForeground(subtextColor);
-        subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel messageLabel = new JLabel("You have defeated Dr. Alcaraz.", SwingConstants.CENTER);
-        messageLabel.setFont(normalFont.deriveFont(Font.ITALIC, 30f)); 
-        messageLabel.setForeground(messageColor); //mlue
-        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JButton finishButton = new JButton("RESTART GAME");
-        finishButton.setFont(buttonFont);
-        finishButton.setBackground(buttonColor);
-        finishButton.setForeground(Color.WHITE);
-        finishButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        finishButton.setMaximumSize(new Dimension(500, 80));
-        finishButton.setPreferredSize(new Dimension(500, 80));
-
-        finishButton.addActionListener(e -> {
+        JButton backToTitleButton = new JButton("BACK TO TITLE");
+        backToTitleButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
+        backToTitleButton.setBackground(new Color(50, 50, 50));
+        backToTitleButton.setForeground(Color.WHITE);
+        backToTitleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        backToTitleButton.addActionListener(e -> {
             window.dispose();
-            new Main();
+            new Main(); 
         });
-
-       panel.add(titleLabel);
-        panel.add(Box.createVerticalStrut(30));
-        panel.add(subLabel);
-        panel.add(Box.createVerticalStrut(10));
-        panel.add(messageLabel);
-        panel.add(Box.createVerticalStrut(60));
-        panel.add(finishButton);
         
+        panel.add(gameOverLabel);
+        panel.add(Box.createVerticalStrut(50));
+        panel.add(backToTitleButton);
         
-        panel.add(Box.createVerticalGlue());
-
         return panel;
-}
+    }
 
     public JPanel createDirectionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -638,7 +726,6 @@ public class Main {
         
         panel.add(textPanel, BorderLayout.NORTH);
 
-
         JPanel choicesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 50));
         choicesPanel.setBackground(Color.BLACK); 
 
@@ -662,31 +749,101 @@ public class Main {
         return panel;
     }
 
+    public JPanel createMissionCompletePanel() {
+        Color darkPurple = new Color(20, 0, 40);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(darkPurple);
+        panel.setBorder(new EmptyBorder(50, 50, 50, 50));
 
-    public void displayCharacterDetails(Character c, JButton sourceButton) {
-        charNameLabel.setText(c.name.toUpperCase());
-        charStatsLabel.setText("HP: " + c.maxHP + " | " + c.resourceName + ": " + c.maxResource);
-        charBackstoryArea.setText(c.backstory);
-        currentViewedCharacter.set(c); 
-        
-        updateDetailsButtonPanel(c, sourceButton);
+        JPanel centerContentPanel = new JPanel();
+        centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
+        centerContentPanel.setBackground(darkPurple);
+
+        JLabel titleLabel = new JLabel("MISSION SUCCESSFUL!");
+        titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 60f));
+        titleLabel.setForeground(Color.GREEN);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subLabel = new JLabel("Floor " + (currentFloor) + " Cleared! Prepare for the next challenge.");
+        subLabel.setFont(normalFont.deriveFont(Font.BOLD, 24f));
+        subLabel.setForeground(Color.YELLOW);
+        subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        String nextButtonText = (currentFloor == 4) ? "FINAL BOSS" : "FLOOR " + (currentFloor + 1);
+        JButton nextFloorButton = new JButton(nextButtonText);
+        nextFloorButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
+        nextFloorButton.setBackground(new Color(0, 150, 0));
+        nextFloorButton.setForeground(Color.WHITE);
+        nextFloorButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        nextFloorButton.setPreferredSize(new Dimension(400, 70));
+        nextFloorButton.addActionListener(e -> newFloor());
+
+        centerContentPanel.add(titleLabel);
+        centerContentPanel.add(Box.createVerticalStrut(20));
+        centerContentPanel.add(subLabel);
+        centerContentPanel.add(Box.createVerticalStrut(40));
+        centerContentPanel.add(nextFloorButton);
+
+        panel.add(centerContentPanel, BorderLayout.CENTER);
+        return panel;
     }
 
-    void updateDetailsButtonPanel(Character c, JButton sourceButton) {
-        detailsButtonPanel.removeAll();
-        JButton selectButton = new JButton("SELECT " + c.name.toUpperCase());
-        selectButton.setFont(normalFont.deriveFont(Font.BOLD));
+    public JPanel createFinalVictoryPanel() {
+        Color victoryBackground = new Color(40, 0, 80);
+        Color titleColor = new Color(0, 255, 100);
+        Color subtextColor = new Color(173, 216, 230);
+        Color buttonColor = new Color(200, 180, 0);
+        Color messageColor = new Color(0, 200, 255);
+        
+        Font mainTitleFont = titleFont.deriveFont(Font.BOLD, 90f);
+        Font subTitleFont = normalFont.deriveFont(Font.BOLD, 30f);
+        Font buttonFont = titleFont.deriveFont(Font.BOLD, 35f);
 
-     if (selectionCount < 3) {
-            selectButton.setForeground(Color.BLACK);
-            
-            selectButton.addActionListener(e -> selectCharacter(sourceButton, c));
-            detailsButtonPanel.add(selectButton);
-            
-        } else {
-             detailsButtonPanel.removeAll();
-        }
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(victoryBackground);
+        panel.setBorder(new EmptyBorder(50, 50, 50, 50));
+        
+        panel.add(Box.createVerticalGlue());
 
+        JLabel titleLabel = new JLabel("VICTORY!", SwingConstants.CENTER);
+        titleLabel.setFont(mainTitleFont);
+        titleLabel.setForeground(titleColor);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subLabel = new JLabel("OUTBREAK ELIMINATED! Facility Secured.", SwingConstants.CENTER);
+        subLabel.setFont(subTitleFont);
+        subLabel.setForeground(subtextColor);
+        subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel messageLabel = new JLabel("You have defeated Dr. Alcaraz.", SwingConstants.CENTER);
+        messageLabel.setFont(normalFont.deriveFont(Font.ITALIC, 30f)); 
+        messageLabel.setForeground(messageColor);
+        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton finishButton = new JButton("RESTART GAME");
+        finishButton.setFont(buttonFont);
+        finishButton.setBackground(buttonColor);
+        finishButton.setForeground(Color.WHITE);
+        finishButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        finishButton.setMaximumSize(new Dimension(500, 80));
+        finishButton.setPreferredSize(new Dimension(500, 80));
+
+        finishButton.addActionListener(e -> {
+            window.dispose();
+            new Main();
+        });
+
+        panel.add(titleLabel);
+        panel.add(Box.createVerticalStrut(30));
+        panel.add(subLabel);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(messageLabel);
+        panel.add(Box.createVerticalStrut(60));
+        panel.add(finishButton);
+        
+        panel.add(Box.createVerticalGlue());
+        return panel;
     }
 
     public void initializeCharacters() {
@@ -700,7 +857,7 @@ public class Main {
     public void createCharacterSelectionButtons() {
         JButton startButton = new JButton("START MISSION");
         startButton.setFont(new Font("Times New Roman", Font.BOLD, 24));
-        startButton.setBackground(new Color(150, 0, 0)); 
+        startButton.setBackground(new Color(150, 0, 0));
         startButton.setForeground(Color.WHITE);
         startButton.setEnabled(false);
         startButton.addActionListener(e -> startGame(new Carrier()));
@@ -730,17 +887,14 @@ public class Main {
             
             button.setEnabled(false);
             button.setBackground(Color.BLACK);
-            button.setForeground(Color.GREEN); 
+            button.setForeground(Color.GREEN);
             
- 
             displayCharacterDetails(c, button);
 
             if (selectionCount == 3) {
                 for (Component comp : selectionButtonsPanel.getComponents()) {
-                    
                     if (comp instanceof JButton) {
                         JButton btn = (JButton) comp;
-                        
                         if ("START_BUTTON".equals(btn.getName())) { 
                             btn.setEnabled(true);
                             btn.setBackground(new Color(0, 150, 0));
@@ -751,7 +905,30 @@ public class Main {
             }
         }
     }
-    
+
+    public void displayCharacterDetails(Character c, JButton sourceButton) {
+        charNameLabel.setText(c.name.toUpperCase());
+        charStatsLabel.setText("HP: " + c.maxHP + " | " + c.resourceName + ": " + c.maxResource);
+        charBackstoryArea.setText(c.backstory);
+        currentViewedCharacter.set(c); 
+        
+        updateDetailsButtonPanel(c, sourceButton);
+    }
+
+    void updateDetailsButtonPanel(Character c, JButton sourceButton) {
+        detailsButtonPanel.removeAll();
+        JButton selectButton = new JButton("SELECT " + c.name.toUpperCase());
+        selectButton.setFont(normalFont.deriveFont(Font.BOLD));
+
+        if (selectionCount < 3) {
+            selectButton.setForeground(Color.BLACK);
+            selectButton.addActionListener(e -> selectCharacter(sourceButton, c));
+            detailsButtonPanel.add(selectButton);
+        } else {
+            detailsButtonPanel.removeAll();
+        }
+    }
+
     public void startGame(Enemy enemy) {
         List<Character> aliveParty = new ArrayList<>();
         for (Character c : playerParty) {
@@ -762,18 +939,18 @@ public class Main {
         playerParty.clear();
         playerParty.addAll(aliveParty);
     
-    if (playerParty.isEmpty()) {
-        endBattle(false);
-              return;
+        if (playerParty.isEmpty()) {
+            endBattle(false);
+            return;
         }
 
         if (enemy instanceof DrAlcaraz) {
             mainTitleLabel.setText("OUTBREAK - FINAL BOSS: DR. ALCARAZ");
             currentFloor = 4; 
         } else if (enemy instanceof Venomshade) {
-              mainTitleLabel.setText("OUTBREAK - FLOOR 3 BOSS: VENOMSHADE");
+            mainTitleLabel.setText("OUTBREAK - FLOOR 3 BOSS: VENOMSHADE");
         } else {
-              mainTitleLabel.setText("OUTBREAK - FLOOR " + currentFloor);
+            mainTitleLabel.setText("OUTBREAK - FLOOR " + currentFloor);
         }
 
         mainTitlePanel.setVisible(false); 
@@ -781,17 +958,16 @@ public class Main {
         cardLayout.show(cardPanel, BATTLE_PANEL);
 
         currentEnemy = enemy; 
-        Color oceanBlue = new Color(0, 119, 190);
 
         if (currentFloor == 1) {
             locationLabel.setText("Level 1: Abandoned Emergency Room");
-            locationLabel.setForeground(darkBlue); 
+            locationLabel.setForeground(oceanBlue); 
         } else if (currentFloor == 2) {
             locationLabel.setText("Level 2: Infectious ICU");
-            locationLabel.setForeground(darkBlue); 
+            locationLabel.setForeground(oceanBlue); 
         } else if (currentFloor == 3) {
             locationLabel.setText("Final Level: Underground Research Lab");
-            locationLabel.setForeground(darkBlue); 
+            locationLabel.setForeground(oceanBlue); 
         }
 
         updateBattleUI();
@@ -800,9 +976,9 @@ public class Main {
         String enemyType = (currentEnemy instanceof Boss) ? "Boss" : "Enemy";
 
         if (currentEnemy instanceof DrAlcaraz) {
-              battleLogArea.setText("A " + currentEnemy.name + " approaches! (FINAL BOSS)\n");
+            battleLogArea.setText("A " + currentEnemy.name + " approaches! (FINAL BOSS)\n");
         } else {
-              battleLogArea.setText("A " + currentEnemy.name + " approaches! (" + enemyType + " - Floor " + currentFloor + ")\n");
+            battleLogArea.setText("A " + currentEnemy.name + " approaches! (" + enemyType + " - Floor " + currentFloor + ")\n");
         }
     }
 
@@ -819,31 +995,30 @@ public class Main {
             charPanel.setLayout(new BoxLayout(charPanel, BoxLayout.Y_AXIS));
             charPanel.setBackground(Color.BLACK);
             charPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            charPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            charPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
-            JLabel nameLabel = new JLabel(character.name.toUpperCase()); // hero name 
+            JLabel nameLabel = new JLabel(character.name.toUpperCase());
             nameLabel.setFont(normalFont.deriveFont(Font.BOLD));
             nameLabel.setForeground(Color.CYAN); 
 
-            JLabel hpLabel = new JLabel("HP: " + character.currentHP + " / " + character.maxHP); // hero HP
+            JLabel hpLabel = new JLabel("HP: " + character.currentHP + " / " + character.maxHP);
             hpLabel.setFont(normalFont);
             hpLabel.setForeground(Color.GREEN);
             if (character.currentHP <= character.maxHP * 0.25 && character.currentHP > 0) { 
-                 hpLabel.setForeground(Color.RED); // warning 
+                 hpLabel.setForeground(Color.RED);
             } else if (character.currentHP <= 0 || character.currentResource <= 0) {
                  hpLabel.setText("DEFEATED");
-                 hpLabel.setForeground(Color.GRAY); // defeated 
+                 hpLabel.setForeground(Color.GRAY);
             }
             
             JLabel resourceLabel = new JLabel(character.resourceName + ": " + character.currentResource + " / " + character.maxResource);
-            resourceLabel.setFont(normalFont); // hewr
+            resourceLabel.setFont(normalFont);
             resourceLabel.setForeground(Color.YELLOW);
 
             charPanel.add(nameLabel);
             charPanel.add(hpLabel);
             charPanel.add(resourceLabel);
 
-            
             playerStatusPanel.add(charPanel);
             playerStatusPanel.add(Box.createVerticalStrut(5)); 
         }
@@ -875,14 +1050,10 @@ public class Main {
             }
         });
 
-
-        
-
         playerStatusPanel.add(switchButton);
         playerStatusPanel.revalidate();
         playerStatusPanel.repaint();
     }
-    
     
     void setupCharacterActionButtons(Character character) {
         battleActionPanel.removeAll();
@@ -920,13 +1091,11 @@ public class Main {
             System.err.println("Error setting up action buttons: " + e.getMessage());
         }
 
-    
         battleActionPanel.revalidate();
         battleActionPanel.repaint();
     }
     
     void performSkill(Character character, Skill skill) {
-        
         if (character.currentResource < skill.cost) {
             battleLogArea.append(character.name + " tried to use " + skill.name + " but is low on " + character.resourceName + "!\n");
             return;
@@ -950,27 +1119,25 @@ public class Main {
         if (!currentEnemy.isAlive()) {
             battleLogArea.append("\n" + currentEnemy.name + " has been defeated!\n");
             endBattle(true);
-                  return;
+            return;
         }
         enemyTurn();
-          List<Character> aliveCharacters = new ArrayList<>();
-          for (Character c : playerParty) {
+        List<Character> aliveCharacters = new ArrayList<>();
+        for (Character c : playerParty) {
             if (c.currentHP > 0 && c.currentResource > 2) {
                 aliveCharacters.add(c);
             }
         }
-    
 
-    if (aliveCharacters.isEmpty()) {
-        battleLogArea.append("\nAll remaining squad members are unable to fight!\n");
-        endBattle(false);
-        return;
-    }
-    if (activeCharacter != null && activeCharacter.currentHP <= 0) {
-          this.activeCharacter = null;
-    } 
+        if (aliveCharacters.isEmpty()) {
+            battleLogArea.append("\nAll remaining squad members are unable to fight!\n");
+            endBattle(false);
+            return;
+        }
+        if (activeCharacter != null && activeCharacter.currentHP <= 0) {
+            this.activeCharacter = null;
+        } 
         setupCharacterActionButtons(this.activeCharacter);
-
     }
 
     void switchToCharacterTurn(Character nextCharacter) {
@@ -979,7 +1146,7 @@ public class Main {
         this.activeCharacter = nextCharacter; 
         battleLogArea.append("\n" + activeCharacter.name + "'s turn to act.\n");
         setupCharacterActionButtons(this.activeCharacter);
-}
+    }
     
     void enemyTurn() {
         List<Character> aliveCharacters = new ArrayList<>();
@@ -1002,10 +1169,10 @@ public class Main {
             battleLogArea.append(target.name + " is knocked out!\n");
         }
 
-          updatePlayerStatusUI();
+        updatePlayerStatusUI();
 
-          List<Character> postAttackAliveCharacters = new ArrayList<>();
-          for (Character c : playerParty) {
+        List<Character> postAttackAliveCharacters = new ArrayList<>();
+        for (Character c : playerParty) {
             if (c.currentHP > 0) { 
                 postAttackAliveCharacters.add(c);
             }
@@ -1016,7 +1183,7 @@ public class Main {
             return;
         }
         if (activeCharacter != null && activeCharacter.currentHP <= 0) {
-            this.activeCharacter = null; // Force user to choose next character
+            this.activeCharacter = null;
         } 
         setupCharacterActionButtons(this.activeCharacter);
     }
@@ -1054,42 +1221,41 @@ public class Main {
                         }
                     }
                 }
-                   if (currentEnemy instanceof DrAlcaraz) {
-                       missionComplete();
-                       return;
-                   } 
-                   
-                   if (currentEnemy instanceof Venomshade) {
-                       currentFloor = 4;
-                       battleLogArea.append("\nVenomshade defeated! The true threat, Dr. Alcaraz, emerges!\n");
-                       startGame(new DrAlcaraz()); 
-                       return; 
-                    }
-                   
-                   } 
-                   if (currentEnemy instanceof Boss) {
-                       cardLayout.show(cardPanel, MISSION_COMPLETE_PANEL); // Standard Floor Cleared screen
-                       return; 
-                    }
-
-                    if (currentEnemy instanceof Enemy) {
-                    cardLayout.show(cardPanel, DIRECTIONAL_PANEL);
-                    try {
-                        JPanel textPanel = (JPanel)((BorderLayout)directionPanel.getLayout()).getLayoutComponent(directionPanel, BorderLayout.NORTH);
-                        if (textPanel != null && textPanel.getComponentCount() > 0 && textPanel.getComponent(0) instanceof JLabel) {
-                            ((JLabel)textPanel.getComponent(0)).setText("You have defeated the " + floorChoice + " enemy.");
-                        }
-                        JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);
-                        for (Component comp : choicesPanel.getComponents()) {
-                            if (comp instanceof JButton) {
-                                comp.setEnabled(true);
-                            }
-                        }
-                    } catch (ClassCastException | NullPointerException e) {
-                        System.err.println("Error updating Direction Panel components: " + e.getMessage());
-                        
-                    }
+                if (currentEnemy instanceof DrAlcaraz) {
+                    missionComplete();
+                    return;
                 } 
+                
+                if (currentEnemy instanceof Venomshade) {
+                    currentFloor = 4;
+                    battleLogArea.append("\nVenomshade defeated! The true threat, Dr. Alcaraz, emerges!\n");
+                    startGame(new DrAlcaraz()); 
+                    return; 
+                }
+                
+            } 
+            if (currentEnemy instanceof Boss) {
+                cardLayout.show(cardPanel, MISSION_COMPLETE_PANEL);
+                return; 
+            }
+
+            if (currentEnemy instanceof Enemy) {
+                cardLayout.show(cardPanel, DIRECTIONAL_PANEL);
+                try {
+                    JPanel textPanel = (JPanel)((BorderLayout)directionPanel.getLayout()).getLayoutComponent(directionPanel, BorderLayout.NORTH);
+                    if (textPanel != null && textPanel.getComponentCount() > 0 && textPanel.getComponent(0) instanceof JLabel) {
+                        ((JLabel)textPanel.getComponent(0)).setText("You have defeated the " + floorChoice + " enemy.");
+                    }
+                    JPanel choicesPanel = (JPanel) directionPanel.getComponent(1);
+                    for (Component comp : choicesPanel.getComponents()) {
+                        if (comp instanceof JButton) {
+                            comp.setEnabled(true);
+                        }
+                    }
+                } catch (ClassCastException | NullPointerException e) {
+                    System.err.println("Error updating Direction Panel components: " + e.getMessage());
+                }
+            } 
         } else {
             cardLayout.show(cardPanel, GAME_OVER_PANEL);
         }
@@ -1105,7 +1271,7 @@ public class Main {
         directionPanel.setLayout(new BorderLayout());
 
         JPanel messageContainer = new JPanel(new GridLayout(3, 1));
-        messageContainer.setBackground(Color.BLACK); 
+        messageContainer.setBackground(Color.BLACK);
         messageContainer.setBorder(BorderFactory.createEmptyBorder(100, 50, 50, 50));
 
         JLabel titleLabel = new JLabel("HEALING INJECTION RECEIVED", SwingConstants.CENTER);
@@ -1121,7 +1287,7 @@ public class Main {
         messageContainer.add(messageLabel);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 50));
-        buttonPanel.setBackground(Color.BLACK); 
+        buttonPanel.setBackground(Color.BLACK);
 
         JButton nextFloorButton = new JButton("NEXT FLOOR");
         nextFloorButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
@@ -1133,14 +1299,14 @@ public class Main {
         nextFloorButton.addActionListener(e -> startNextFloorTransition());
 
         if (currentFloor == 3) {
-             nextFloorButton.setText("FINAL CONFRONTATION");
-             for (java.awt.event.ActionListener al : nextFloorButton.getActionListeners()) {
-                 nextFloorButton.removeActionListener(al);
-             }
-             nextFloorButton.addActionListener(e -> {
-                 currentFloor = 4;
-                 startGame(new DrAlcaraz()); 
-             });
+            nextFloorButton.setText("FINAL CONFRONTATION");
+            for (java.awt.event.ActionListener al : nextFloorButton.getActionListeners()) {
+                nextFloorButton.removeActionListener(al);
+            }
+            nextFloorButton.addActionListener(e -> {
+                currentFloor = 4;
+                startGame(new DrAlcaraz()); 
+            });
         }
         buttonPanel.add(nextFloorButton);
         directionPanel.add(messageContainer, BorderLayout.CENTER);
@@ -1150,13 +1316,12 @@ public class Main {
     }
 
     public void startNextFloorTransition() {
-        
         directionPanel.removeAll();
         directionPanel.setLayout(new BorderLayout());
         newFloor();
     }
 
-      public void newFloor() {
+    public void newFloor() {
         currentFloor++;
 
         cardPanel.remove(directionPanel);
@@ -1169,8 +1334,7 @@ public class Main {
             missionComplete();
             return;
         }
-          if (currentFloor == 2) {
-            // Floor 2: Start with Howler
+        if (currentFloor == 2) {
             nextEnemy = new Howler();
             mainTitleLabel.setText("OUTBREAK - FLOOR 2");
         } else if (currentFloor == 3) {
