@@ -1,12 +1,15 @@
 package game.core;
 public abstract class Enemy {
-    public String name;
-    public int maxHP;
-    public int currentHP;
-    public String description;
-    public int damage;
+    public String name = "Carrier";
+    public int maxHP = 100;
+    public int currentHP = 50;
+    public String description = "A creature affected by the virus";
+    public int damage = 5;
     
     public Enemy(String name, int hp, int damage, String description) {
+        if(name == null) {
+            throw new NullPointerException("Name is null");
+        }
         this.name = name;
         this.maxHP = hp;
         this.currentHP = hp;
