@@ -35,10 +35,9 @@ public class Floor {
                 manager.updatePlayerStatusUI(); // update player status
 
 
-                if (gui.currentFloor == 1) gui.floorChoice = "First Floor";
-                else if (gui.currentFloor == 2) gui.floorChoice = "Second Floor";
-                else if (gui.currentFloor == 3) gui.floorChoice = "Third Floor";
-                else if (gui.currentFloor == 4) gui.floorChoice = "Final Floor";
+                if (gui.currentFloor == 1) gui.floorChoice = "Second Floor";
+                else if (gui.currentFloor == 2) gui.floorChoice = "Third Floor";
+                else if (gui.currentFloor >= 3) gui.floorChoice = "Final Floor";
 
                 // boss transition (special for the Final Boss)
                 Enemy currentEnemy = manager.getCurrentEnemy();
