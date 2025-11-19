@@ -239,7 +239,15 @@ public class Battle {
         } else {
             JLabel promptLabel;
             if(character == null){
-                promptLabel = new JLabel("Select a character to take action.");
+                if(currentEnemy instanceof IronMaw){
+                    promptLabel = new JLabel("You came across the Boss of the First Floor, select a character to take action.");
+                } else if(currentEnemy instanceof Boneclaw){
+                    promptLabel = new JLabel("Boneclaw is coming your way, quick select a character.");
+                } else if(currentEnemy instanceof DrAlcaraz){
+                    promptLabel = new JLabel("THE FINAL BOSS IS HERE, DEFEAT HIM!!!");
+                } else {
+                    promptLabel = new JLabel("Select a character to take action.");
+                }
             } else if (character.currentHP <= 0) {
                 promptLabel = new JLabel(character.name + " is knocked out! Choose another character.");
             } else {
