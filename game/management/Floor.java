@@ -13,6 +13,8 @@ public class Floor {
 
     private final GameVisuals gui;
     private final Battle manager;
+    private static final String EAST_DIRECTION = "A";
+    private static final String WEST_DIRECTION = "B";
 
     public Floor(GameVisuals gui, Battle manager) {
         this.gui = gui;
@@ -70,7 +72,7 @@ public class Floor {
 
 
     public void chooseDirection(String choice) {
-        if (choice.equals("A")) { // East (Boss)
+        if (choice.equals(EAST_DIRECTION)) { // East (Boss)
             Enemy boss = null;
             if (gui.currentFloor == 1) {
                 boss = new IronMaw();
@@ -83,7 +85,7 @@ public class Floor {
             if (boss != null) {
                 manager.startGame(boss);
             }
-        } else if (choice.equals("B")) { // west
+        } else if (choice.equals(WEST_DIRECTION)) { // west
             handleWestHealing();
         }
     }
