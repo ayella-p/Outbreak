@@ -56,8 +56,13 @@ public class Attack {
         Random rand = new Random();
         Character target = aliveCharacters.get(rand.nextInt(aliveCharacters.size()));
 
-        currentEnemy.attack(target);
-        int damage = currentEnemy instanceof Boss ? currentEnemy.damage + 5 : currentEnemy.damage;
+        int bonusdamage = 0;
+        if(currentEnemy instanceof Boss) {
+            bonusdamage = 3;
+        }
+
+        int damage = currentEnemy.damage + bonusdamage;
+        target.takeDamage(damage);
         gui.battleLogArea.append(currentEnemy.name + " attacks " + target.name + ", dealing " + damage + " damage.\n");
 
         if (target.currentHP <= 0) {

@@ -245,6 +245,8 @@ public class Battle {
                     promptLabel = new JLabel("Boneclaw is coming your way, quick select a character.");
                 } else if(currentEnemy instanceof DrAlcaraz){
                     promptLabel = new JLabel("THE FINAL BOSS IS HERE, DEFEAT HIM!!!");
+                } else if(currentEnemy instanceof Venomshade){
+                    promptLabel = new JLabel("Venomshade the third fLoor Boss is coming your way!!!");
                 } else {
                     promptLabel = new JLabel("Select a character to take action.");
                 }
