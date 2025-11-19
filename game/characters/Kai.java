@@ -1,7 +1,7 @@
 package game.characters;
 
-import game.core.Character;
-import game.core.Skill;
+import game.base.Character;
+import game.base.Skill;
 public class Kai extends Character {
     public Kai() {
         super("Kai", 100, 70, "Focus", "A former bio-hacker, " +

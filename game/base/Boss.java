@@ -1,4 +1,4 @@
-package game.core;
+package game.base;
 public abstract class Boss extends Enemy {
     public int maxMana = 100;
     public int currentMana = 100;

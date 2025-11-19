@@ -1,8 +1,8 @@
-package game.battle;
+package game.management;
 
-import game.core.Character;
-import game.core.Enemy;
-import game.core.Skill;
+import game.base.Character;
+import game.base.Enemy;
+import game.base.Skill;
 import game.enemies.Carrier;
 import game.enemies.Howler;
 import game.enemies.bosses.*;

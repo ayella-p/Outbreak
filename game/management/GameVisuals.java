@@ -1,4 +1,4 @@
-package game.battle;
+package game.management;
 import game.Main;
 import java.awt.*;
 import javax.swing.*;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import game.core.Character;
+import game.base.Character;
 import game.characters.*;
 import game.enemies.*;
 

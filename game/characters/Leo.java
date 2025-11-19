@@ -1,7 +1,7 @@
 package game.characters;
 
-import game.core.Character;
-import game.core.Skill;
+import game.base.Character;
+import game.base.Skill;
 public class Leo extends Character {
     public Leo() {
         super("Leo", 150, 80, "Stamina", "Leo was a combat medic" +

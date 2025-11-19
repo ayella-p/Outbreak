@@ -1,7 +1,7 @@
-package game.battle;
+package game.management;
 import java.awt.*;
 import javax.swing.*;
-import game.core.Character;
+import game.base.Character;
 import game.enemies.*;
 
 public class CharacterSelection {

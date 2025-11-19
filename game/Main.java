@@ -1,7 +1,7 @@
 package game;
 
 import javax.swing.SwingUtilities;
-import game.battle.GameVisuals;
+import game.management.GameVisuals;
 
 public class Main {
     public static void main(String[] args) {

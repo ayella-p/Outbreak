@@ -1,9 +1,9 @@
-package game.battle;
+package game.management;
 
-import game.core.Character;
-import game.core.Enemy;
-import game.core.Skill;
-import game.core.Boss;
+import game.base.Character;
+import game.base.Enemy;
+import game.base.Skill;
+import game.base.Boss;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
