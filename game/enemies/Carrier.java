@@ -1,6 +1,6 @@
 package game.enemies;
-import game.core.Enemy;
-import game.core.Character;
+import game.base.Enemy;
+import game.base.Character;
 public class Carrier extends Enemy {
     public Carrier() {
         super("Carrier", 50, 10, "Slow but spreads the virus.");

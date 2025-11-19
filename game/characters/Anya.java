@@ -1,7 +1,7 @@
 package game.characters;
 
-import game.core.Character;
-import game.core.Skill;
+import game.base.Character;
+import game.base.Skill;
 public class Anya extends Character {
     public Anya() {
         super("Anya", 100, 90, "Resolve", "An ex-special forces " +

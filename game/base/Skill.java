@@ -1,4 +1,4 @@
-package game.core;
+package game.base;
 public class Skill {
     public String name = "Unnamed Skill";
     public int damage = 5;

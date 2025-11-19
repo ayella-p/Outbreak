@@ -1,4 +1,4 @@
-package game.core;
+package game.base;
 public abstract class Enemy {
     public String name = "Carrier";
     public int maxHP = 100;

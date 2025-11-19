@@ -1,6 +1,6 @@
 package game.enemies.bosses;
-import game.core.Character;
-import game.core.Boss;
+import game.base.Character;
+import game.base.Boss;
 import java.util.Random;
 
 public class IronMaw extends Boss {

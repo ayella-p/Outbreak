@@ -1,7 +1,7 @@
 package game.characters;
 
-import game.core.Character;
-import game.core.Skill;
+import game.base.Character;
+import game.base.Skill;
 public class Elara extends Character {
     public Elara() {
         super("Elara", 95, 85, "Battery", "A brilliant but " +

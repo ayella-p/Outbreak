@@ -1,6 +1,6 @@
 package game.enemies;
-import game.core.Enemy;
-import game.core.Character;
+import game.base.Enemy;
+import game.base.Character;
 public class Howler extends Enemy {
     public Howler() {
         super("Howler", 100, 10 , "Disorients enemies and summons more Carriers.");
