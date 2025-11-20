@@ -28,7 +28,7 @@ public class CharacterSelection {
         gui.mainTitlePanel.add(gui.mainTitleLabel);
 
         gui.charNameLabel = new JLabel(" ");
-        gui.charNameLabel.setFont(new Font("Times New Roman", Font.BOLD, 36));
+        gui.charNameLabel.setFont(gui.titleFont.deriveFont(Font.BOLD, 36f));
         gui.charNameLabel.setForeground(new Color(50, 50, 50));
         gui.charNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -85,7 +85,7 @@ public class CharacterSelection {
     public void createCharacterSelectionButtons() {
         try {
         JButton startButton = new JButton("START MISSION");
-        startButton.setFont(new Font("Times New Roman", Font.BOLD, 24));
+        startButton.setFont(gui.titleFont.deriveFont(Font.BOLD, 24f));
         startButton.setBackground(new Color(150, 0, 0));
         startButton.setForeground(Color.WHITE);
         startButton.setEnabled(false);

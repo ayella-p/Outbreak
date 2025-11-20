@@ -28,8 +28,8 @@ public class Floor {
                 int floor = gui.currentFloor + 1;
                 for (Character c : gui.playerParty) {
                     if (c.currentHP >= 0) {
-                        int healAmount = (int) (c.maxHP * 0.25);
-                        int resourceRestore = (int) (c.maxResource * 0.25);
+                        int healAmount = (int) (c.maxHP * 0.50);
+                        int resourceRestore = (int) (c.maxResource * 0.50);
                         c.currentHP = Math.min(c.currentHP + healAmount, c.maxHP); // returns the min, and returns equals if over the maxHP
                         c.currentResource = Math.min(c.currentResource + resourceRestore, c.maxResource); // same here
                     }

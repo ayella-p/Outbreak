@@ -22,6 +22,7 @@ public class Attack {
                 gui.battleLogArea.append("[ERROR] Invalid action: Character, skill, or enemy is missing.\n");
                 return currentEnemy != null && currentEnemy.isAlive();
             }
+
             if (character.currentHP <= 0) {
                 gui.battleLogArea.append(character.name + " is knocked out and cannot act!\n");
                 character.currentResource = 0;
@@ -35,7 +36,9 @@ public class Attack {
             character.currentResource -= skill.cost;
             int damageDealt = skill.damage;
             currentEnemy.takeDamage(damageDealt);
-            gui.battleLogArea.append(character.name + " uses " + skill.name + ", dealing " + damageDealt + " damage to " + currentEnemy.name + ".\n");
+            gui.battleLogArea.append(character.name + " channels their energy and unleashes " + skill.name + "!\n");
+            gui.battleLogArea.append("The attack strikes " + currentEnemy.name + " with great force.\n");
+
             return currentEnemy.isAlive();
         } catch (Exception e) {
             System.err.println("Error resolving player action: " + e.getMessage());
@@ -56,13 +59,48 @@ public class Attack {
         Random rand = new Random();
         Character target = aliveCharacters.get(rand.nextInt(aliveCharacters.size()));
 
-        int bonusdamage = 0;
-        if(currentEnemy instanceof Boss) {
-            bonusdamage = 3;
+        if (currentEnemy instanceof Boss) {
+            performBossMove((Boss) currentEnemy, target);
+        } else {
+            performNormalEnemyMove(currentEnemy, target);
         }
+    }
 
-        int damage = currentEnemy.damage + bonusdamage;
+    private void performNormalEnemyMove(Enemy enemy, Character target) {
+        int damage = enemy.damage;
         target.takeDamage(damage);
+
+        gui.battleLogArea.append("The " + enemy.name + " lunges forward violently to "+ target.name + "!\n");
+        gui.battleLogArea.append("   >>> " + target.name + " takes " + damage + " damage!\n");
+    }
+
+    private void performBossMove(Boss boss, Character target) {
+        Random rand = new Random();
+
+        boolean canUseSkill = boss.currentMana >= 20;
+        boolean wantsToUseSkill = rand.nextInt(100) < 40; // 40% chance
+        //boss special attack
+        if (canUseSkill && wantsToUseSkill) {
+
+            // calculate Skill Damage (Random between Min and Max)
+            int range = boss.skillDamageMax - boss.skillDamageMin + 1;
+            int skillDamage = boss.skillDamageMin + rand.nextInt(range);
+
+            boss.currentMana -= 20; // 20 mana cost per skill
+            target.takeDamage(skillDamage);
+
+            gui.battleLogArea.append(boss.name + " unleashes a DEVASTATING attack on " + target.name + "!\n");
+            gui.battleLogArea.append("   >>> CATASTROPHIC HIT: " + skillDamage + " DAMAGE!\n");
+            gui.battleLogArea.append("(Boss Mana Remaining: " + boss.currentMana + ")\n");
+
+        } else {
+            // boss normal attack
+            int damage = boss.damage;
+            target.takeDamage(damage);
+
+            gui.battleLogArea.append("\nBOSS: " + boss.name + " strikes " + target.name + ".\n");
+            gui.battleLogArea.append("   -> " + target.name + " took " + damage + " damage.\n");
+        }
     }
 
     private List<Character> getAliveCharacters(List<Character> party) {
