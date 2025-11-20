@@ -1,8 +1,5 @@
 package game.base;
-public abstract class Enemy {
-    public String name = "Carrier";
-    public int maxHP = 100;
-    public int currentHP = 50;
+public abstract class Enemy extends Character{
     public String description = "A creature affected by the virus";
     public int damage = 5;
     
@@ -10,18 +7,11 @@ public abstract class Enemy {
         if(name == null) {
             throw new NullPointerException("Name is null");
         }
-        this.name = name;
-        this.maxHP = hp;
-        this.currentHP = hp;
+        super(name, hp, 100, "Stamina", description);
         this.damage = damage;
         this.description = description;
     }
-    public void takeDamage(int damage) {
-        this.currentHP -= damage;
-        if (this.currentHP < 0) {
-            this.currentHP = 0;
-        }
-    }
+
     public boolean isAlive() {
         return currentHP > 0;
     }
