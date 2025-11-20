@@ -54,7 +54,7 @@ public class Battle {
             return;
         }
 
-
+        this.activeCharacter = null;
         this.currentEnemy = enemy;
         gui.mainTitlePanel.setVisible(false);
         gui.selectionButtonsPanel.setVisible(false);
@@ -77,7 +77,7 @@ public class Battle {
         gui.battleLogArea.setText(logMsg);
 
 
-        this.activeCharacter = null;
+
         setupCharacterActionButtons(null);
     }
 
@@ -120,6 +120,7 @@ public class Battle {
                 this.activeCharacter = null;
             }
             setupCharacterActionButtons(this.activeCharacter);
+            updatePlayerStatusUI();
         } catch (IndexOutOfBoundsException e) {
             System.err.println("Specific Error: Index out of bounds during skill performance or list iteration: " + e.getLocalizedMessage());
             e.printStackTrace();
@@ -143,19 +144,39 @@ public class Battle {
     public void updatePlayerStatusUI() {
         gui.playerStatusPanel.removeAll();
         for (Character character : gui.playerParty) {
-            JPanel charPanel = new JPanel();
-            charPanel.setLayout(new BoxLayout(charPanel, BoxLayout.Y_AXIS));
+            JPanel charPanel = new JPanel(new BorderLayout());
             charPanel.setBackground(Color.BLACK);
-            charPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            charPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+            if (character == activeCharacter) {
+                charPanel.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.YELLOW, 2),
+                        BorderFactory.createEmptyBorder(10, 10, 10, 10)
+                ));
+            } else if (character.currentHP <= 0) {
+                charPanel.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.GRAY, 2),
+                        BorderFactory.createEmptyBorder(10, 10, 10, 10)
+                ));
+            } else {
+                charPanel.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.WHITE, 1),
+                        BorderFactory.createEmptyBorder(10, 10, 10, 10)
+                ));
+            }
+
+            JPanel infoPanel = new JPanel();
+            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+            infoPanel.setBackground(Color.BLACK);
 
             JLabel nameLabel = new JLabel(character.name.toUpperCase());
-            nameLabel.setFont(gui.normalFont.deriveFont(java.awt.Font.BOLD));
-            nameLabel.setForeground(Color.CYAN);
-
+            nameLabel.setFont(gui.normalFont.deriveFont(Font.BOLD, 18f));
+            nameLabel.setForeground((character == activeCharacter ? Color.YELLOW :Color.CYAN));
+            nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             JLabel hpLabel = new JLabel("HP: " + character.currentHP + " / " + character.maxHP);
             hpLabel.setFont(gui.normalFont);
             hpLabel.setForeground(Color.GREEN);
+            hpLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
             if (character.currentHP <= character.maxHP * 0.25 && character.currentHP > 0) {
                 hpLabel.setForeground(Color.RED);
             } else if (character.currentHP <= 0) {
@@ -165,55 +186,46 @@ public class Battle {
 
             JLabel resourceLabel = new JLabel(character.resourceName + ": " + character.currentResource + " / " + character.maxResource);
             resourceLabel.setFont(gui.normalFont);
-            resourceLabel.setForeground(Color.YELLOW);
+            resourceLabel.setForeground(Color.LIGHT_GRAY);
+            resourceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            charPanel.add(nameLabel);
-            charPanel.add(hpLabel);
-            charPanel.add(resourceLabel);
+            infoPanel.add(nameLabel);
+            infoPanel.add(Box.createVerticalStrut(5));
+            infoPanel.add(hpLabel);
+            infoPanel.add(Box.createVerticalStrut(5));
+            infoPanel.add(resourceLabel);
 
-            gui.playerStatusPanel.add(charPanel);
-            gui.playerStatusPanel.add(javax.swing.Box.createVerticalStrut(5));
-        }
+            charPanel.add(infoPanel, BorderLayout.CENTER);
 
-        JButton switchButton = new JButton("CHOOSE CHARACTER");
-        switchButton.setFont(gui.normalFont.deriveFont(java.awt.Font.BOLD));
-        switchButton.setBackground(Color.BLACK);
-        switchButton.setForeground(Color.WHITE);
-        switchButton.addActionListener(e -> {
-            gui.battleLogArea.append("\nChoose a character to switch to:\n");
-            gui.playerStatusPanel.remove(switchButton); // remove choose character button
+            if (character.currentHP > 0) {
+                JButton selectButton = new JButton(character == activeCharacter ? "ACTIVE" : "SELECT");
+                selectButton.setFont(gui.normalFont.deriveFont(20f));
+                selectButton.setPreferredSize(new Dimension(100, 5));
+                selectButton.setBackground(new Color(0, 100, 150));
 
-            for (Character character : gui.playerParty) {
-                if (character != activeCharacter && character.currentHP > 0) { // added a chatacter that !activecharacter and alive
-                    JButton charSwitchButton = new JButton(character.name);
-                    charSwitchButton.setFont(gui.normalFont);
-                    charSwitchButton.setBackground(new Color(60, 60, 60));
-                    charSwitchButton.setForeground(Color.WHITE);
-                    charSwitchButton.setFocusPainted(false);
-                    charSwitchButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-                    charSwitchButton.setMaximumSize(new Dimension(100, 50));
 
-                    charSwitchButton.addActionListener(ev -> {
-                        switchToCharacterTurn(character);
-                    });
-
-                    gui.playerStatusPanel.add(charSwitchButton);
+                if (character == activeCharacter) {
+                    selectButton.setEnabled(false);
+                } else {
+                    selectButton.addActionListener(e -> switchToCharacterTurn(character));
                 }
+
+                // Add button to the RIGHT side of the card
+                charPanel.add(selectButton, BorderLayout.EAST);
             }
 
-            gui.playerStatusPanel.revalidate();
-            gui.playerStatusPanel.repaint();
-        });
+            // Add the card to the main panel
+            gui.playerStatusPanel.add(charPanel);
+        }
 
-        // add choose character button here
-        gui.playerStatusPanel.add(switchButton);
+        // Refresh the UI to show changes
         gui.playerStatusPanel.revalidate();
         gui.playerStatusPanel.repaint();
     }
 
     public void switchToCharacterTurn(Character nextCharacter) {
-        updatePlayerStatusUI();
         this.activeCharacter = nextCharacter;
+        updatePlayerStatusUI();
         gui.battleLogArea.append("\n" + activeCharacter.name + "'s turn to act.\n");
         setupCharacterActionButtons(this.activeCharacter);
     }

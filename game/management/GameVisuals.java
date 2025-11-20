@@ -293,32 +293,43 @@ public class GameVisuals {
 
         panel.add(enemyPanel, BorderLayout.NORTH);
 
-        JPanel centerPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+        JPanel centerPanel = new JPanel(new GridBagLayout());
         centerPanel.setBackground(Color.DARK_GRAY);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
+        GridBagConstraints gbc = new GridBagConstraints();
         battleLogArea = new JTextArea(" ");
-        battleLogArea.setFont(normalFont);
+        battleLogArea.setFont(normalFont.deriveFont(Font.PLAIN, 20f));
         battleLogArea.setForeground(Color.LIGHT_GRAY);
         battleLogArea.setBackground(Color.BLACK);
         battleLogArea.setEditable(false);
         battleLogArea.setLineWrap(true);
-        battleLogArea.setWrapStyleWord(true); //
+        battleLogArea.setWrapStyleWord(true);
+        battleLogArea.setBorder(BorderFactory.createEmptyBorder(20, 35, 20, 20));
         JScrollPane scrollPane = new JScrollPane(battleLogArea);
-        scrollPane.setBorder(null);
-        scrollPane.setPreferredSize(new Dimension(500, 200));
-        EmptyBorder logBorder = new EmptyBorder(20, 20, 20, 20);
-        battleLogArea.setBorder(logBorder);
+        scrollPane.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        scrollPane.setPreferredSize(new Dimension(0, 0));
 
-        centerPanel.add(scrollPane);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.65; //wider
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 0, 0, 10);
+        centerPanel.add(scrollPane, gbc);
 
         playerStatusPanel = new JPanel();
-        playerStatusPanel.setLayout(new BoxLayout(playerStatusPanel, BoxLayout.Y_AXIS));
-        playerStatusPanel.setBackground(Color.BLACK);
-        EmptyBorder playerStatusBorder = new EmptyBorder(10, 10, 10, 10); // for padding/margin
-        playerStatusPanel.setBorder(playerStatusBorder);
+        playerStatusPanel.setLayout((new GridLayout(3, 1, 0, 10)));
+        playerStatusPanel.setBackground(Color.DARK_GRAY);
 
-        centerPanel.add(playerStatusPanel);
+        playerStatusPanel.setPreferredSize(new Dimension(0, 0));
+        gbc.gridx = 1;
+        gbc.weightx = 0.35; //thinner
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        centerPanel.add(playerStatusPanel, gbc);
+
+
         panel.add(centerPanel, BorderLayout.CENTER);
         panel.setBackground(Color.BLACK);
 
@@ -343,13 +354,13 @@ public class GameVisuals {
         titleLabel.setForeground(Color.GREEN);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subLabel = new JLabel("Floor " + (currentFloor) + " Cleared! Prepare for the next challenge.");
+        JLabel subLabel = new JLabel("You Cleared this level! Prepare for the next challenge.\n" );
         subLabel.setFont(normalFont.deriveFont(Font.BOLD, 24f));
         subLabel.setForeground(Color.YELLOW);
         subLabel.setName("SUB_LABEL");
         subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        String nextButtonText = (currentFloor == 4) ? "FINAL BOSS" : "FLOOR " + (currentFloor + 1);
+        String nextButtonText = (currentFloor == 4) ? "FINAL BOSS" : "NEXT LEVEL";
         JButton nextFloorButton = new JButton(nextButtonText);
         nextFloorButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
         nextFloorButton.setBackground(new Color(0, 150, 0));
