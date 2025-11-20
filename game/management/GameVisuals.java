@@ -1,6 +1,8 @@
 package game.management;
 import game.Main;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.util.ArrayList;
@@ -39,8 +41,8 @@ public class GameVisuals {
     public final static String FINAL_VICTORY_PANEL = "FINAL_VICTORY";
     public final static String GAME_OVER_PANEL = "GAME_OVER";
 
-    public Font titleFont = new Font("Courier New", Font.BOLD, 50);
-    public Font normalFont = new Font("Arial", Font.PLAIN, 16);
+    public Font titleFont;
+    public Font normalFont;
     public Color oceanBlue = new Color(0, 119, 190);
 
 
@@ -57,6 +59,8 @@ public class GameVisuals {
 
     public GameVisuals() {
         try {
+            titleFont = loadPixelFont(50f);
+            normalFont = loadPixelFont(20f);
             this.charSelectionManager = new CharacterSelection(this); // this = referencing to gamevisuals gui
             this.battleManager = new Battle(this, new Carrier()); // first floor enemy carrier
 
@@ -101,6 +105,17 @@ public class GameVisuals {
         }
     }
 
+    private Font loadPixelFont(float size) {
+        try {
+            File fontFile = new File("res/pixelfont.ttf");
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+            return customFont.deriveFont(size);
+
+        } catch (IOException | FontFormatException e) {
+            System.out.println("Could not load pixel font. Using default.");
+            return new Font("Monospaced", Font.BOLD, (int)size);
+        }
+    }
 
     public void initializeCharacters() {
         try {

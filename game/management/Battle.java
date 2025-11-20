@@ -38,7 +38,6 @@ public class Battle {
     }
 
 
-
     public void startGame(Enemy enemy) {
         // to remove dead characters
         List<Character> aliveParty = new ArrayList<>();
@@ -238,24 +237,25 @@ public class Battle {
             }
         } else {
             JLabel promptLabel;
-            if(character == null){
-                if(currentEnemy instanceof IronMaw){
+            if (character == null) {
+                if (currentEnemy instanceof IronMaw) {
                     promptLabel = new JLabel("You came across the Boss of the First Floor, select a character to take action.");
-                } else if(currentEnemy instanceof Boneclaw){
+                } else if (currentEnemy instanceof Boneclaw) {
                     promptLabel = new JLabel("Boneclaw is coming your way, quick select a character.");
-                } else if(currentEnemy instanceof DrAlcaraz){
+                } else if (currentEnemy instanceof DrAlcaraz) {
                     promptLabel = new JLabel("THE FINAL BOSS IS HERE, DEFEAT HIM!!!");
-                } else if(currentEnemy instanceof Venomshade){
+                } else if (currentEnemy instanceof Venomshade) {
                     promptLabel = new JLabel("Venomshade the third fLoor Boss is coming your way!!!");
                 } else {
                     promptLabel = new JLabel("Select a character to take action.");
                 }
-            promptLabel.setForeground(Color.RED);
-            promptLabel.setFont(gui.normalFont.deriveFont(java.awt.Font.BOLD, 18f));
-            gui.battleActionPanel.add(promptLabel);
-        }
+                promptLabel.setForeground(Color.RED);
+                promptLabel.setFont(gui.normalFont.deriveFont(java.awt.Font.BOLD, 18f));
+                gui.battleActionPanel.add(promptLabel);
+            }
 
-        gui.battleActionPanel.revalidate();
-        gui.battleActionPanel.repaint();
+            gui.battleActionPanel.revalidate();
+            gui.battleActionPanel.repaint();
+        }
     }
 }
