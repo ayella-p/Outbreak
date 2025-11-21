@@ -32,6 +32,7 @@ public class GameVisuals {
     public JPanel gameOverPanel;
 
     // card panel identifiers
+    public final static String INTRO_STORY_PANEL = "INTRO_STORY";
     public final static String TITLE_SCREEN_PANEL = "TITLE_SCREEN";
     public final static String HOW_TO_PLAY_PANEL = "HOW_TO_PLAY";
     public final static String CHARACTER_SELECT_PANEL = "CHARACTER_SELECT";
@@ -81,7 +82,7 @@ public class GameVisuals {
             cardPanel.setBackground(Color.WHITE);
             con.add(cardPanel, BorderLayout.CENTER);
 
-
+            cardPanel.add(createIntroStoryPanel(), INTRO_STORY_PANEL);
             cardPanel.add(createTitleScreenPanel(), TITLE_SCREEN_PANEL);
             cardPanel.add(createHowToPlayPanel(), HOW_TO_PLAY_PANEL);
             cardPanel.add(charSelectionManager.createCharacterSelectContainer(), CHARACTER_SELECT_PANEL);
@@ -95,7 +96,7 @@ public class GameVisuals {
             cardPanel.add(gameOverPanel, GAME_OVER_PANEL);
 
             // start screen
-            cardLayout.show(cardPanel, TITLE_SCREEN_PANEL);
+            cardLayout.show(cardPanel, INTRO_STORY_PANEL);
             window.setLocationRelativeTo(null);
             window.setVisible(true);
         } catch (Exception e) {
@@ -128,6 +129,58 @@ public class GameVisuals {
             System.err.println("Error initializing characters: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public JPanel createIntroStoryPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.BLACK);
+        panel.setBorder(new EmptyBorder(50, 50, 50, 50));
+
+        // Title and Backstory Container
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBackground(Color.BLACK);
+
+        JLabel titleLabel = new JLabel("OUTBREAK: The Story Begins", SwingConstants.CENTER);
+        titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 50f));
+        titleLabel.setForeground(Color.YELLOW);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setBorder(new EmptyBorder(0, 0, 30, 0));
+
+        // Backstory Text
+        JTextArea backstoryArea = new JTextArea(
+                " Dr.Alcaraz created a vaccine in hope to relieve the pain and all sickness, " +
+                        "for 3 years everything was fine and the drug is working well. " +
+                        "Not until Dr.Alcaraz disappeared and people who took the vaccine are " +
+                        "having strange symptoms and are dying. In response to this, a special task" +
+                        " is asked to find Dr.Alcaraz and retrieve the antidote. The only people that " +
+                        "can do that are those who didn’t take the said vaccine and those who are immune to it." +
+                        " They have found his location but there are already creatures protecting Dr.Alcaraz. "
+        );
+        backstoryArea.setFont(normalFont.deriveFont(Font.PLAIN, 22f));
+        backstoryArea.setForeground(Color.LIGHT_GRAY);
+        backstoryArea.setBackground(Color.DARK_GRAY);
+        backstoryArea.setWrapStyleWord(true);
+        backstoryArea.setLineWrap(true);
+        backstoryArea.setEditable(false);
+        backstoryArea.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+
+        // Button to proceed
+        JButton proceedButton = new JButton("PROCEED TO MISSION");
+        proceedButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
+        proceedButton.setBackground(new Color(0, 100, 150));
+        proceedButton.setForeground(Color.WHITE);
+        proceedButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        proceedButton.setPreferredSize(new Dimension(400, 70));
+        proceedButton.addActionListener(e -> showCard(TITLE_SCREEN_PANEL)); // Switch to Title Screen
+
+        contentPanel.add(titleLabel);
+        contentPanel.add(backstoryArea);
+        contentPanel.add(Box.createVerticalStrut(50));
+        contentPanel.add(proceedButton);
+
+        panel.add(contentPanel, BorderLayout.CENTER);
+        return panel;
     }
 
     // card switching
