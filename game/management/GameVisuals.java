@@ -58,6 +58,11 @@ public class GameVisuals {
     private CharacterSelection charSelectionManager;
     public Battle battleManager;
 
+    private JTextArea backstoryArea;
+    private Timer typingTimer;
+    private String fullBackstoryText;
+    private int charIndex = 0;
+
     public GameVisuals() {
         try {
             titleFont = loadPixelFont(50f);
@@ -148,15 +153,18 @@ public class GameVisuals {
         titleLabel.setBorder(new EmptyBorder(0, 0, 30, 0));
 
         // Backstory Text
-        JTextArea backstoryArea = new JTextArea(
+        fullBackstoryText =
                 " Dr.Alcaraz created a vaccine in hope to relieve the pain and all sickness, " +
                         "for 3 years everything was fine and the drug is working well. " +
                         "Not until Dr.Alcaraz disappeared and people who took the vaccine are " +
                         "having strange symptoms and are dying. In response to this, a special task" +
                         " is asked to find Dr.Alcaraz and retrieve the antidote. The only people that " +
                         "can do that are those who didn’t take the said vaccine and those who are immune to it." +
-                        " They have found his location but there are already creatures protecting Dr.Alcaraz. "
-        );
+                        " They have found his location but there are already creatures protecting Dr.Alcaraz. ";
+
+        backstoryArea = new JTextArea(); // Use the class variable
+        backstoryArea.setText(""); // Start with empty text for typing
+
         backstoryArea.setFont(normalFont.deriveFont(Font.PLAIN, 22f));
         backstoryArea.setForeground(Color.LIGHT_GRAY);
         backstoryArea.setBackground(Color.DARK_GRAY);
@@ -172,7 +180,19 @@ public class GameVisuals {
         proceedButton.setForeground(Color.WHITE);
         proceedButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         proceedButton.setPreferredSize(new Dimension(400, 70));
-        proceedButton.addActionListener(e -> showCard(TITLE_SCREEN_PANEL)); // Switch to Title Screen
+        proceedButton.addActionListener(e -> {
+            if (charIndex < fullBackstoryText.length()) {
+                // If not finished, skip the typing
+                if (typingTimer != null) {
+                    typingTimer.stop();
+                }
+                backstoryArea.setText(fullBackstoryText);
+                charIndex = fullBackstoryText.length(); // Mark as complete
+            } else {
+                // If finished, proceed
+                showCard(TITLE_SCREEN_PANEL);
+            }
+        });
 
         contentPanel.add(titleLabel);
         contentPanel.add(backstoryArea);
@@ -180,7 +200,34 @@ public class GameVisuals {
         contentPanel.add(proceedButton);
 
         panel.add(contentPanel, BorderLayout.CENTER);
+        startTypingAnimation();
         return panel;
+    }
+
+    public void startTypingAnimation() {
+
+        charIndex = 0;
+        if (backstoryArea != null) {
+            backstoryArea.setText("");
+        }
+
+        int delay = 50;
+
+        if (typingTimer != null && typingTimer.isRunning()) {
+            typingTimer.stop();
+        }
+
+        typingTimer = new Timer(delay, e -> {
+            if (charIndex < fullBackstoryText.length()) {
+                // Append the next character and scroll to the bottom
+                backstoryArea.append(String.valueOf(fullBackstoryText.charAt(charIndex)));
+                charIndex++;
+            } else {
+                typingTimer.stop();
+            }
+        });
+
+        typingTimer.start();
     }
 
     // card switching
