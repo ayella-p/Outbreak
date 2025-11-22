@@ -16,31 +16,31 @@ public class CharacterSelection {
     public JPanel createCharacterSelectContainer() {
         gui.charDisplayPanel = new JPanel();
         gui.charDisplayPanel.setLayout(new BoxLayout(gui.charDisplayPanel, BoxLayout.Y_AXIS));
-        gui.charDisplayPanel.setBackground(new Color(240, 240, 240));
+        gui.charDisplayPanel.setOpaque(false);
         gui.charDisplayPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         gui.mainTitlePanel = new JPanel();
-        gui.mainTitlePanel.setBackground(new Color(240, 240, 240));
+        gui.mainTitlePanel.setOpaque(false);
         gui.mainTitlePanel.setBorder(BorderFactory.createLineBorder(new Color(0, 100, 150), 2));
         gui.mainTitleLabel = new JLabel("CHOOSE YOUR SQUAD (0/3)");
-        gui.mainTitleLabel.setForeground(new Color(50, 50, 50));
+        gui.mainTitleLabel.setForeground(Color.WHITE);
         gui.mainTitleLabel.setFont(gui.titleFont);
         gui.mainTitlePanel.add(gui.mainTitleLabel);
 
         gui.charNameLabel = new JLabel(" ");
         gui.charNameLabel.setFont(gui.titleFont.deriveFont(Font.BOLD, 36f));
-        gui.charNameLabel.setForeground(new Color(50, 50, 50));
+        gui.charNameLabel.setForeground(Color.YELLOW);
         gui.charNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         gui.charStatsLabel = new JLabel(" ");
         gui.charStatsLabel.setFont(gui.normalFont);
-        gui.charStatsLabel.setForeground(new Color(50, 50, 50));
+        gui.charStatsLabel.setForeground(Color.CYAN);
         gui.charStatsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         gui.charBackstoryArea = new JTextArea(" ");
         gui.charBackstoryArea.setFont(gui.normalFont);
-        gui.charBackstoryArea.setForeground(new Color(50, 50, 50));
-        gui.charBackstoryArea.setBackground(new Color(240, 240, 240));
+        gui.charBackstoryArea.setForeground(Color.LIGHT_GRAY);
+        gui.charBackstoryArea.setOpaque(false);
         gui.charBackstoryArea.setWrapStyleWord(true);
         gui.charBackstoryArea.setLineWrap(true);
         gui.charBackstoryArea.setEditable(false);
@@ -50,12 +50,12 @@ public class CharacterSelection {
 
         JPanel textAreaWrapper = new JPanel();
         textAreaWrapper.setLayout(new GridBagLayout());
-        textAreaWrapper.setBackground(new Color(240, 240, 240));
+        textAreaWrapper.setOpaque(false);
         textAreaWrapper.add(gui.charBackstoryArea);
         textAreaWrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         gui.detailsButtonPanel = new JPanel();
-        gui.detailsButtonPanel.setBackground(new Color(240, 240, 240));
+        gui.detailsButtonPanel.setOpaque(false);
         gui.detailsButtonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 
@@ -69,13 +69,13 @@ public class CharacterSelection {
 
         // Container Panel
         JPanel charSelectContainer = new JPanel(new BorderLayout());
-        charSelectContainer.setBackground(new Color(240, 240, 240));
+        charSelectContainer.setOpaque(false);
         charSelectContainer.add(gui.mainTitlePanel, BorderLayout.NORTH);
         charSelectContainer.add(gui.charDisplayPanel, BorderLayout.CENTER);
 
         gui.selectionButtonsPanel = new JPanel();
         gui.selectionButtonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
-        gui.selectionButtonsPanel.setBackground(new Color(240, 240, 240));
+        gui.selectionButtonsPanel.setOpaque(false);
         createCharacterSelectionButtons();
         charSelectContainer.add(gui.selectionButtonsPanel, BorderLayout.SOUTH);
 
@@ -89,6 +89,7 @@ public class CharacterSelection {
         startButton.setBackground(new Color(150, 0, 0));
         startButton.setForeground(Color.WHITE);
         startButton.setEnabled(false);
+        startButton.setName("START_BUTTON");
         // This button initiates the game loop with the first enemy
         startButton.addActionListener(e -> {
             try {
@@ -97,7 +98,6 @@ public class CharacterSelection {
                 System.err.println("Error starting game: " + ex.getMessage());
             }
         });
-        startButton.setName("START_BUTTON");
         gui.selectionButtonsPanel.add(startButton);
 
         for (Character character : gui.availableCharacters) {
@@ -116,7 +116,7 @@ public class CharacterSelection {
                 }
             });
 
-            gui.selectionButtonsPanel.add(charButton, gui.selectionButtonsPanel.getComponentCount() - 1); // - 1 to put the Start Mission further
+            gui.selectionButtonsPanel.add(charButton, 0); // 0 to put the Start Mission further
         }
     }catch (Exception e) {
         System.err.println("Error creating character selection buttons: " + e.getMessage());
@@ -134,31 +134,32 @@ public class CharacterSelection {
     }
 
     void updateDetailsButtonPanel(Character c, JButton sourceButton) {
-    try {
-    gui.detailsButtonPanel.removeAll();
-        JButton selectButton = new JButton("SELECT " + c.name.toUpperCase());
-        selectButton.setFont(gui.normalFont.deriveFont(Font.BOLD));
-
-        if (gui.selectionCount < 3) {
-            selectButton.setForeground(Color.BLACK);
-            selectButton.addActionListener(e -> {
-                try {
-                    selectCharacter(sourceButton, c);
-                } catch (Exception ex) {
-                    System.err.println("Error in selectCharacter logic: " + ex.getMessage());
-                    ex.printStackTrace();
-                }
-            });
-            gui.detailsButtonPanel.add(selectButton);
-        } else {
+        try {
             gui.detailsButtonPanel.removeAll();
+            JButton selectButton = new JButton("SELECT " + c.name.toUpperCase());
+            selectButton.setFont(gui.normalFont.deriveFont(Font.BOLD));
+            selectButton.setBackground(new Color(0, 100, 150));
+            selectButton.setForeground(Color.WHITE);
+
+            if (gui.selectionCount < 3) {
+                selectButton.addActionListener(e -> {
+                    try {
+                        selectCharacter(sourceButton, c);
+                    } catch (Exception ex) {
+                        System.err.println("Error in selectCharacter logic: " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                });
+                gui.detailsButtonPanel.add(selectButton);
+            } else {
+                gui.detailsButtonPanel.removeAll();
+            }
+            gui.detailsButtonPanel.revalidate();
+            gui.detailsButtonPanel.repaint();
+        } catch (Exception e) {
+            System.err.println("Error updating details button panel: " + e.getMessage());
+            e.printStackTrace();
         }
-        gui.detailsButtonPanel.revalidate();
-        gui.detailsButtonPanel.repaint();
-    } catch (Exception e) {
-        System.err.println("Error updating details button panel: " + e.getMessage());
-        e.printStackTrace();
-    }
     }
 
 

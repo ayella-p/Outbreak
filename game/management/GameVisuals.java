@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -74,18 +75,23 @@ public class GameVisuals {
 
             //window
             window = new JFrame();
-            window.setSize(1000, 700);
+            window.setSize(1035, 725);
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             window.setTitle("OUTBREAK");
-            window.getContentPane().setBackground(new Color(240, 240, 240));
             window.setLayout(new BorderLayout());
             con = window.getContentPane();
 
+            BackgroundPanel bgPanel = new BackgroundPanel("res/bg.png");
+            bgPanel.setLayout(new GridBagLayout());
+            window.setContentPane(bgPanel);
+            con = window.getContentPane();
 
             cardLayout = new CardLayout();
-            cardPanel = new JPanel(cardLayout);
-            cardPanel.setBackground(Color.WHITE);
-            con.add(cardPanel, BorderLayout.CENTER);
+            cardPanel = new TranslucentPanel();
+            cardPanel.setLayout(cardLayout);
+            cardPanel.setPreferredSize(new Dimension(950, 650));
+            cardPanel.setBorder(new LineBorder(new Color(255, 255, 255, 100), 2));
+            bgPanel.add(cardPanel);
 
             cardPanel.add(createIntroStoryPanel(), INTRO_STORY_PANEL);
             cardPanel.add(createTitleScreenPanel(), TITLE_SCREEN_PANEL);
@@ -115,6 +121,8 @@ public class GameVisuals {
         try {
             File fontFile = new File("res/pixelfont.ttf");
             Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(customFont);
             return customFont.deriveFont(size);
 
         } catch (IOException | FontFormatException e) {
@@ -138,19 +146,19 @@ public class GameVisuals {
 
     public JPanel createIntroStoryPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK);
-        panel.setBorder(new EmptyBorder(50, 50, 50, 50));
+        panel.setOpaque(false);
+        panel.setBorder(new EmptyBorder(70, 50, 50, 50));
 
         // Title and Backstory Container
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBackground(Color.BLACK);
+        contentPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("OUTBREAK: The Story Begins", SwingConstants.CENTER);
         titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 50f));
         titleLabel.setForeground(Color.YELLOW);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        titleLabel.setBorder(new EmptyBorder(0, 0, 30, 0));
+        titleLabel.setBorder(new EmptyBorder(30, 0, 30, 0));
 
         // Backstory Text
         fullBackstoryText =
@@ -167,11 +175,11 @@ public class GameVisuals {
 
         backstoryArea.setFont(normalFont.deriveFont(Font.PLAIN, 22f));
         backstoryArea.setForeground(Color.LIGHT_GRAY);
-        backstoryArea.setBackground(Color.DARK_GRAY);
+        backstoryArea.setOpaque(false);
         backstoryArea.setWrapStyleWord(true);
         backstoryArea.setLineWrap(true);
         backstoryArea.setEditable(false);
-        backstoryArea.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        backstoryArea.setBorder(BorderFactory.createEmptyBorder(50, 30, 30, 30));
 
         // Button to proceed
         JButton proceedButton = new JButton("PROCEED TO MISSION");
@@ -196,7 +204,7 @@ public class GameVisuals {
 
         contentPanel.add(titleLabel);
         contentPanel.add(backstoryArea);
-        contentPanel.add(Box.createVerticalStrut(50));
+        contentPanel.add(Box.createVerticalStrut(30));
         contentPanel.add(proceedButton);
 
         panel.add(contentPanel, BorderLayout.CENTER);
@@ -240,7 +248,7 @@ public class GameVisuals {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(Color.BLACK);
-        panel.setBorder(new EmptyBorder(100, 0, 0, 0));
+        panel.setBorder(new EmptyBorder(200, 0, 0, 0));
 
         JLabel gameOverLabel = new JLabel("GAME OVER", SwingConstants.CENTER);
         gameOverLabel.setFont(titleFont.deriveFont(Font.BOLD, 80f));
@@ -249,7 +257,7 @@ public class GameVisuals {
 
         JButton backToTitleButton = new JButton("BACK TO TITLE");
         backToTitleButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        backToTitleButton.setBackground(new Color(50, 50, 50));
+        backToTitleButton.setBackground(Color.DARK_GRAY);
         backToTitleButton.setForeground(Color.WHITE);
         backToTitleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         backToTitleButton.addActionListener(e -> {
@@ -266,7 +274,7 @@ public class GameVisuals {
 
     public JPanel createTitleScreenPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
+        panel.setOpaque(false);
 
         JLabel title = new JLabel("OUTBREAK", SwingConstants.CENTER);
         title.setFont(titleFont.deriveFont(Font.BOLD, 80f));
@@ -276,32 +284,33 @@ public class GameVisuals {
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setOpaque(false);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
 
         JButton startButton = new JButton("START MISSION");
         startButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        startButton.setBackground(new Color(200, 0, 0));
         startButton.setForeground(Color.WHITE);
         startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         startButton.setFocusPainted(false);
+        startButton.setBackground(new Color(150, 0, 0));
         startButton.setMaximumSize(new Dimension(300, 70));
         startButton.addActionListener(e -> showCard(CHARACTER_SELECT_PANEL)); // Use card switch utility
 
         JButton howToPlayButton = new JButton("HOW TO PLAY");
         howToPlayButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        howToPlayButton.setBackground(new Color(0, 100, 150));
         howToPlayButton.setForeground(Color.WHITE);
+        howToPlayButton.setBackground(new Color(0, 100, 150));
         howToPlayButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         howToPlayButton.setMaximumSize(new Dimension(300, 70));
         howToPlayButton.addActionListener(e -> showCard(HOW_TO_PLAY_PANEL));
 
         JButton quitButton = new JButton("QUIT");
         quitButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        quitButton.setBackground(new Color(50, 50, 50));
+        quitButton.setFocusPainted(false);
         quitButton.setForeground(Color.WHITE);
         quitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         quitButton.setMaximumSize(new Dimension(300, 70));
+        quitButton.setBackground(Color.DARK_GRAY);
         quitButton.addActionListener(e -> System.exit(0));
 
         buttonPanel.add(startButton);
@@ -318,7 +327,7 @@ public class GameVisuals {
     public JPanel createHowToPlayPanel() {
         // body of how to play
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
+        panel.setOpaque(false);
 
         JLabel title = new JLabel("How to Play", SwingConstants.CENTER);
         title.setFont(titleFont.deriveFont(Font.BOLD, 40f));
@@ -340,8 +349,8 @@ public class GameVisuals {
 
         );
         instructionsArea.setFont(normalFont.deriveFont(Font.PLAIN, 20f));
-        instructionsArea.setForeground(new Color(50, 50, 50));
-        instructionsArea.setBackground(new Color(240, 240, 240));
+        instructionsArea.setForeground(Color.WHITE);
+        instructionsArea.setOpaque(false);
         instructionsArea.setWrapStyleWord(true);
         instructionsArea.setLineWrap(true);
         instructionsArea.setEditable(false);
@@ -355,7 +364,7 @@ public class GameVisuals {
         backButton.addActionListener(e -> showCard(TITLE_SCREEN_PANEL)); // call showcard to switch back using identifier
 
         JPanel southPanel = new JPanel();
-        southPanel.setBackground(Color.WHITE);
+        southPanel.setOpaque(false);
         southPanel.add(backButton);
         southPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
 
@@ -365,7 +374,7 @@ public class GameVisuals {
 
     public JPanel createBattlePanel(){
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.DARK_GRAY);
+        panel.setOpaque(false);
 
         enemyPanel = new JPanel();
         enemyPanel.setLayout(new BoxLayout(enemyPanel, BoxLayout.Y_AXIS));
@@ -394,20 +403,23 @@ public class GameVisuals {
         panel.add(enemyPanel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel(new GridBagLayout());
-        centerPanel.setBackground(Color.DARK_GRAY);
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        centerPanel.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
         battleLogArea = new JTextArea(" ");
         battleLogArea.setFont(normalFont.deriveFont(Font.PLAIN, 20f));
         battleLogArea.setForeground(Color.LIGHT_GRAY);
-        battleLogArea.setBackground(Color.BLACK);
+        battleLogArea.setOpaque(false);
         battleLogArea.setEditable(false);
         battleLogArea.setLineWrap(true);
         battleLogArea.setWrapStyleWord(true);
+        battleLogArea.setEditable(false);
         battleLogArea.setBorder(BorderFactory.createEmptyBorder(20, 35, 20, 20));
         JScrollPane scrollPane = new JScrollPane(battleLogArea);
-        scrollPane.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(new LineBorder(new Color(255,255,255,50)));
         scrollPane.setPreferredSize(new Dimension(0, 0));
+        scrollPane.getViewport().setScrollMode(JViewport.SIMPLE_SCROLL_MODE);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -419,7 +431,7 @@ public class GameVisuals {
 
         playerStatusPanel = new JPanel();
         playerStatusPanel.setLayout((new GridLayout(3, 1, 0, 10)));
-        playerStatusPanel.setBackground(Color.DARK_GRAY);
+        playerStatusPanel.setOpaque(false);
 
         playerStatusPanel.setPreferredSize(new Dimension(0, 0));
         gbc.gridx = 1;
@@ -431,10 +443,10 @@ public class GameVisuals {
 
 
         panel.add(centerPanel, BorderLayout.CENTER);
-        panel.setBackground(Color.BLACK);
+
 
         battleActionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        battleActionPanel.setBackground(Color.BLACK);
+        battleActionPanel.setOpaque(false);
         panel.add(battleActionPanel, BorderLayout.SOUTH);
 
         return panel;
@@ -442,12 +454,12 @@ public class GameVisuals {
 
     public JPanel createMissionCompletePanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK);
-        panel.setBorder(new EmptyBorder(50, 50, 50, 50));
+        panel.setOpaque(false);
+        panel.setBorder(new EmptyBorder(175, 50, 50, 50));
 
         JPanel centerContentPanel = new JPanel();
         centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
-        centerContentPanel.setBackground(Color.BLACK);
+        centerContentPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("MISSION SUCCESSFUL!");
         titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 60f));
@@ -484,12 +496,12 @@ public class GameVisuals {
 
     public JPanel createFinalVictoryPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(20, 20, 40));
-        panel.setBorder(new EmptyBorder(50, 50, 50, 50));
+        panel.setOpaque(false);
+        panel.setBorder(new EmptyBorder(175, 50, 50, 50));
 
         JPanel centerContentPanel = new JPanel();
         centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
-        centerContentPanel.setBackground(new Color(20, 20, 40));
+        centerContentPanel.setOpaque(false);
 
         JLabel titleLabel = new JLabel("OUTBREAK ELIMINATED!", SwingConstants.CENTER);
         titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 70f));
@@ -527,7 +539,7 @@ public class GameVisuals {
 
     public JPanel createDirectionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.BLACK);
+        panel.setOpaque(false);
 
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
@@ -572,4 +584,27 @@ public class GameVisuals {
         panel.add(choicesPanel, BorderLayout.CENTER);
         return panel;
     }
+    class BackgroundPanel extends JPanel {
+        private Image backgroundImage;
+        public BackgroundPanel(String filePath) {
+            try { backgroundImage = new ImageIcon(filePath).getImage(); } catch (Exception e) { }
+        }
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (backgroundImage != null) g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
+
+    }
+
+    class TranslucentPanel extends JPanel {
+        public TranslucentPanel() { setOpaque(false); }
+        @Override
+        protected void paintComponent(Graphics g) {
+            g.setColor(new Color(0, 0, 0, 220));
+            g.fillRect(0, 0, getWidth(), getHeight());
+            super.paintComponent(g);
+        }
+    }
+
 }
