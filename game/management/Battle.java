@@ -251,6 +251,10 @@ public class Battle {
         // Refresh the UI to show changes
         gui.playerStatusPanel.revalidate();
         gui.playerStatusPanel.repaint();
+
+        if (gui.battlePanel != null) {
+            gui.battlePanel.repaint();
+        }
     }
 
     public void switchToCharacterTurn(Character nextCharacter) {
@@ -298,6 +302,10 @@ public class Battle {
 
             gui.battleActionPanel.revalidate();
             gui.battleActionPanel.repaint();
+
+            if (gui.battlePanel != null) {
+                gui.battlePanel.repaint();
+            }
         }
     }
 }
