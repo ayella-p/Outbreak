@@ -162,13 +162,14 @@ public class GameVisuals {
 
         // Backstory Text
         fullBackstoryText =
-                " Dr.Alcaraz created a vaccine in hope to relieve the pain and all sickness, " +
-                        "for 3 years everything was fine and the drug is working well. " +
-                        "Not until Dr.Alcaraz disappeared and people who took the vaccine are " +
-                        "having strange symptoms and are dying. In response to this, a special task" +
-                        " is asked to find Dr.Alcaraz and retrieve the antidote. The only people that " +
-                        "can do that are those who didn’t take the said vaccine and those who are immune to it." +
-                        " They have found his location but there are already creatures protecting Dr.Alcaraz. ";
+                "   For three years, humanity lived in a golden age. Dr. Alcaraz’s miracle vaccine had eradicated all " +
+                        "pain and sickness, just as promised. Until it turned into a curse, mutating patients into" +
+                        " deadly creatures just as the doctor vanished. Intelligence has located his hideout, but" +
+                        " it is overrun by these monsters. Because the infection targets the vaccinated, " +
+                        "only the naturally immune can survive the zone.\n" +
+                        "\n" +
+                        "You are tasked to assemble a squad of these immune survivors to infiltrate the hideout " +
+                        "and retrieve the antidote.";
 
         backstoryArea = new JTextArea(); // Use the class variable
         backstoryArea.setText(""); // Start with empty text for typing
@@ -543,7 +544,7 @@ public class GameVisuals {
 
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-        textPanel.setBackground(Color.BLACK);
+        textPanel.setOpaque(false);
         textPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 20, 50));
 
         JLabel directionLabel = new JLabel("You have defeated the " + floorChoice + " enemy.", SwingConstants.CENTER);

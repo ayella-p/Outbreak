@@ -55,6 +55,7 @@ public class Floor {
                 } else if (currentEnemy instanceof Boss) {
                     gui.showCard(GameVisuals.MISSION_COMPLETE_PANEL);
                 } else {
+                    setupDirectionPanelUI();
                     gui.showCard(GameVisuals.DIRECTIONAL_PANEL); // regular enemy
                 }
 
