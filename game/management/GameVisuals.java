@@ -509,7 +509,7 @@ public class GameVisuals {
         titleLabel.setForeground(new Color(255, 215, 0));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subLabel = new JLabel("You have defeated Dr. Alcaraz and secured the facility!", SwingConstants.CENTER);
+        JLabel subLabel = new JLabel("You have defeated Dr. Alcaraz and acquired the antidote!\n", SwingConstants.CENTER);
         subLabel.setFont(normalFont.deriveFont(Font.BOLD, 30f));
         subLabel.setForeground(new Color(0, 255, 0));
         subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -585,27 +585,6 @@ public class GameVisuals {
         panel.add(choicesPanel, BorderLayout.CENTER);
         return panel;
     }
-    class BackgroundPanel extends JPanel {
-        private Image backgroundImage;
-        public BackgroundPanel(String filePath) {
-            try { backgroundImage = new ImageIcon(filePath).getImage(); } catch (Exception e) { }
-        }
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            if (backgroundImage != null) g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-        }
 
-    }
-
-    class TranslucentPanel extends JPanel {
-        public TranslucentPanel() { setOpaque(false); }
-        @Override
-        protected void paintComponent(Graphics g) {
-            g.setColor(new Color(0, 0, 0, 220));
-            g.fillRect(0, 0, getWidth(), getHeight());
-            super.paintComponent(g);
-        }
-    }
 
 }

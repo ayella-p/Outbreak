@@ -74,7 +74,7 @@ public class Floor {
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
         textPanel.setOpaque(false);
-        textPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 20, 50));
+        textPanel.setBorder(BorderFactory.createEmptyBorder(185, 50, 20, 50));
 
         JLabel directionLabel = new JLabel("You have defeated the enemy.", SwingConstants.CENTER);
         directionLabel.setFont(gui.titleFont.deriveFont(Font.BOLD, 35f));
@@ -95,14 +95,14 @@ public class Floor {
 
         // --- BUTTONS (No Spoilers) ---
         JButton choiceAButton = new JButton("EAST");
-        choiceAButton.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        choiceAButton.setFont(gui.titleFont.deriveFont(Font.BOLD, 30f));
         choiceAButton.setBackground(new Color(40, 40, 100));
         choiceAButton.setForeground(Color.WHITE);
         choiceAButton.setPreferredSize(new Dimension(200, 80));
         choiceAButton.addActionListener(e -> chooseDirection("A"));
 
         JButton choiceBButton = new JButton("WEST");
-        choiceBButton.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        choiceBButton.setFont(gui.titleFont.deriveFont(Font.BOLD, 30f));
         choiceBButton.setBackground(new Color(100, 40, 40));
         choiceBButton.setForeground(Color.WHITE);
         choiceBButton.setPreferredSize(new Dimension(200, 80));
@@ -147,7 +147,7 @@ public class Floor {
         gui.directionPanel.setLayout(new BorderLayout());
 
         JPanel messageContainer = new JPanel(new GridLayout(3, 1));
-        messageContainer.setBackground(Color.BLACK);
+        messageContainer.setOpaque(false);
         messageContainer.setBorder(BorderFactory.createEmptyBorder(100, 50, 50, 50));
 
         JLabel titleLabel = new JLabel("HEALING INJECTION RECEIVED", SwingConstants.CENTER);
@@ -163,7 +163,7 @@ public class Floor {
         messageContainer.add(messageLabel);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 50));
-        buttonPanel.setBackground(Color.BLACK);
+        buttonPanel.setOpaque(false);
 
         JButton nextFloorButton = new JButton("NEXT FLOOR");
         nextFloorButton.setFont(gui.titleFont.deriveFont(Font.BOLD, 30f));
