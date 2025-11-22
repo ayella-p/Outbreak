@@ -37,19 +37,39 @@ public class Battle {
         return currentEnemy;
     }
 
+    private int getMinSkillCost(Character c) {
+        int min = Integer.MAX_VALUE;
+        for (Skill s : c.skills) {
+            if (s.cost < min) min = s.cost;
+        }
+        return min;
+    }
+
+    // Checks if character is Dead OR Exhausted
+    private boolean isDefeated(Character c) {
+        if (c.currentHP <= 0) return true;
+        return c.currentResource < getMinSkillCost(c);
+    }
 
     public void startGame(Enemy enemy) {
         // to remove dead characters
-        List<Character> aliveParty = new ArrayList<>();
+        List<Character> validParty = new ArrayList<>();
         for (Character c : playerParty) {
             if (c.currentHP > 0) {
-                aliveParty.add(c);
+                validParty.add(c);
             }
         }
         playerParty.clear();
-        playerParty.addAll(aliveParty);
+        playerParty.addAll(validParty);
 
-        if (playerParty.isEmpty()) {
+        boolean anyoneCanFight = false;
+        for (Character c : playerParty) {
+            if (!isDefeated(c)) {
+                anyoneCanFight = true;
+                break;
+            }
+        }
+        if (!anyoneCanFight) {
             progressionManager.endBattle(false);
             return;
         }
@@ -102,14 +122,15 @@ public class Battle {
             enemyTurn();
 
             // Check for party wipe after enemy turn
-            List<Character> aliveCharacters = new ArrayList<>();
+            boolean squadWiped = true;
             for (Character c : playerParty) {
-                if (c.currentHP > 0) {
-                    aliveCharacters.add(c);
+                if (!isDefeated(c)) {
+                    squadWiped = false;
+                    break;
                 }
             }
 
-            if (aliveCharacters.isEmpty()) {
+            if (squadWiped) {
                 gui.battleLogArea.append("\nAll remaining squad members are defeated!\n");
                 progressionManager.endBattle(false);
                 return;
@@ -124,7 +145,6 @@ public class Battle {
         } catch (IndexOutOfBoundsException e) {
             System.err.println("Specific Error: Index out of bounds during skill performance or list iteration: " + e.getLocalizedMessage());
             e.printStackTrace();
-            gui.battleLogArea.append("\n[ERROR] Data access error encountered. Selecting new action.\n");
             setupCharacterActionButtons(null);
         }
     }
@@ -147,6 +167,10 @@ public class Battle {
             JPanel charPanel = new JPanel(new BorderLayout());
             charPanel.setBackground(Color.BLACK);
 
+            boolean isDead = character.currentHP <= 0;
+            boolean isExhausted = !isDead && character.currentResource < getMinSkillCost(character);
+            boolean isUnableToAct = isDead || isExhausted;
+
             if (character == activeCharacter) {
                 charPanel.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.YELLOW, 2),
@@ -166,7 +190,7 @@ public class Battle {
 
             JPanel infoPanel = new JPanel();
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-            infoPanel.setBackground(Color.BLACK);
+            infoPanel.setOpaque(false);
 
             JLabel nameLabel = new JLabel(character.name.toUpperCase());
             nameLabel.setFont(gui.normalFont.deriveFont(Font.BOLD, 18f));
@@ -179,10 +203,16 @@ public class Battle {
 
             if (character.currentHP <= character.maxHP * 0.25 && character.currentHP > 0) {
                 hpLabel.setForeground(Color.RED);
-            } else if (character.currentHP <= 0) {
+            }
+
+            if (isDead) {
                 hpLabel.setText("DEFEATED");
                 hpLabel.setForeground(Color.GRAY);
+            } else if (isExhausted) {
+                hpLabel.setText("EXHAUSTED");
+                hpLabel.setForeground(Color.ORANGE);
             }
+
 
             JLabel resourceLabel = new JLabel(character.resourceName + ": " + character.currentResource + " / " + character.maxResource);
             resourceLabel.setFont(gui.normalFont);
@@ -197,7 +227,7 @@ public class Battle {
 
             charPanel.add(infoPanel, BorderLayout.CENTER);
 
-            if (character.currentHP > 0) {
+            if (!isUnableToAct) {
                 JButton selectButton = new JButton(character == activeCharacter ? "ACTIVE" : "SELECT");
                 selectButton.setFont(gui.normalFont.deriveFont(20f));
                 selectButton.setPreferredSize(new Dimension(100, 5));
@@ -232,9 +262,9 @@ public class Battle {
 
     public void setupCharacterActionButtons(Character character) {
         gui.battleActionPanel.removeAll();
-        boolean isDefeatedOrExhausted = character == null || character.currentHP <= 0 || (character != null && character.currentResource < 2);// the minimum resources
+        boolean isUnabletoAct = character == null || isDefeated(character);// the minimum resources
 
-        if (!isDefeatedOrExhausted) {
+        if (!isUnabletoAct) {
             JLabel turnLabel = new JLabel(character.name.toUpperCase() + "'s Turn");
             turnLabel.setForeground(Color.YELLOW);
             turnLabel.setFont(gui.normalFont.deriveFont(Font.BOLD, 18f));
