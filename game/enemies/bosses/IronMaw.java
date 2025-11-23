@@ -10,12 +10,10 @@ public class IronMaw extends Boss {
 
     @Override
     public void useSkill(Character target) {
-        Random rand = new Random();
-        lastSkillUsed = rand.nextInt(3); 
-        
-        if (lastSkillUsed == 0) {
-            int damage = rand.nextInt(skillDamageMax - skillDamageMin + 1) + skillDamageMin;
-            target.takeDamage(damage);
+        int healAmount = 20;
+        this.currentHP += healAmount;
+        if (this.currentHP > this.maxHP) {
+            this.currentHP = this.maxHP;
         }
     }
     

@@ -60,7 +60,7 @@ public class Attack {
         Character target = aliveCharacters.get(rand.nextInt(aliveCharacters.size()));
 
         if (currentEnemy instanceof Boss) {
-            performBossMove((Boss) currentEnemy, target);
+            performBossMove((Boss)currentEnemy, target);
         } else {
             performNormalEnemyMove(currentEnemy, target);
         }
@@ -82,15 +82,11 @@ public class Attack {
         //boss special attack
         if (canUseSkill && wantsToUseSkill) {
 
-            // calculate Skill Damage (Random between Min and Max)
-            int range = boss.skillDamageMax - boss.skillDamageMin + 1;
-            int skillDamage = boss.skillDamageMin + rand.nextInt(range);
-
             boss.currentMana -= 20; // 20 mana cost per skill
-            target.takeDamage(skillDamage);
+            boss.useSkill(target);
 
             gui.battleLogArea.append(boss.name + " unleashes a DEVASTATING attack on " + target.name + "!\n");
-            gui.battleLogArea.append("   >>> CATASTROPHIC HIT: " + skillDamage + " DAMAGE!\n");
+            gui.battleLogArea.append("   >>> CATASTROPHIC HIT: BOSS USES ITS SKILL\n");
             gui.battleLogArea.append("(Boss Mana Remaining: " + boss.currentMana + ")\n");
 
         } else {
