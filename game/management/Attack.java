@@ -68,7 +68,7 @@ public class Attack {
 
     private void performNormalEnemyMove(Enemy enemy, Character target) {
         int damage = enemy.damage;
-        target.takeDamage(damage);
+        enemy.attack(target);
 
         gui.battleLogArea.append("The " + enemy.name + " lunges forward violently to "+ target.name + "!\n");
         gui.battleLogArea.append("   >>> " + target.name + " takes " + damage + " damage!\n");
@@ -92,7 +92,7 @@ public class Attack {
         } else {
             // boss normal attack
             int damage = boss.damage;
-            target.takeDamage(damage);
+            boss.attack(target);
 
             gui.battleLogArea.append("\nBOSS: " + boss.name + " strikes " + target.name + ".\n");
             gui.battleLogArea.append("   -> " + target.name + " took " + damage + " damage.\n");
