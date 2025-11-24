@@ -4,6 +4,10 @@ import game.base.Character;
 import game.base.Enemy;
 import game.base.Skill;
 import game.base.Boss;
+import game.enemies.bosses.Boneclaw;
+import game.enemies.bosses.IronMaw;
+import game.enemies.bosses.Venomshade;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -37,7 +41,7 @@ public class Attack {
             int damageDealt = skill.damage;
             currentEnemy.takeDamage(damageDealt);
             gui.battleLogArea.append(character.name + " channels their energy and unleashes " + skill.name + "!\n");
-            gui.battleLogArea.append("The attack strikes " + currentEnemy.name + " with great force.\n");
+            gui.battleLogArea.append("The attack strikes " + currentEnemy.name + " dealing "+ skill.damage+" damage.\n\n");
 
             return currentEnemy.isAlive();
         } catch (Exception e) {
@@ -71,7 +75,8 @@ public class Attack {
         enemy.attack(target);
 
         gui.battleLogArea.append("The " + enemy.name + " lunges forward violently to "+ target.name + "!\n");
-        gui.battleLogArea.append("   >>> " + target.name + " takes " + damage + " damage!\n");
+        gui.battleLogArea.append("                                          >>> " + target.name + " takes "
+                + damage + " damage!\n");
     }
 
     private void performBossMove(Boss boss, Character target) {
@@ -86,7 +91,13 @@ public class Attack {
             boss.useSkill(target);
 
             gui.battleLogArea.append(boss.name + " unleashes a DEVASTATING attack on " + target.name + "!\n");
-            gui.battleLogArea.append("   >>> CATASTROPHIC HIT: BOSS USES ITS SKILL\n");
+            if(boss instanceof Boneclaw){
+                gui.battleLogArea.append("Boneclaw drains 10 HP from " + target.name + " and absorbs it!\n");
+            } else if(boss instanceof IronMaw || boss instanceof Venomshade){
+                gui.battleLogArea.append(boss.name + " heals himself by 20 HP!");
+            } else {
+                gui.battleLogArea.append("DR. ALCAZAR USES HIS SKILL: HIT " + target.name + " by "+ boss.damage +"!\n" );
+            }
             gui.battleLogArea.append("(Boss Mana Remaining: " + boss.currentMana + ")\n");
 
         } else {
@@ -95,7 +106,8 @@ public class Attack {
             boss.attack(target);
 
             gui.battleLogArea.append("\nBOSS: " + boss.name + " strikes " + target.name + ".\n");
-            gui.battleLogArea.append("   -> " + target.name + " took " + damage + " damage.\n");
+            gui.battleLogArea.append("                                          -> " + target.name + " took " + damage +
+                    " damage.\n");
         }
     }
 
