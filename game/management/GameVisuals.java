@@ -541,48 +541,6 @@ public class GameVisuals {
     public JPanel createDirectionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
-
-        JPanel textPanel = new JPanel();
-        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-        textPanel.setOpaque(false);
-        textPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 20, 50));
-
-        JLabel directionLabel = new JLabel("You have defeated the " + floorChoice + " enemy.", SwingConstants.CENTER);
-        directionLabel.setFont(titleFont.deriveFont(Font.BOLD, 35f));
-        directionLabel.setForeground(Color.GREEN);
-        directionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel choicePromptLabel = new JLabel("Which direction will you proceed?", SwingConstants.CENTER);
-        choicePromptLabel.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        choicePromptLabel.setForeground(Color.GREEN);
-        choicePromptLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        textPanel.add(directionLabel);
-        textPanel.add(Box.createVerticalStrut(10));
-        textPanel.add(choicePromptLabel);
-
-        panel.add(textPanel, BorderLayout.NORTH);
-
-        JPanel choicesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 50));
-        choicesPanel.setBackground(Color.BLACK);
-
-        JButton choiceAButton = new JButton("EAST");
-        choiceAButton.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        choiceAButton.setBackground(new Color(40, 40, 100));
-        choiceAButton.setForeground(Color.WHITE);
-        choiceAButton.setPreferredSize(new Dimension(200, 80));
-        choiceAButton.addActionListener(e -> battleManager.progressionManager.chooseDirection("A")); //Battle.java -> Floor.java -> choosedirection method
-        choicesPanel.add(choiceAButton);
-
-        JButton choiceBButton = new JButton("WEST");
-        choiceBButton.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        choiceBButton.setBackground(new Color(100, 40, 40));
-        choiceBButton.setForeground(Color.WHITE);
-        choiceBButton.setPreferredSize(new Dimension(200, 80));
-        choiceBButton.addActionListener(e -> battleManager.progressionManager.chooseDirection("B"));
-        choicesPanel.add(choiceBButton);
-
-        panel.add(choicesPanel, BorderLayout.CENTER);
         return panel;
     }
 

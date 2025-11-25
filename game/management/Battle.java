@@ -176,7 +176,7 @@ public class Battle {
                         BorderFactory.createLineBorder(Color.YELLOW, 2),
                         BorderFactory.createEmptyBorder(10, 10, 10, 10)
                 ));
-            } else if (character.currentHP <= 0) {
+            } else if (isDead) {
                 charPanel.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.GRAY, 2),
                         BorderFactory.createEmptyBorder(10, 10, 10, 10)
