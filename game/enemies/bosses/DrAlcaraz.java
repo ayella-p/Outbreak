@@ -5,22 +5,20 @@ import java.util.Random;
 
 public class DrAlcaraz extends Boss {
     public DrAlcaraz() {
-        super("Dr. Severino Alcaraz", 250, 18, "Boss monster.", 200, 13, 20);
+        super("Dr. Severino Alcaraz", 250, 18, "Boss monster.", 200, 10, 25);
     }
 
     @Override
     public void useSkill(Character target) {
         Random rand = new Random();
-        lastSkillUsed = rand.nextInt(3);
+        damage = rand.nextInt(skillDamageMax - skillDamageMin + 1) + skillDamageMin;
 
-        if (lastSkillUsed == 0) {
-            int damage = rand.nextInt(skillDamageMax - skillDamageMin + 1) + skillDamageMin;
-            target.takeDamage(damage);
-        }
+        target.takeDamage(damage);
     }
     
     @Override
     public void attack(Character target) {
         target.takeDamage(damage);
     }
+
 }
