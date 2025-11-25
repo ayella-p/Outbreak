@@ -1,4 +1,4 @@
-package game.management;
+package game.management.panel;
 
 import java.awt.*;
 import javax.swing.*;

@@ -76,8 +76,6 @@ public class Battle {
 
         this.activeCharacter = null;
         this.currentEnemy = enemy;
-        gui.mainTitlePanel.setVisible(false);
-        gui.selectionButtonsPanel.setVisible(false);
         gui.showCard(GameVisuals.BATTLE_PANEL); // the battle panel
 
         //the upper ui
@@ -176,7 +174,7 @@ public class Battle {
                         BorderFactory.createLineBorder(Color.YELLOW, 2),
                         BorderFactory.createEmptyBorder(10, 10, 10, 10)
                 ));
-            } else if (character.currentHP <= 0) {
+            } else if (isDead) {
                 charPanel.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.GRAY, 2),
                         BorderFactory.createEmptyBorder(10, 10, 10, 10)
