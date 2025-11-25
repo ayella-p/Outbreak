@@ -76,8 +76,6 @@ public class Battle {
 
         this.activeCharacter = null;
         this.currentEnemy = enemy;
-        gui.mainTitlePanel.setVisible(false);
-        gui.selectionButtonsPanel.setVisible(false);
         gui.showCard(GameVisuals.BATTLE_PANEL); // the battle panel
 
         //the upper ui

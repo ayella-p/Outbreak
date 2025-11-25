@@ -1,10 +1,10 @@
 package game.management;
-import game.Main;
+import game.management.panel.*;
+
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +21,8 @@ public class GameVisuals {
     // cardlayout like album
     public JPanel cardPanel;
     public CardLayout cardLayout;
-    public JPanel mainTitlePanel, charDisplayPanel, selectionButtonsPanel, detailsButtonPanel;
-    public JLabel mainTitleLabel, charNameLabel, charStatsLabel;
-    public JTextArea charBackstoryArea;
+
+
     public JPanel battlePanel, enemyPanel, battleActionPanel;
     public JLabel enemyNameLabel, enemyHPLabel;
     public JTextArea battleLogArea;
@@ -56,19 +55,13 @@ public class GameVisuals {
     public final AtomicReference<Character> currentViewedCharacter = new AtomicReference<>(null);
 
     // managers
-    private CharacterSelection charSelectionManager;
     public Battle battleManager;
 
-    private JTextArea backstoryArea;
-    private Timer typingTimer;
-    private String fullBackstoryText;
-    private int charIndex = 0;
 
     public GameVisuals() {
         try {
             titleFont = loadPixelFont(50f);
-            normalFont = loadPixelFont(20f);
-            this.charSelectionManager = new CharacterSelection(this); // this = referencing to gamevisuals gui
+            normalFont = loadPixelFont(20f); // this = referencing to gamevisuals gui
             this.battleManager = new Battle(this, new Carrier()); // first floor enemy carrier
 
             initializeCharacters();
@@ -93,17 +86,17 @@ public class GameVisuals {
             cardPanel.setBorder(new LineBorder(new Color(255, 255, 255, 100), 2));
             bgPanel.add(cardPanel);
 
-            cardPanel.add(createIntroStoryPanel(), INTRO_STORY_PANEL);
-            cardPanel.add(createTitleScreenPanel(), TITLE_SCREEN_PANEL);
-            cardPanel.add(createHowToPlayPanel(), HOW_TO_PLAY_PANEL);
-            cardPanel.add(charSelectionManager.createCharacterSelectContainer(), CHARACTER_SELECT_PANEL);
-            battlePanel = createBattlePanel();
+            cardPanel.add(new IntroStoryPanel(this), INTRO_STORY_PANEL);
+            cardPanel.add(new TitleScreenPanel(this), TITLE_SCREEN_PANEL);
+            cardPanel.add(new HowToPlayPanel(this), HOW_TO_PLAY_PANEL);
+            cardPanel.add(new CharacterSelectionPanel(this), CHARACTER_SELECT_PANEL);
+            battlePanel = new BattlePanel(this);
             cardPanel.add(battlePanel, BATTLE_PANEL);
-            directionPanel = createDirectionPanel();
+            directionPanel = new DirectionPanel();
             cardPanel.add(directionPanel, DIRECTIONAL_PANEL);
-            cardPanel.add(createMissionCompletePanel(), MISSION_COMPLETE_PANEL);
-            cardPanel.add(createFinalVictoryPanel(), FINAL_VICTORY_PANEL);
-            gameOverPanel = createGameOverPanel();
+            cardPanel.add(new MissionCompletePanel(this), MISSION_COMPLETE_PANEL);
+            cardPanel.add(new FinalVictoryPanel(this), FINAL_VICTORY_PANEL);
+            gameOverPanel = new GameOverPanel(this);
             cardPanel.add(gameOverPanel, GAME_OVER_PANEL);
 
             // start screen
@@ -144,405 +137,10 @@ public class GameVisuals {
         }
     }
 
-    public JPanel createIntroStoryPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
-        panel.setBorder(new EmptyBorder(70, 50, 50, 50));
-
-        // Title and Backstory Container
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setOpaque(false);
-
-        JLabel titleLabel = new JLabel("OUTBREAK: The Story Begins", SwingConstants.CENTER);
-        titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 50f));
-        titleLabel.setForeground(Color.YELLOW);
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        titleLabel.setBorder(new EmptyBorder(30, 0, 30, 0));
-
-        // Backstory Text
-        fullBackstoryText =
-                "   For three years, humanity lived in a golden age. Dr. Alcaraz’s miracle vaccine had eradicated all " +
-                        "pain and sickness, just as promised. Until it turned into a curse, mutating patients into" +
-                        " deadly creatures just as the doctor vanished. Intelligence has located his hideout, but" +
-                        " it is overrun by these monsters. Because the infection targets the vaccinated, " +
-                        "only the naturally immune can survive the zone.\n" +
-                        "\n" +
-                        "You are tasked to assemble a squad of these immune survivors to infiltrate the hideout " +
-                        "and retrieve the antidote.";
-
-        backstoryArea = new JTextArea(); // Use the class variable
-        backstoryArea.setText(""); // Start with empty text for typing
-
-        backstoryArea.setFont(normalFont.deriveFont(Font.PLAIN, 22f));
-        backstoryArea.setForeground(Color.LIGHT_GRAY);
-        backstoryArea.setOpaque(false);
-        backstoryArea.setWrapStyleWord(true);
-        backstoryArea.setLineWrap(true);
-        backstoryArea.setEditable(false);
-        backstoryArea.setBorder(BorderFactory.createEmptyBorder(50, 30, 30, 30));
-
-        // Button to proceed
-        JButton proceedButton = new JButton("PROCEED TO MISSION");
-        proceedButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        proceedButton.setBackground(new Color(0, 100, 150));
-        proceedButton.setForeground(Color.WHITE);
-        proceedButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        proceedButton.setPreferredSize(new Dimension(400, 70));
-        proceedButton.addActionListener(e -> {
-            if (charIndex < fullBackstoryText.length()) {
-                // If not finished, skip the typing
-                if (typingTimer != null) {
-                    typingTimer.stop();
-                }
-                backstoryArea.setText(fullBackstoryText);
-                charIndex = fullBackstoryText.length(); // Mark as complete
-            } else {
-                // If finished, proceed
-                showCard(TITLE_SCREEN_PANEL);
-            }
-        });
-
-        contentPanel.add(titleLabel);
-        contentPanel.add(backstoryArea);
-        contentPanel.add(Box.createVerticalStrut(30));
-        contentPanel.add(proceedButton);
-
-        panel.add(contentPanel, BorderLayout.CENTER);
-        startTypingAnimation();
-        return panel;
-    }
-
-    public void startTypingAnimation() {
-
-        charIndex = 0;
-        if (backstoryArea != null) {
-            backstoryArea.setText("");
-        }
-
-        int delay = 50;
-
-        if (typingTimer != null && typingTimer.isRunning()) {
-            typingTimer.stop();
-        }
-
-        typingTimer = new Timer(delay, e -> {
-            if (charIndex < fullBackstoryText.length()) {
-                // Append the next character and scroll to the bottom
-                backstoryArea.append(String.valueOf(fullBackstoryText.charAt(charIndex)));
-                charIndex++;
-            } else {
-                typingTimer.stop();
-            }
-        });
-
-        typingTimer.start();
-    }
 
     // card switching
     public void showCard(String panelName) {
         cardLayout.show(cardPanel, panelName);
     }
-
-
-    public JPanel createGameOverPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.BLACK);
-        panel.setBorder(new EmptyBorder(200, 0, 0, 0));
-
-        JLabel gameOverLabel = new JLabel("GAME OVER", SwingConstants.CENTER);
-        gameOverLabel.setFont(titleFont.deriveFont(Font.BOLD, 80f));
-        gameOverLabel.setForeground(Color.RED);
-        gameOverLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JButton backToTitleButton = new JButton("BACK TO TITLE");
-        backToTitleButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        backToTitleButton.setBackground(Color.DARK_GRAY);
-        backToTitleButton.setForeground(Color.WHITE);
-        backToTitleButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        backToTitleButton.addActionListener(e -> {
-            window.dispose();
-            Main.main(new String[]{}); // restart
-        });
-
-        panel.add(gameOverLabel);
-        panel.add(Box.createVerticalStrut(50));
-        panel.add(backToTitleButton);
-        return panel;
-    }
-
-
-    public JPanel createTitleScreenPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
-
-        JLabel title = new JLabel("OUTBREAK", SwingConstants.CENTER);
-        title.setFont(titleFont.deriveFont(Font.BOLD, 80f));
-        title.setForeground(new Color(200, 0, 0));
-        title.setBorder(BorderFactory.createEmptyBorder(100, 0, 50, 0));
-        panel.add(title, BorderLayout.NORTH);
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-        buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
-
-        JButton startButton = new JButton("START MISSION");
-        startButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        startButton.setForeground(Color.WHITE);
-        startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        startButton.setFocusPainted(false);
-        startButton.setBackground(new Color(150, 0, 0));
-        startButton.setMaximumSize(new Dimension(300, 70));
-        startButton.addActionListener(e -> showCard(CHARACTER_SELECT_PANEL)); // Use card switch utility
-
-        JButton howToPlayButton = new JButton("HOW TO PLAY");
-        howToPlayButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        howToPlayButton.setForeground(Color.WHITE);
-        howToPlayButton.setBackground(new Color(0, 100, 150));
-        howToPlayButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        howToPlayButton.setMaximumSize(new Dimension(300, 70));
-        howToPlayButton.addActionListener(e -> showCard(HOW_TO_PLAY_PANEL));
-
-        JButton quitButton = new JButton("QUIT");
-        quitButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        quitButton.setFocusPainted(false);
-        quitButton.setForeground(Color.WHITE);
-        quitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        quitButton.setMaximumSize(new Dimension(300, 70));
-        quitButton.setBackground(Color.DARK_GRAY);
-        quitButton.addActionListener(e -> System.exit(0));
-
-        buttonPanel.add(startButton);
-        buttonPanel.add(Box.createVerticalStrut(20));
-        buttonPanel.add(howToPlayButton);
-        buttonPanel.add(Box.createVerticalStrut(20));
-        buttonPanel.add(quitButton);
-
-        panel.add(buttonPanel, BorderLayout.CENTER);
-        return panel;
-    }
-
-
-    public JPanel createHowToPlayPanel() {
-        // body of how to play
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
-
-        JLabel title = new JLabel("How to Play", SwingConstants.CENTER);
-        title.setFont(titleFont.deriveFont(Font.BOLD, 40f));
-        title.setForeground(new Color(0, 100, 150));
-        title.setBorder(BorderFactory.createEmptyBorder(50, 0, 30, 0));
-        panel.add(title, BorderLayout.NORTH);
-
-        JTextArea instructionsArea = new JTextArea(
-                " SETUP \n\n" +
-                        "Form Your Squad: Choose 3 unique characters.\n" +
-                        "Manage Resources: Use your character skills wisely — they cost resources!\n\n" +
-                        " GAME FLOW \n\n" +
-                        "1. Fight: Complete battles in the current level. You may face up to two enemies per level.\n" +
-                        "2. Decide: Choose a path wisely; one will lead you to the next level, and the other will lead you to the boss of the current level.\n" +
-                        "3. Win: Defeat the level enemies to advance. Win all levels to fight the Boss!\n\n" +
-                        " VICTORY CONDITION \n\n" +
-                        "WIN: Defeat the enemy squad.\n" +
-                        "LOSE: If all 3 of your squad members are defeated, it's Game Over!\n"
-
-        );
-        instructionsArea.setFont(normalFont.deriveFont(Font.PLAIN, 20f));
-        instructionsArea.setForeground(Color.WHITE);
-        instructionsArea.setOpaque(false);
-        instructionsArea.setWrapStyleWord(true);
-        instructionsArea.setLineWrap(true);
-        instructionsArea.setEditable(false);
-        instructionsArea.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
-        panel.add(instructionsArea, BorderLayout.CENTER);
-
-        JButton backButton = new JButton("BACK TO TITLE");
-        backButton.setFont(titleFont.deriveFont(Font.BOLD, 25f));
-        backButton.setBackground(new Color(0, 100, 150));
-        backButton.setForeground(Color.WHITE);
-        backButton.addActionListener(e -> showCard(TITLE_SCREEN_PANEL)); // call showcard to switch back using identifier
-
-        JPanel southPanel = new JPanel();
-        southPanel.setOpaque(false);
-        southPanel.add(backButton);
-        southPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0));
-
-        panel.add(southPanel, BorderLayout.SOUTH);
-        return panel;
-    }
-
-    public JPanel createBattlePanel(){
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
-
-        enemyPanel = new JPanel();
-        enemyPanel.setLayout(new BoxLayout(enemyPanel, BoxLayout.Y_AXIS));
-        enemyPanel.setBackground(Color.BLACK);
-        enemyPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        locationLabel = new JLabel("Level 1: Abandoned Emergency Room", SwingConstants.CENTER);
-        locationLabel.setFont(normalFont.deriveFont(Font.BOLD, 18f));
-        locationLabel.setForeground(oceanBlue);
-        locationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        enemyPanel.add(locationLabel);
-
-        enemyNameLabel = new JLabel("Enemy: ???");
-        enemyNameLabel.setFont(titleFont.deriveFont(Font.BOLD, 40f));
-        enemyNameLabel.setForeground(Color.WHITE);
-        enemyNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        enemyHPLabel = new JLabel("HP: ???");
-        enemyHPLabel.setFont(normalFont.deriveFont(Font.BOLD, 20f));
-        enemyHPLabel.setForeground(Color.RED);
-        enemyHPLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        enemyPanel.add(enemyNameLabel);
-        enemyPanel.add(enemyHPLabel);
-
-        panel.add(enemyPanel, BorderLayout.NORTH);
-
-        JPanel centerPanel = new JPanel(new GridBagLayout());
-        centerPanel.setOpaque(false);
-        GridBagConstraints gbc = new GridBagConstraints();
-        battleLogArea = new JTextArea(" ");
-        battleLogArea.setFont(normalFont.deriveFont(Font.PLAIN, 20f));
-        battleLogArea.setForeground(Color.LIGHT_GRAY);
-        battleLogArea.setOpaque(false);
-        battleLogArea.setEditable(false);
-        battleLogArea.setLineWrap(true);
-        battleLogArea.setWrapStyleWord(true);
-        battleLogArea.setEditable(false);
-        battleLogArea.setBorder(BorderFactory.createEmptyBorder(20, 35, 20, 20));
-        JScrollPane scrollPane = new JScrollPane(battleLogArea);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setBorder(new LineBorder(new Color(255,255,255,50)));
-        scrollPane.setPreferredSize(new Dimension(0, 0));
-        scrollPane.getViewport().setScrollMode(JViewport.SIMPLE_SCROLL_MODE);
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 0.65; //wider
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(0, 0, 0, 10);
-        centerPanel.add(scrollPane, gbc);
-
-        playerStatusPanel = new JPanel();
-        playerStatusPanel.setLayout((new GridLayout(3, 1, 0, 10)));
-        playerStatusPanel.setOpaque(false);
-
-        playerStatusPanel.setPreferredSize(new Dimension(0, 0));
-        gbc.gridx = 1;
-        gbc.weightx = 0.35; //thinner
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(0, 0, 0, 0);
-        centerPanel.add(playerStatusPanel, gbc);
-
-
-        panel.add(centerPanel, BorderLayout.CENTER);
-
-
-        battleActionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        battleActionPanel.setOpaque(false);
-        panel.add(battleActionPanel, BorderLayout.SOUTH);
-
-        return panel;
-    }
-
-    public JPanel createMissionCompletePanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
-        panel.setBorder(new EmptyBorder(175, 50, 50, 50));
-
-        JPanel centerContentPanel = new JPanel();
-        centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
-        centerContentPanel.setOpaque(false);
-
-        JLabel titleLabel = new JLabel("MISSION SUCCESSFUL!");
-        titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 60f));
-        titleLabel.setForeground(Color.GREEN);
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel subLabel = new JLabel("You Cleared this level! Prepare for the next challenge.\n" );
-        subLabel.setFont(normalFont.deriveFont(Font.BOLD, 24f));
-        subLabel.setForeground(Color.YELLOW);
-        subLabel.setName("SUB_LABEL");
-        subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        String nextButtonText = (currentFloor == 4) ? "FINAL BOSS" : "NEXT LEVEL";
-        JButton nextFloorButton = new JButton(nextButtonText);
-        nextFloorButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        nextFloorButton.setBackground(new Color(0, 150, 0));
-        nextFloorButton.setForeground(Color.WHITE);
-        nextFloorButton.setName("FLOOR_BUTTON");
-        nextFloorButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        nextFloorButton.setPreferredSize(new Dimension(400, 70));
-        nextFloorButton.addActionListener(e -> battleManager.progressionManager.newFloor()); // Call ProgressionManager
-
-        centerContentPanel.add(titleLabel);
-        centerContentPanel.add(Box.createVerticalStrut(20));
-        centerContentPanel.add(subLabel);
-        centerContentPanel.add(Box.createVerticalStrut(40));
-        centerContentPanel.add(nextFloorButton);
-
-        panel.add(centerContentPanel, BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    public JPanel createFinalVictoryPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
-        panel.setBorder(new EmptyBorder(175, 50, 50, 50));
-
-        JPanel centerContentPanel = new JPanel();
-        centerContentPanel.setLayout(new BoxLayout(centerContentPanel, BoxLayout.Y_AXIS));
-        centerContentPanel.setOpaque(false);
-
-        JLabel titleLabel = new JLabel("OUTBREAK ELIMINATED!", SwingConstants.CENTER);
-        titleLabel.setFont(titleFont.deriveFont(Font.BOLD, 70f));
-        titleLabel.setForeground(new Color(255, 215, 0));
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel subLabel = new JLabel("You have defeated Dr. Alcaraz and acquired the antidote!\n", SwingConstants.CENTER);
-        subLabel.setFont(normalFont.deriveFont(Font.BOLD, 30f));
-        subLabel.setForeground(new Color(0, 255, 0));
-        subLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JButton finishButton = new JButton("RETURN TO TITLE");
-        finishButton.setFont(titleFont.deriveFont(Font.BOLD, 30f));
-        finishButton.setBackground(new Color(150, 0, 0));
-        finishButton.setForeground(Color.WHITE);
-        finishButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        finishButton.setMaximumSize(new Dimension(400, 70));
-        finishButton.setPreferredSize(new Dimension(400, 70));
-
-        finishButton.addActionListener(e -> {
-            window.dispose();
-            Main.main(new String[]{}); // restart ulit
-        });
-
-        centerContentPanel.add(titleLabel);
-        centerContentPanel.add(Box.createVerticalStrut(30));
-        centerContentPanel.add(subLabel);
-        centerContentPanel.add(Box.createVerticalStrut(50));
-        centerContentPanel.add(finishButton);
-
-        panel.add(centerContentPanel, BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    public JPanel createDirectionPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
-        return panel;
-    }
-
 
 }

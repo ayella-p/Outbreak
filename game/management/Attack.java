@@ -75,7 +75,7 @@ public class Attack {
         enemy.attack(target);
 
         gui.battleLogArea.append("The " + enemy.name + " lunges forward violently to "+ target.name + "!\n");
-        gui.battleLogArea.append("                                    >>> " + target.name + " takes "
+        gui.battleLogArea.append("                                       >>> " + target.name + " takes "
                 + damage + " damage!\n");
     }
 
