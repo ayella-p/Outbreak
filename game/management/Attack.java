@@ -5,6 +5,7 @@ import game.base.Enemy;
 import game.base.Skill;
 import game.base.Boss;
 import game.enemies.bosses.Boneclaw;
+import game.enemies.bosses.DrAlcaraz;
 import game.enemies.bosses.IronMaw;
 import game.enemies.bosses.Venomshade;
 
@@ -96,6 +97,7 @@ public class Attack {
             } else if(boss instanceof IronMaw || boss instanceof Venomshade){
                 gui.battleLogArea.append(boss.name + " heals himself by 20 HP!");
             } else {
+
                 gui.battleLogArea.append("DR. ALCAZAR USES HIS SKILL: HIT " + target.name + " by "+ boss.damage +"!\n" );
             }
             gui.battleLogArea.append("(Boss Mana Remaining: " + boss.currentMana + ")\n\n");

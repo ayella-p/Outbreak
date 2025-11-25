@@ -11,16 +11,14 @@ public class DrAlcaraz extends Boss {
     @Override
     public void useSkill(Character target) {
         Random rand = new Random();
-        lastSkillUsed = rand.nextInt(3);
+        damage = rand.nextInt(skillDamageMax - skillDamageMin + 1) + skillDamageMin;
 
-        if (lastSkillUsed == 0) {
-            int damage = rand.nextInt(skillDamageMax - skillDamageMin + 1) + skillDamageMin;
-            target.takeDamage(damage);
-        }
+        target.takeDamage(damage);
     }
     
     @Override
     public void attack(Character target) {
         target.takeDamage(damage);
     }
+
 }
