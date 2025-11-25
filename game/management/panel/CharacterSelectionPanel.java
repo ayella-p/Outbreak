@@ -6,13 +6,11 @@ import game.management.GameVisuals;
 import javax.swing.*;
 import java.awt.*;
 
-// 1. Extend JPanel so this class IS the visual panel
 public class CharacterSelectionPanel extends JPanel {
 
     private final GameVisuals gui;
 
-    // 2. Move specific UI components HERE.
-    // They don't need to be in GameVisuals anymore because only this screen uses them.
+    
     private JLabel mainTitleLabel;
     private JLabel charNameLabel;
     private JLabel charStatsLabel;
@@ -25,12 +23,12 @@ public class CharacterSelectionPanel extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
 
-        // 3. The logic from 'createCharacterSelectContainer' goes into the constructor
-        initUI();
+        
+        selectionOfCharacter();
     }
 
-    private void initUI() {
-        // --- Center Panel (Character Display) ---
+    private void selectionOfCharacter() {
+        
         JPanel charDisplayPanel = new JPanel();
         charDisplayPanel.setLayout(new BoxLayout(charDisplayPanel, BoxLayout.Y_AXIS));
         charDisplayPanel.setOpaque(false);
@@ -86,11 +84,11 @@ public class CharacterSelectionPanel extends JPanel {
         charDisplayPanel.add(Box.createVerticalStrut(10));
         charDisplayPanel.add(detailsButtonPanel);
 
-        // Add to THIS panel (Since this class extends JPanel)
+        // add this to main panel
         add(mainTitlePanel, BorderLayout.NORTH);
         add(charDisplayPanel, BorderLayout.CENTER);
 
-        // --- Bottom Panel (Selection Buttons) ---
+       
         selectionButtonsPanel = new JPanel();
         selectionButtonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
         selectionButtonsPanel.setOpaque(false);
@@ -144,18 +142,16 @@ public class CharacterSelectionPanel extends JPanel {
     }
 
     public void displayCharacterDetails(Character c, JButton sourceButton) {
-        // We use the local variables now, not 'gui.charNameLabel'
         charNameLabel.setText(c.name.toUpperCase());
         charStatsLabel.setText("HP: " + c.maxHP + " | " + c.resourceName + ": " + c.maxResource);
         charBackstoryArea.setText(c.backstory);
 
-        // This is still shared data, so we keep it in gui
         gui.currentViewedCharacter.set(c);
 
         updateDetailsButtonPanel(c, sourceButton);
     }
 
-    void updateDetailsButtonPanel(Character c, JButton sourceButton) {
+     public void updateDetailsButtonPanel(Character c, JButton sourceButton) {
         try {
             detailsButtonPanel.removeAll();
             JButton selectButton = new JButton("SELECT " + c.name.toUpperCase());
