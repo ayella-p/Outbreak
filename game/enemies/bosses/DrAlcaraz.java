@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class DrAlcaraz extends Boss {
     public DrAlcaraz() {
-        super("Dr. Severino Alcaraz", 250, 18, "Boss monster.", 200, 13, 20);
+        super("Dr. Severino Alcaraz", 250, 18, "Boss monster.", 200, 10, 25);
     }
 
     @Override
