@@ -152,6 +152,7 @@ public class Battle {
         combatResolver.resolveEnemyAction(currentEnemy, playerParty);
         // update player info
         updatePlayerStatusUI();
+        updateBattleUI();
     }
 
     public void updateBattleUI() {
