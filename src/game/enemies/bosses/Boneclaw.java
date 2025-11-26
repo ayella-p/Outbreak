@@ -1,7 +1,6 @@
 package game.enemies.bosses;
 import game.base.Character;
 import game.base.Boss;
-import java.util.Random;
 
 public class Boneclaw extends Boss {
     public Boneclaw() {
