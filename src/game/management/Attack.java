@@ -5,7 +5,6 @@ import game.base.Enemy;
 import game.base.Skill;
 import game.base.Boss;
 import game.enemies.bosses.Boneclaw;
-import game.enemies.bosses.DrAlcaraz;
 import game.enemies.bosses.IronMaw;
 import game.enemies.bosses.Venomshade;
 

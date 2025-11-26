@@ -111,7 +111,7 @@ public class CharacterSelectionPanel extends JPanel {
                 try {
                     gui.battleManager.startGame(new Carrier());
                 } catch (Exception ex) {
-                    System.err.println("Error starting game: " + ex.getMessage());
+                    System.err.println("Error starting src.game: " + ex.getMessage());
                 }
             });
             selectionButtonsPanel.add(startButton);
